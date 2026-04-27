@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('prayer_requests', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('name')->nullable();
+            $table->string('email')->nullable();
+            $table->string('title');
+            $table->longText('body');
+            $table->boolean('is_public')->default(false)->index();
+            $table->boolean('is_answered')->default(false)->index();
+            $table->unsignedInteger('prayed_count')->default(0);
             $table->timestamps();
         });
     }

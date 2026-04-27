@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
     ];
 
     /**
@@ -44,6 +47,37 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
+    }
+
+    public function devotionals(): HasMany
+    {
+        return $this->hasMany(Devotional::class);
+    }
+
+    public function journalEntries(): HasMany
+    {
+        return $this->hasMany(JournalEntry::class);
+    }
+
+    public function prayerRequests(): HasMany
+    {
+        return $this->hasMany(PrayerRequest::class);
+    }
+
+    public function testimonies(): HasMany
+    {
+        return $this->hasMany(Testimony::class);
+    }
+
+    public function favoriteDevotionals(): BelongsToMany
+    {
+        return $this->belongsToMany(Devotional::class, 'devotional_favorites')->withTimestamps();
+    }
+
+    public function devotionalCompletions(): HasMany
+    {
+        return $this->hasMany(DevotionalCompletion::class);
     }
 }

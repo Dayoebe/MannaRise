@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('testimonies', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('name')->nullable();
+            $table->string('title');
+            $table->longText('body');
+            $table->boolean('is_anonymous')->default(false);
+            $table->boolean('is_approved')->default(false)->index();
             $table->timestamps();
         });
     }

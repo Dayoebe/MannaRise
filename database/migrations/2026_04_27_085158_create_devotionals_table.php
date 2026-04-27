@@ -13,6 +13,20 @@ return new class extends Migration
     {
         Schema::create('devotionals', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('devotional_category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('title');
+            $table->string('slug')->unique();
+            $table->string('bible_reference')->nullable();
+            $table->text('bible_text')->nullable();
+            $table->longText('content');
+            $table->text('reflection_question')->nullable();
+            $table->text('prayer_point')->nullable();
+            $table->text('declaration')->nullable();
+            $table->timestamp('published_at')->nullable()->index();
+            $table->boolean('is_featured')->default(false)->index();
+            $table->boolean('is_published')->default(false)->index();
+            $table->unsignedSmallInteger('reading_time')->default(5);
             $table->timestamps();
         });
     }

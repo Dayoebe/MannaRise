@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('devotional_completions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('devotional_id')->constrained()->cascadeOnDelete();
+            $table->date('completed_on')->index();
             $table->timestamps();
+
+            $table->unique(['user_id', 'devotional_id', 'completed_on']);
         });
     }
 
