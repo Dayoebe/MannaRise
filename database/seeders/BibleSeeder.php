@@ -4,10 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\BibleBook;
 use App\Models\BibleVerse;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Throwable;
 
 class BibleSeeder extends Seeder
 {
@@ -16,7 +17,22 @@ class BibleSeeder extends Seeder
      */
     public function run(): void
     {
-        $books = collect([
+        $books = $this->seedBooks();
+
+        if ($this->hasCompleteCleanKjvImport()) {
+            return;
+        }
+
+        $verses = $this->loadVersesFromLocalFile()
+            ?? $this->loadVersesFromRemoteSource()
+            ?? $this->fallbackVerses();
+
+        $this->importVerses($verses, $books);
+    }
+
+    private function seedBooks()
+    {
+        return collect([
             ['Genesis', 'Gen', 'Old Testament'], ['Exodus', 'Exod', 'Old Testament'], ['Leviticus', 'Lev', 'Old Testament'], ['Numbers', 'Num', 'Old Testament'], ['Deuteronomy', 'Deut', 'Old Testament'],
             ['Joshua', 'Josh', 'Old Testament'], ['Judges', 'Judg', 'Old Testament'], ['Ruth', 'Ruth', 'Old Testament'], ['1 Samuel', '1 Sam', 'Old Testament'], ['2 Samuel', '2 Sam', 'Old Testament'],
             ['1 Kings', '1 Kgs', 'Old Testament'], ['2 Kings', '2 Kgs', 'Old Testament'], ['1 Chronicles', '1 Chr', 'Old Testament'], ['2 Chronicles', '2 Chr', 'Old Testament'], ['Ezra', 'Ezra', 'Old Testament'],
@@ -46,27 +62,103 @@ class BibleSeeder extends Seeder
                 ],
             );
         })->keyBy('name');
+    }
 
-        if (BibleVerse::where('version', 'KJV')->count() >= 31102 && ! BibleVerse::where('version', 'KJV')->where('text', 'like', '#%')->exists()) {
-            return;
+    private function hasCompleteCleanKjvImport(): bool
+    {
+        return BibleVerse::where('version', 'KJV')->count() >= 31102
+            && ! BibleVerse::where('version', 'KJV')->where('text', 'like', '#%')->exists();
+    }
+
+    private function loadVersesFromLocalFile(): ?array
+    {
+        $paths = [
+            database_path('seeders/data/kjv-verses.json'),
+            database_path('seeders/data/verses-1769.json'),
+            storage_path('app/private/kjv-verses.json'),
+            storage_path('app/kjv-verses.json'),
+        ];
+
+        foreach ($paths as $path) {
+            if (! File::exists($path)) {
+                continue;
+            }
+
+            $content = File::get($path);
+            $decoded = json_decode($content, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded) && $decoded !== []) {
+                $this->command?->info('KJV Bible import loaded from local file: '.$path);
+
+                return $decoded;
+            }
         }
 
+        return null;
+    }
+
+    private function loadVersesFromRemoteSource(): ?array
+    {
         $url = 'https://raw.githubusercontent.com/farskipper/kjv/master/json/verses-1769.json';
-        $response = Http::timeout(60)->get($url);
 
-        if (! $response->successful()) {
-            throw new \RuntimeException('Unable to download public-domain KJV Bible JSON.');
+        try {
+            $response = Http::timeout(60)->get($url);
+
+            if ($response->successful() && is_array($response->json())) {
+                $this->command?->info('KJV Bible import loaded from remote source.');
+
+                return $response->json();
+            }
+        } catch (Throwable $exception) {
+            $this->command?->warn('Remote KJV download failed. Falling back to bundled starter verses.');
         }
 
-        $verses = $response->json();
+        return null;
+    }
+
+    private function fallbackVerses(): array
+    {
+        $this->command?->warn('Using offline-safe starter Bible verses. Add a local KJV JSON file for full offline import.');
+
+        return [
+            'Genesis 1:1' => 'In the beginning God created the heaven and the earth.',
+            'Genesis 1:2' => 'And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters.',
+            'Genesis 1:3' => 'And God said, Let there be light: and there was light.',
+            'Psalms 23:1' => 'The LORD is my shepherd; I shall not want.',
+            'Psalms 23:2' => 'He maketh me to lie down in green pastures: he leadeth me beside the still waters.',
+            'Psalms 23:3' => 'He restoreth my soul: he leadeth me in the paths of righteousness for his name\'s sake.',
+            'Psalms 23:4' => 'Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me; thy rod and thy staff they comfort me.',
+            'John 1:1' => 'In the beginning was the Word, and the Word was with God, and the Word was God.',
+            'John 1:2' => 'The same was in the beginning with God.',
+            'John 1:3' => 'All things were made by him; and without him was not any thing made that was made.',
+            'John 3:16' => 'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.',
+            'Romans 8:28' => 'And we know that all things work together for good to them that love God, to them who are the called according to his purpose.',
+            'Philippians 4:6' => 'Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.',
+            'Philippians 4:7' => 'And the peace of God, which passeth all understanding, shall keep your hearts and minds through Christ Jesus.',
+        ];
+    }
+
+    private function importVerses(array $verses, $books): void
+    {
         $sourceBookAliases = [
             "Solomon's Song" => 'Song of Solomon',
+            'Psalm' => 'Psalms',
         ];
+
         $chapterCounts = [];
         $rows = [];
         $now = now();
 
         foreach ($verses as $reference => $text) {
+            if (is_array($text)) {
+                $reference = $text['reference'] ?? null;
+                $text = $text['text'] ?? null;
+            }
+
+            if (! is_string($reference) || ! is_string($text)) {
+                continue;
+            }
+
             if (! preg_match('/^(.+) (\d+):(\d+)$/', $reference, $matches)) {
                 continue;
             }
