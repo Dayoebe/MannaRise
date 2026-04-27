@@ -20,6 +20,8 @@
 
                     <nav class="flex flex-wrap items-center gap-2 text-sm font-medium text-stone-700">
                         <a href="{{ route('devotionals.index') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('devotionals.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Devotionals</a>
+                        <a href="{{ route('bible') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('bible') ? 'bg-emerald-50 text-emerald-800' : '' }}">Bible</a>
+                        <a href="{{ route('library.index') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('library.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Library</a>
                         <a href="{{ route('prayer-requests.wall') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('prayer-requests.wall') ? 'bg-emerald-50 text-emerald-800' : '' }}">Prayer Wall</a>
                         <a href="{{ route('prayer-requests.submit') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('prayer-requests.submit') ? 'bg-emerald-50 text-emerald-800' : '' }}">Request Prayer</a>
                         <a href="{{ route('testimonies.index') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('testimonies.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Testimonies</a>

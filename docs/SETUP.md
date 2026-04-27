@@ -29,6 +29,10 @@ Seeded local accounts:
 - Admin: `admin@mannarise.test` / `password`
 - Reader: `reader@mannarise.test` / `password`
 
+The seeders also create a large starter content set: devotional categories, published devotionals, public prayer wall entries, approved testimonies, favorites, journal entries, completion history, the full public-domain KJV Bible, and a public-domain spiritual library.
+
+The Bible seeder downloads the public-domain KJV JSON source during first import, so the first `migrate --seed` needs network access.
+
 ## Testing
 
 Create a separate MySQL database for the test suite.

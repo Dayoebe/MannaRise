@@ -167,6 +167,11 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
+        $this->call([
+            BibleSeeder::class,
+            SpiritualLibrarySeeder::class,
+        ]);
+
         $this->call(MannaRiseContentSeeder::class);
     }
 }

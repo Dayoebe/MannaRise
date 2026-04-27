@@ -139,6 +139,66 @@ class MannaRiseContentSeeder extends Seeder
             );
         }
 
+        $seriesThemes = [
+            'faith' => ['Faith That Keeps Showing Up', 'Trust When Answers Delay', 'Boldness for the Next Step', 'Confidence in God\'s Character'],
+            'prayer' => ['Prayer When Words Are Few', 'Listening After Amen', 'Praying for Your City', 'Consistency in the Secret Place'],
+            'purpose' => ['Purpose in Ordinary Work', 'Surrendering Your Timeline', 'Clarity for the Next Assignment', 'Faithfulness Before Promotion'],
+            'healing' => ['Healing From Hidden Wounds', 'Hope for the Brokenhearted', 'Letting God Restore Joy', 'Strength for Recovery'],
+            'family' => ['Grace Around the Table', 'Covering Children in Prayer', 'Honoring Difficult Relatives', 'Choosing Peace at Home'],
+            'business' => ['Building With Clean Hands', 'Profit With Purpose', 'Courage for Ethical Choices', 'Serving Customers Well'],
+            'wisdom' => ['Wisdom for Hard Conversations', 'Discernment in Transition', 'Learning From Correction', 'Quietness Before Decisions'],
+            'hope' => ['Hope for a New Beginning', 'Mercy for Heavy Mornings', 'Joy After Delay', 'Expectation Without Anxiety'],
+            'forgiveness' => ['Forgiving Without Pretending', 'Mercy That Changes Memory', 'Leaving Vengeance With God', 'Receiving a Fresh Start'],
+            'leadership' => ['Serving Before Speaking', 'Carrying Influence Humbly', 'Leading Through Pressure', 'Protecting What God Entrusted'],
+            'peace' => ['Peace When Plans Change', 'A Stayed Mind', 'Rest in the Middle of Work', 'Silencing the Inner Storm'],
+            'spiritual-growth' => ['Deep Roots in Scripture', 'Obedience After Conviction', 'Growing Through Accountability', 'Formation in Hidden Seasons'],
+        ];
+
+        $references = [
+            'faith' => ['Romans 10:17', 'Mark 9:24', 'Psalm 56:3', 'Hebrews 10:23'],
+            'prayer' => ['Romans 8:26', 'Jeremiah 33:3', 'Colossians 4:2', 'Psalm 5:3'],
+            'purpose' => ['Ephesians 2:10', 'Psalm 37:5', 'Proverbs 16:3', 'Luke 16:10'],
+            'healing' => ['Isaiah 61:1', 'Psalm 34:18', 'Jeremiah 30:17', 'Isaiah 40:29'],
+            'family' => ['Joshua 24:15', 'Proverbs 22:6', 'Romans 12:18', 'Colossians 3:14'],
+            'business' => ['Micah 6:8', 'Deuteronomy 8:18', 'Proverbs 16:11', 'Matthew 5:16'],
+            'wisdom' => ['James 3:17', 'Ecclesiastes 3:1', 'Proverbs 12:1', 'Proverbs 18:13'],
+            'hope' => ['Isaiah 43:19', 'Psalm 30:5', 'Romans 12:12', '1 Peter 1:3'],
+            'forgiveness' => ['Ephesians 4:32', 'Luke 6:36', 'Romans 12:19', '2 Corinthians 5:17'],
+            'leadership' => ['John 13:14', 'Philippians 2:3', '2 Timothy 1:7', 'Proverbs 27:23'],
+            'peace' => ['John 14:27', 'Isaiah 26:3', 'Psalm 23:2', 'Mark 4:39'],
+            'spiritual-growth' => ['Colossians 2:7', 'John 14:15', 'Proverbs 27:17', '2 Peter 3:18'],
+        ];
+
+        $seriesIndex = 0;
+
+        foreach ($seriesThemes as $category => $titles) {
+            foreach ($titles as $themeIndex => $title) {
+                $reference = $references[$category][$themeIndex];
+
+                Devotional::updateOrCreate(
+                    ['slug' => Str::slug($title)],
+                    [
+                        'devotional_category_id' => $categories[$category]->id,
+                        'user_id' => $admin->id,
+                        'title' => $title,
+                        'slug' => Str::slug($title),
+                        'bible_reference' => $reference,
+                        'bible_text' => "A devotional reflection drawn from {$reference}.",
+                        'content' => "{$title} is an invitation to let God's word shape the way you think, speak, and respond today.\n\nRead the reference slowly. Notice what it reveals about God's character, then bring your current situation before Him without hiding or exaggerating. Choose one faithful action that agrees with the truth you have received.",
+                        'reflection_question' => 'Where does this truth need to move from idea to practice in my life?',
+                        'prayer_point' => 'Lord, make this word alive in me and help me obey with humility.',
+                        'declaration' => 'My life is being formed by the word and presence of God.',
+                        'published_at' => now()->subDays(($seriesIndex % 60) + 1)->setTime(6, 30),
+                        'is_featured' => false,
+                        'is_published' => true,
+                        'reading_time' => 3 + ($seriesIndex % 5),
+                    ],
+                );
+
+                $seriesIndex++;
+            }
+        }
+
         $prayers = [
             ['Healing for my mother', 'Please pray for strength, accurate diagnosis, and peace for our family while my mother receives treatment.', true, false, 34],
             ['Direction for a new job', 'I need wisdom about a job offer and courage to choose what honors God over fear.', true, false, 21],
@@ -173,6 +233,36 @@ class MannaRiseContentSeeder extends Seeder
             );
         }
 
+        $extraPrayerSubjects = [
+            'Grace for a difficult workplace', 'Protection during travel', 'Wisdom for ministry planning', 'Healing from anxiety',
+            'Provision for a new apartment', 'Strength for a caregiver', 'Breakthrough in studies', 'Peace after a medical report',
+            'Unity in a church team', 'Direction for relocation', 'Courage to forgive', 'Growth in prayer discipline',
+            'Rest for a tired pastor', 'Financial wisdom for a family', 'Hope while waiting for results', 'A child returning to faith',
+            'Comfort after disappointment', 'Discipline for daily devotion', 'Favor in a legal process', 'Healing for a friendship',
+        ];
+
+        foreach ($extraPrayerSubjects as $index => $title) {
+            $reader = $readers[$index % $readers->count()];
+            $answered = $index % 6 === 0;
+
+            PrayerRequest::updateOrCreate(
+                ['title' => $title],
+                [
+                    'user_id' => $reader->id,
+                    'name' => $reader->name,
+                    'email' => $reader->email,
+                    'body' => $answered
+                        ? 'This prayer has seen encouraging progress. Please join us in giving thanks and praying for continued strength.'
+                        : 'Please stand with me in prayer for wisdom, peace, provision, and a heart that stays faithful through this season.',
+                    'is_public' => true,
+                    'is_answered' => $answered,
+                    'prayed_count' => 8 + ($index * 3),
+                    'created_at' => now()->subDays($index + 4),
+                    'updated_at' => now()->subDays($index + 2),
+                ],
+            );
+        }
+
         $testimonies = [
             ['God met me in prayer', 'I started praying before checking my phone each morning, and my anxiety has been quieter. The change has been simple but deep.', false, true],
             ['A job came through', 'After weeks of applications and discouragement, God opened a role that fits my gifts and gives space for family.', false, true],
@@ -199,6 +289,31 @@ class MannaRiseContentSeeder extends Seeder
                     'is_approved' => $approved,
                     'created_at' => now()->subDays($index + 2),
                     'updated_at' => now()->subDays($index + 1),
+                ],
+            );
+        }
+
+        $extraTestimonies = [
+            'God restored my consistency', 'Peace before surgery', 'A reconciled friendship', 'Provision for school needs',
+            'Freedom from bitterness', 'Renewed hunger for Scripture', 'Guidance in a business decision', 'Strength during grief',
+            'Prayer became honest again', 'A family altar restarted', 'Courage to apologize', 'Hope after a failed plan',
+            'A new job with better rhythm', 'Healing in my emotions', 'A testimony from the prayer wall', 'God met me in silence',
+            'Financial discipline returned', 'A fresh start in leadership', 'Confidence to serve again', 'Joy in a waiting season',
+        ];
+
+        foreach ($extraTestimonies as $index => $title) {
+            $reader = $readers[$index % $readers->count()];
+
+            Testimony::updateOrCreate(
+                ['title' => $title],
+                [
+                    'user_id' => $reader->id,
+                    'name' => $reader->name,
+                    'body' => 'This testimony began with a small step of faith. Through prayer, Scripture, and steady obedience, I saw God bring peace and practical help in a way I could not have arranged on my own.',
+                    'is_anonymous' => $index % 5 === 0,
+                    'is_approved' => $index % 7 !== 0,
+                    'created_at' => now()->subDays($index + 6),
+                    'updated_at' => now()->subDays($index + 3),
                 ],
             );
         }
