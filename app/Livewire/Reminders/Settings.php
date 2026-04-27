@@ -16,7 +16,7 @@ class Settings extends Component
 
     public function mount(): void
     {
-        $reminder = auth()->user()->devotionalReminders()->first();
+        $reminder = DevotionalReminder::where('user_id', auth()->id())->first();
 
         if (! $reminder) {
             return;
