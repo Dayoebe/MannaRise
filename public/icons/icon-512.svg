@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="MannaRise icon">
+  <rect width="512" height="512" rx="112" fill="#047857"/>
+  <circle cx="256" cy="256" r="154" fill="#ecfdf5"/>
+  <path d="M256 112c27 67 67 107 134 134-67 27-107 67-134 154-27-87-67-127-134-154 67-27 107-67 134-134Z" fill="#f59e0b"/>
+  <path d="M256 186c14 35 35 56 70 70-35 14-56 35-70 70-14-35-35-56-70-70 35-14 56-35 70-70Z" fill="#047857"/>
+</svg>
