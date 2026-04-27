@@ -6,6 +6,7 @@ use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\Devotionals as AdminDevotionals;
 use App\Livewire\Admin\Engagement as AdminEngagement;
 use App\Livewire\Admin\PrayerRequests as AdminPrayerRequests;
+use App\Livewire\Admin\Roles as AdminRoles;
 use App\Livewire\Admin\Testimonies as AdminTestimonies;
 use App\Livewire\AudioDevotionals\Index as AudioDevotionalIndex;
 use App\Livewire\Auth\Login;
@@ -69,4 +70,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/prayer-requests', AdminPrayerRequests::class)->name('prayer-requests');
     Route::get('/testimonies', AdminTestimonies::class)->name('testimonies');
     Route::get('/engagement', AdminEngagement::class)->name('engagement');
+    Route::get('/roles', AdminRoles::class)->middleware('permission:manage-roles')->name('roles');
 });
