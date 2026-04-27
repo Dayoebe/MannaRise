@@ -46,6 +46,16 @@
 
                     <div class="flex shrink-0 items-center gap-2">
                         @auth
+                            <a href="{{ route('dashboard') }}" class="btn-secondary px-3" title="Dashboard">
+                                <x-ui.icon name="layout-dashboard" class="h-4 w-4" />
+                                <span class="hidden sm:inline">Dashboard</span>
+                            </a>
+                            @if (auth()->user()->hasAdminAccess())
+                                <a href="{{ route('admin.dashboard') }}" class="btn-secondary px-3" title="Admin">
+                                    <x-ui.icon name="shield" class="h-4 w-4" />
+                                    <span class="hidden sm:inline">{{ auth()->user()->is_super_admin ? 'Super Admin' : 'Admin' }}</span>
+                                </a>
+                            @endif
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="btn-secondary px-3" title="Log out">
@@ -66,7 +76,7 @@
                     </div>
                 </div>
 
-                <nav class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3 lg:flex lg:flex-wrap">
+                <nav class="hidden gap-2 text-sm lg:flex lg:flex-wrap">
                     <a href="{{ route('devotionals.index') }}" class="nav-pill {{ request()->routeIs('devotionals.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="sparkles" class="h-4 w-4" /> Devotionals</a>
                     <a href="{{ route('bible') }}" class="nav-pill {{ request()->routeIs('bible') ? 'nav-pill-active' : '' }}"><x-ui.icon name="book-open" class="h-4 w-4" /> Bible</a>
                     <a href="{{ route('library.index') }}" class="nav-pill {{ request()->routeIs('library.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="library" class="h-4 w-4" /> Library</a>
@@ -75,17 +85,17 @@
                     <a href="{{ route('testimonies.index') }}" class="nav-pill {{ request()->routeIs('testimonies.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="message-circle" class="h-4 w-4" /> Testimonies</a>
                     @auth
                         <a href="{{ route('dashboard') }}" class="nav-pill {{ request()->routeIs('dashboard') || request()->routeIs('journal.*') || request()->routeIs('favorites.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="layout-dashboard" class="h-4 w-4" /> Dashboard</a>
-                        @if (auth()->user()->is_admin)
+                        @if (auth()->user()->hasAdminAccess())
                             <a href="{{ route('admin.dashboard') }}" class="nav-pill {{ request()->routeIs('admin.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="shield" class="h-4 w-4" /> Admin</a>
                         @endif
                     @endauth
                 </nav>
 
                 @auth
-                    <nav class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3 lg:flex lg:flex-wrap">
+                    <nav class="hidden gap-2 text-sm lg:flex lg:flex-wrap">
                         <a href="{{ route('journal.index') }}" class="subnav-pill {{ request()->routeIs('journal.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="journal" class="h-4 w-4" /> Journal</a>
                         <a href="{{ route('favorites.index') }}" class="subnav-pill {{ request()->routeIs('favorites.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bookmark" class="h-4 w-4" /> Favorites</a>
-                        @if (auth()->user()->is_admin)
+                        @if (auth()->user()->hasAdminAccess())
                             <a href="{{ route('admin.categories') }}" class="subnav-pill {{ request()->routeIs('admin.categories') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bookmark" class="h-4 w-4" /> Categories</a>
                             <a href="{{ route('admin.devotionals') }}" class="subnav-pill {{ request()->routeIs('admin.devotionals') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="sparkles" class="h-4 w-4" /> Devotionals</a>
                             <a href="{{ route('admin.prayer-requests') }}" class="subnav-pill {{ request()->routeIs('admin.prayer-requests') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="heart" class="h-4 w-4" /> Requests</a>
@@ -97,7 +107,7 @@
             </div>
         </header>
 
-        <main class="mx-auto w-full max-w-7xl flex-1 px-3 py-5 sm:px-5 sm:py-8 lg:px-8">
+        <main class="mx-auto w-full max-w-7xl flex-1 px-3 pb-36 pt-5 sm:px-5 sm:pt-8 lg:px-8 lg:pb-8">
             @if (session('status'))
                 <div class="mb-6 app-surface flex items-center gap-2 border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-900">
                     <x-ui.icon name="sparkles" class="h-4 w-4" /> {{ session('status') }}
@@ -106,6 +116,35 @@
 
             {{ $slot }}
         </main>
+
+        <nav class="mobile-bottom-nav">
+            <div class="mx-auto grid max-w-md grid-cols-3 gap-2">
+                <a href="{{ route('devotionals.index') }}" class="mobile-tab {{ request()->routeIs('devotionals.*') ? 'mobile-tab-active' : '' }}">
+                    <x-ui.icon name="sparkles" />
+                    <span>Devotionals</span>
+                </a>
+                <a href="{{ route('bible') }}" class="mobile-tab {{ request()->routeIs('bible') ? 'mobile-tab-active' : '' }}">
+                    <x-ui.icon name="book-open" />
+                    <span>Bible</span>
+                </a>
+                <a href="{{ route('library.index') }}" class="mobile-tab {{ request()->routeIs('library.*') ? 'mobile-tab-active' : '' }}">
+                    <x-ui.icon name="library" />
+                    <span>Library</span>
+                </a>
+                <a href="{{ route('prayer-requests.wall') }}" class="mobile-tab {{ request()->routeIs('prayer-requests.wall') ? 'mobile-tab-active' : '' }}">
+                    <x-ui.icon name="heart" />
+                    <span>Prayer</span>
+                </a>
+                <a href="{{ route('prayer-requests.submit') }}" class="mobile-tab {{ request()->routeIs('prayer-requests.submit') ? 'mobile-tab-active' : '' }}">
+                    <x-ui.icon name="send" />
+                    <span>Request</span>
+                </a>
+                <a href="{{ route('testimonies.index') }}" class="mobile-tab {{ request()->routeIs('testimonies.*') ? 'mobile-tab-active' : '' }}">
+                    <x-ui.icon name="message-circle" />
+                    <span>Testimonies</span>
+                </a>
+            </div>
+        </nav>
 
         <footer class="border-t border-slate-200 bg-white">
             <div class="mx-auto flex max-w-7xl flex-col gap-4 px-3 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-5 lg:px-8">

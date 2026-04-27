@@ -23,7 +23,12 @@ class MannaRiseContentSeeder extends Seeder
     {
         $admin = User::firstOrCreate(
             ['email' => 'admin@mannarise.test'],
-            ['name' => 'MannaRise Admin', 'password' => 'password', 'is_admin' => true],
+            ['name' => 'MannaRise Admin', 'password' => 'password', 'is_admin' => true, 'is_super_admin' => false],
+        );
+
+        User::updateOrCreate(
+            ['email' => 'super@admin.com'],
+            ['name' => 'MannaRise Super Admin', 'password' => '9638', 'is_admin' => true, 'is_super_admin' => true],
         );
 
         $readers = collect([
@@ -34,7 +39,7 @@ class MannaRiseContentSeeder extends Seeder
             ['name' => 'Ruth Peace', 'email' => 'ruth@mannarise.test'],
         ])->map(fn (array $reader) => User::updateOrCreate(
             ['email' => $reader['email']],
-            ['name' => $reader['name'], 'password' => 'password', 'is_admin' => false],
+            ['name' => $reader['name'], 'password' => 'password', 'is_admin' => false, 'is_super_admin' => false],
         ));
 
         $categories = collect([
