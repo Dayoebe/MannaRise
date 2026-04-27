@@ -1,11 +1,13 @@
 <?php
 
+use App\Livewire\Admin\AudioDevotionals as AdminAudioDevotionals;
 use App\Livewire\Admin\Categories as AdminCategories;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\Devotionals as AdminDevotionals;
 use App\Livewire\Admin\Engagement as AdminEngagement;
 use App\Livewire\Admin\PrayerRequests as AdminPrayerRequests;
 use App\Livewire\Admin\Testimonies as AdminTestimonies;
+use App\Livewire\AudioDevotionals\Index as AudioDevotionalIndex;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Bible\Reader as BibleReader;
@@ -32,6 +34,7 @@ Route::get('/library', LibraryIndex::class)->name('library.index');
 Route::get('/library/{slug}/{chapter?}', LibraryShow::class)->name('library.show');
 Route::get('/devotionals', DevotionalIndex::class)->name('devotionals.index');
 Route::get('/devotionals/{slug}', DevotionalShow::class)->name('devotionals.show');
+Route::get('/audio-devotionals', AudioDevotionalIndex::class)->name('audio-devotionals.index');
 Route::get('/prayer-request', SubmitPrayerRequest::class)->name('prayer-requests.submit');
 Route::get('/prayer-wall', PrayerWall::class)->name('prayer-requests.wall');
 Route::get('/testimonies', TestimonyIndex::class)->name('testimonies.index');
@@ -62,6 +65,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/', AdminDashboard::class)->name('dashboard');
     Route::get('/categories', AdminCategories::class)->name('categories');
     Route::get('/devotionals', AdminDevotionals::class)->name('devotionals');
+    Route::get('/audio-devotionals', AdminAudioDevotionals::class)->name('audio-devotionals');
     Route::get('/prayer-requests', AdminPrayerRequests::class)->name('prayer-requests');
     Route::get('/testimonies', AdminTestimonies::class)->name('testimonies');
     Route::get('/engagement', AdminEngagement::class)->name('engagement');
