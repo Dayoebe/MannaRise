@@ -22,7 +22,22 @@ Recommended database name: `mannarise`
 
 Create the database in your preferred MySQL tool, then run migrations.
 
-`php artisan migrate`
+`php artisan migrate --seed`
+
+Seeded local accounts:
+
+- Admin: `admin@mannarise.test` / `password`
+- Reader: `reader@mannarise.test` / `password`
+
+## Testing
+
+Create a separate MySQL database for the test suite.
+
+`mysql -h127.0.0.1 -uroot -e "CREATE DATABASE IF NOT EXISTS mannarise_testing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"`
+
+Run the tests.
+
+`php artisan test`
 
 ## Development Server
 

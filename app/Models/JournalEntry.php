@@ -35,4 +35,3 @@ class JournalEntry extends Model
         return $this->belongsTo(Devotional::class);
     }
 }
-}
