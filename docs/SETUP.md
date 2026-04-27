@@ -29,9 +29,24 @@ Seeded local accounts:
 - Admin: `admin@mannarise.test` / `password`
 - Reader: `reader@mannarise.test` / `password`
 
-The seeders also create a large starter content set: devotional categories, published devotionals, public prayer wall entries, approved testimonies, favorites, journal entries, completion history, the full public-domain KJV Bible, and a public-domain spiritual library.
+The seeders create devotional categories, published devotionals, public prayer wall entries, approved testimonies, favorites, journal entries, completion history, Bible reader records, and a public-domain spiritual library.
 
-The Bible seeder downloads the public-domain KJV JSON source during first import, so the first `migrate --seed` needs network access.
+## Offline-safe Bible import
+
+The Bible seeder now works safely with or without internet access.
+
+Preferred full import options:
+
+- Put a KJV JSON file at `database/seeders/data/kjv-verses.json`
+- Or put it at `database/seeders/data/verses-1769.json`
+- Or put it at `storage/app/private/kjv-verses.json`
+- Or put it at `storage/app/kjv-verses.json`
+
+When a local file is found, the seeder imports from it first.
+
+When no local file is available, the seeder tries the remote public-domain KJV JSON source.
+
+When both local and remote sources are unavailable, the seeder no longer fails. It imports a small starter set of Bible verses so the app can still run offline.
 
 ## Testing
 
