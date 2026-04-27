@@ -9,7 +9,7 @@
         </div>
         <div class="flex flex-col gap-4 p-5 sm:p-6 md:flex-row md:items-end md:justify-between">
             <div>
-                <p class="app-eyebrow border-fuchsia-200 bg-fuchsia-50 text-fuchsia-900"><x-ui.icon name="message-circle" class="h-4 w-4" /> 🌈 Moderation</p>
+                <p class="app-eyebrow border-fuchsia-200 bg-fuchsia-50 text-fuchsia-900"><x-ui.icon name="message-circle" class="h-4 w-4" /> Moderation</p>
                 <h1 class="mt-3 app-section-title">Moderate testimonies</h1>
                 <p class="mt-2 text-sm text-slate-600">Approve testimonies before they appear publicly.</p>
             </div>
@@ -26,7 +26,7 @@
             <article class="app-panel border-t-4 {{ $testimony->is_approved ? 'border-t-emerald-500' : 'border-t-amber-400' }}">
                 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div>
-                        <span class="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-normal {{ $testimony->is_approved ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900' }}">{{ $testimony->is_approved ? 'Approved ✅' : 'Pending 🌟' }}</span>
+                        <span class="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-normal {{ $testimony->is_approved ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900' }}">{{ $testimony->is_approved ? 'Approved' : 'Pending' }}</span>
                         <h2 class="mt-3 text-lg font-black tracking-normal text-slate-950">{{ $testimony->title }}</h2>
                         <p class="mt-1 text-sm font-bold text-slate-500">{{ $testimony->is_anonymous ? 'Anonymous' : ($testimony->name ?: 'MannaRise reader') }}</p>
                     </div>

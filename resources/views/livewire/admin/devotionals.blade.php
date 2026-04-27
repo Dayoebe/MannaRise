@@ -9,7 +9,7 @@
             <span class="bg-violet-500"></span>
         </div>
         <div class="p-5 sm:p-6">
-            <p class="app-eyebrow border-amber-200 bg-amber-50 text-amber-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> ✍️ Admin devotionals</p>
+            <p class="app-eyebrow border-amber-200 bg-amber-50 text-amber-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> Admin devotionals</p>
             <h1 class="mt-3 app-section-title">Manage devotionals</h1>
             <p class="mt-2 text-sm text-slate-600">Create, publish, feature, and edit devotional content.</p>
         </div>
@@ -94,11 +94,11 @@
         <div class="mt-5 flex flex-wrap items-center gap-4">
             <label class="flex items-center gap-2 rounded-xl border border-amber-200 bg-white px-3 py-3 text-sm font-bold text-slate-700">
                 <input type="checkbox" wire:model="is_published" class="rounded border-amber-300 text-amber-700 focus:ring-amber-600">
-                Published ✅
+                <x-ui.icon name="sparkles" class="h-4 w-4" /> Published
             </label>
             <label class="flex items-center gap-2 rounded-xl border border-amber-200 bg-white px-3 py-3 text-sm font-bold text-slate-700">
                 <input type="checkbox" wire:model="is_featured" class="rounded border-amber-300 text-amber-700 focus:ring-amber-600">
-                Featured 🌟
+                <x-ui.icon name="star" class="h-4 w-4" /> Featured
             </label>
             <button type="submit" class="btn-primary bg-amber-600 text-slate-950 hover:bg-amber-500">Save devotional</button>
         </div>
@@ -106,7 +106,7 @@
 
     <section>
         <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <h2 class="text-2xl font-black tracking-normal text-slate-950">Devotional library ✨</h2>
+            <h2 class="text-2xl font-black tracking-normal text-slate-950">Devotional library</h2>
             <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search titles" class="field-input max-w-md border-amber-300 focus:border-amber-600 focus:ring-amber-100">
         </div>
 

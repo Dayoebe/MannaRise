@@ -10,18 +10,18 @@
         </div>
         <div class="flex flex-col gap-4 p-5 sm:p-6 md:flex-row md:items-end md:justify-between">
             <div>
-                <p class="app-eyebrow border-blue-200 bg-blue-50 text-blue-900"><x-ui.icon name="bar-chart" class="h-4 w-4" /> 📊 Engagement</p>
+                <p class="app-eyebrow border-blue-200 bg-blue-50 text-blue-900"><x-ui.icon name="bar-chart" class="h-4 w-4" /> Engagement</p>
                 <h1 class="mt-3 app-section-title">Engagement summary</h1>
                 <p class="mt-2 text-sm text-slate-600">User activity, completion counts, and top devotionals.</p>
             </div>
             <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-black text-emerald-900 shadow-sm">
-                ✅ {{ $completionCountThisWeek }} completions this week
+                 {{ $completionCountThisWeek }} completions this week
             </div>
         </div>
     </div>
 
     <section class="app-panel border-emerald-200">
-        <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="sparkles" class="h-5 w-5 text-emerald-800" /> Top devotionals ✨</h2>
+        <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="sparkles" class="h-5 w-5 text-emerald-800" /> Top devotionals</h2>
         <div class="mt-4 grid gap-3 md:grid-cols-2">
             @forelse ($topDevotionals as $devotional)
                 <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-4">

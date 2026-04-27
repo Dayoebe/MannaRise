@@ -8,11 +8,11 @@
             <span class="bg-emerald-500"></span>
         </div>
         <div class="p-5 sm:p-6">
-            <p class="app-eyebrow border-fuchsia-200 bg-fuchsia-50 text-fuchsia-900"><x-ui.icon name="message-circle" class="h-4 w-4" /> 🌈 Share testimony</p>
+            <p class="app-eyebrow border-fuchsia-200 bg-fuchsia-50 text-fuchsia-900"><x-ui.icon name="message-circle" class="h-4 w-4" /> Share testimony</p>
             <h1 class="mt-3 app-section-title">Share testimony</h1>
             <p class="mt-3 text-sm leading-6 text-slate-600">
             Testimonies are reviewed before appearing publicly so the community can be encouraged with care.
-            </p>
+</p>
         </div>
     </section>
 
@@ -37,7 +37,7 @@
 
         <label class="mt-4 flex items-center gap-2 rounded-xl border border-fuchsia-200 bg-white px-3 py-3 text-sm font-bold text-slate-700">
             <input type="checkbox" wire:model="is_anonymous" class="rounded border-fuchsia-300 text-fuchsia-700 focus:ring-fuchsia-600">
-            Keep my name anonymous publicly 🌟
+            <x-ui.icon name="shield" class="h-4 w-4" /> Keep my name anonymous publicly
         </label>
 
         <button type="submit" class="mt-6 btn-primary w-full bg-fuchsia-700 hover:bg-fuchsia-800 sm:w-auto"><x-ui.icon name="send" class="h-4 w-4" /> Submit testimony</button>

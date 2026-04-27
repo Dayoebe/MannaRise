@@ -11,7 +11,7 @@
         </div>
         <div class="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30rem)] lg:items-end">
             <div>
-                <p class="app-eyebrow border-amber-200 bg-amber-50 text-amber-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> ✨ Devotionals</p>
+                <p class="app-eyebrow border-amber-200 bg-amber-50 text-amber-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> Devotionals</p>
                 <h1 class="mt-3 app-section-title">Devotionals</h1>
                 <p class="mt-2 text-sm leading-6 text-slate-600">Search, filter, and keep growing one reading at a time.</p>
             </div>
@@ -22,7 +22,7 @@
                     <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search devotionals" class="field-input border-amber-300 focus:border-amber-600 focus:ring-amber-100">
                 </label>
                 <label class="block">
-                    <span class="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700">🌿 Topic</span>
+                    <span class="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="bookmark" class="h-4 w-4 text-amber-700" /> Topic</span>
                     <select wire:model.live="category" class="field-input border-amber-300 focus:border-amber-600 focus:ring-amber-100">
                         <option value="">All topics</option>
                         @foreach ($categories as $category)
@@ -38,12 +38,12 @@
         @forelse ($devotionals as $devotional)
             <article class="app-panel border-t-4 border-t-amber-400 hover:border-amber-300 even:border-t-emerald-500">
                 <div class="flex items-center justify-between gap-3">
-                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-emerald-900">🌿 {{ $devotional->category?->name }}</span>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-emerald-900"><x-ui.icon name="bookmark" class="h-4 w-4" /> {{ $devotional->category?->name }}</span>
                     <span class="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-900">{{ $devotional->reading_time }} min</span>
                 </div>
                 <h2 class="mt-3 text-xl font-black tracking-normal text-slate-950">{{ $devotional->title }}</h2>
                 @if ($devotional->bible_reference)
-                    <p class="mt-2 inline-flex items-center gap-2 text-sm font-bold text-olive-800">📖 {{ $devotional->bible_reference }}</p>
+                    <p class="mt-2 inline-flex items-center gap-2 text-sm font-bold text-olive-800"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $devotional->bible_reference }}</p>
                 @endif
                 <p class="mt-3 text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit(strip_tags($devotional->content), 165) }}</p>
                 <a href="{{ route('devotionals.show', $devotional->slug) }}" class="mt-4 btn-primary px-3">Read devotional <x-ui.icon name="chevron-right" class="h-4 w-4" /></a>

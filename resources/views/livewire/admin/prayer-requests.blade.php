@@ -9,7 +9,7 @@
         </div>
         <div class="flex flex-col gap-4 p-5 sm:p-6 md:flex-row md:items-end md:justify-between">
             <div>
-                <p class="app-eyebrow border-rose-200 bg-rose-50 text-rose-900"><x-ui.icon name="heart" class="h-4 w-4" /> 🙏 Moderation</p>
+                <p class="app-eyebrow border-rose-200 bg-rose-50 text-rose-900"><x-ui.icon name="heart" class="h-4 w-4" /> Moderation</p>
                 <h1 class="mt-3 app-section-title">Prayer requests</h1>
                 <p class="mt-2 text-sm text-slate-600">Review public and private requests.</p>
             </div>
@@ -24,7 +24,7 @@
                     <div>
                         <div class="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-normal">
                             <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-700">{{ $request->is_public ? 'Public' : 'Private' }}</span>
-                            <span class="rounded-full px-3 py-1 {{ $request->is_answered ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900' }}">{{ $request->is_answered ? 'Answered ✅' : 'Open 🙏' }}</span>
+                            <span class="rounded-full px-3 py-1 {{ $request->is_answered ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900' }}">{{ $request->is_answered ? 'Answered' : 'Open' }}</span>
                         </div>
                         <h2 class="mt-3 text-lg font-black tracking-normal text-slate-950">{{ $request->title }}</h2>
                         <p class="mt-1 text-sm font-bold text-slate-500">{{ $request->name ?: 'Anonymous' }} @if ($request->email) · {{ $request->email }} @endif</p>

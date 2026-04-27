@@ -1,6 +1,6 @@
 <div class="grid gap-5 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-start">
     <form wire:submit="save" class="app-panel border-olive-200 bg-olive-50 lg:sticky lg:top-36">
-        <p class="app-eyebrow border-olive-200 bg-white text-olive-900">🏷️ Categories</p>
+        <p class="app-eyebrow border-olive-200 bg-white text-olive-900"><x-ui.icon name="bookmark" class="h-4 w-4" /> Categories</p>
         <h1 class="mt-3 text-2xl font-black tracking-normal text-slate-950">{{ $editingId ? 'Edit category' : 'New category' }}</h1>
 
         @error('category') <p class="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{{ $message }}</p> @enderror
@@ -23,7 +23,7 @@
             </div>
             <label class="flex items-center gap-2 rounded-xl border border-olive-200 bg-white px-3 py-3 text-sm font-bold text-slate-700">
                 <input type="checkbox" wire:model="is_active" class="rounded border-olive-300 text-olive-700 focus:ring-olive-600">
-                Active 🌿
+                <x-ui.icon name="sparkles" class="h-4 w-4" /> Active
             </label>
         </div>
 
@@ -45,7 +45,7 @@
                 <span class="bg-yellow-400"></span>
             </div>
             <div class="p-5 sm:p-6">
-                <p class="app-eyebrow border-lime-200 bg-lime-50 text-lime-900">🏷️ Topics</p>
+                <p class="app-eyebrow border-lime-200 bg-lime-50 text-lime-900"><x-ui.icon name="bookmark" class="h-4 w-4" /> Topics</p>
                 <h2 class="mt-3 app-section-title">Categories</h2>
                 <p class="mt-2 text-sm text-slate-600">Organize devotionals by topic.</p>
             </div>

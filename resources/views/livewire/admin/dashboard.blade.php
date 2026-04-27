@@ -10,7 +10,7 @@
             <span class="bg-amber-400"></span>
         </div>
         <div class="p-5 sm:p-6">
-            <p class="app-eyebrow border-indigo-200 bg-indigo-50 text-indigo-900"><x-ui.icon name="shield" class="h-4 w-4" /> 🛡️ Admin</p>
+            <p class="app-eyebrow border-indigo-200 bg-indigo-50 text-indigo-900"><x-ui.icon name="shield" class="h-4 w-4" /> Admin</p>
             <h1 class="mt-3 app-section-title">Admin dashboard</h1>
             <p class="mt-2 text-sm text-slate-600">Content, moderation, and engagement at a glance.</p>
         </div>
@@ -19,7 +19,7 @@
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         @foreach ($stats as $label => $value)
             <div class="metric-card border-indigo-200 bg-indigo-50">
-                <p class="text-sm font-bold capitalize text-indigo-900">📊 {{ str_replace('_', ' ', $label) }}</p>
+                <p class="flex items-center gap-2 text-sm font-bold capitalize text-indigo-900"><x-ui.icon name="bar-chart" class="h-4 w-4" /> {{ str_replace('_', ' ', $label) }}</p>
                 <p class="mt-2 text-3xl font-black tracking-normal text-slate-950">{{ $value }}</p>
             </div>
         @endforeach
@@ -28,7 +28,7 @@
     <div class="grid gap-6 lg:grid-cols-2">
         <section class="app-panel border-emerald-200">
             <div class="flex items-center justify-between gap-3">
-                <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="sparkles" class="h-5 w-5 text-emerald-800" /> Recent devotionals ✨</h2>
+                <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="sparkles" class="h-5 w-5 text-emerald-800" /> Recent devotionals</h2>
                 <a href="{{ route('admin.devotionals') }}" class="text-sm font-bold text-emerald-800 hover:underline">Manage</a>
             </div>
             <div class="mt-4 space-y-3">
@@ -45,7 +45,7 @@
 
         <section class="app-panel border-rose-200">
             <div class="flex items-center justify-between gap-3">
-                <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="heart" class="h-5 w-5 text-rose-800" /> Recent prayer requests 🙏</h2>
+                <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="heart" class="h-5 w-5 text-rose-800" /> Recent prayer requests</h2>
                 <a href="{{ route('admin.prayer-requests') }}" class="text-sm font-bold text-rose-800 hover:underline">Manage</a>
             </div>
             <div class="mt-4 space-y-3">

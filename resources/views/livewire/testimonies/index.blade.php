@@ -11,11 +11,11 @@
         </div>
         <div class="flex flex-col gap-4 p-5 sm:p-6 md:flex-row md:items-end md:justify-between">
             <div>
-                <p class="app-eyebrow border-fuchsia-200 bg-fuchsia-50 text-fuchsia-900"><x-ui.icon name="message-circle" class="h-4 w-4" /> 🌈 Testimonies</p>
+                <p class="app-eyebrow border-fuchsia-200 bg-fuchsia-50 text-fuchsia-900"><x-ui.icon name="message-circle" class="h-4 w-4" /> Testimonies</p>
                 <h1 class="mt-3 app-section-title">Testimonies</h1>
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Read approved testimonies from the MannaRise community and share your own story for review.</p>
             </div>
-            <a href="{{ route('testimonies.submit') }}" class="btn-primary w-full bg-fuchsia-700 hover:bg-fuchsia-800 sm:w-auto"><x-ui.icon name="send" class="h-4 w-4" /> Share testimony 🌟</a>
+            <a href="{{ route('testimonies.submit') }}" class="btn-primary w-full bg-fuchsia-700 hover:bg-fuchsia-800 sm:w-auto"><x-ui.icon name="send" class="h-4 w-4" /> Share testimony</a>
         </div>
     </div>
 
@@ -27,7 +27,7 @@
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         @forelse ($testimonies as $testimony)
             <article class="app-panel border-t-4 border-t-fuchsia-500 hover:border-fuchsia-300 even:border-t-pink-500">
-                <p class="inline-flex items-center gap-2 rounded-full bg-fuchsia-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-fuchsia-900">🌈 Testimony</p>
+                <p class="inline-flex items-center gap-2 rounded-full bg-fuchsia-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-fuchsia-900"><x-ui.icon name="message-circle" class="h-4 w-4" /> Testimony</p>
                 <h2 class="mt-3 text-lg font-black tracking-normal text-slate-950">{{ $testimony->title }}</h2>
                 <p class="mt-3 text-sm leading-6 text-slate-700">{{ $testimony->body }}</p>
                 <p class="mt-4 text-sm font-bold text-fuchsia-800">{{ $testimony->is_anonymous ? 'Anonymous' : ($testimony->name ?: 'MannaRise reader') }}</p>

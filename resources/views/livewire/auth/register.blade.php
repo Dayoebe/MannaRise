@@ -9,7 +9,7 @@
         </div>
         <div class="p-5 sm:p-6">
             <div class="mb-6">
-                <p class="app-eyebrow border-violet-200 bg-violet-50 text-violet-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> ✨ Join</p>
+                <p class="app-eyebrow border-violet-200 bg-violet-50 text-violet-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> Join</p>
                 <h1 class="mt-3 text-2xl font-black tracking-normal text-slate-950">Create account</h1>
                 <p class="mt-2 text-sm text-slate-600">Save devotionals, journal reflections, and track your reading.</p>
             </div>
@@ -40,13 +40,13 @@
 
                 <button type="submit" class="btn-primary w-full bg-violet-700 hover:bg-violet-800" wire:loading.attr="disabled">
                     <x-ui.icon name="sparkles" class="h-4 w-4" /> Create account
-                </button>
+</button>
             </form>
 
             <p class="mt-6 text-center text-sm text-slate-600">
                 Already have an account?
                 <a href="{{ route('login') }}" class="font-bold text-violet-800 hover:underline">Log in</a>
-            </p>
+</p>
         </div>
     </div>
 </div>

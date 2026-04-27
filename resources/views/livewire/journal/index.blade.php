@@ -1,6 +1,6 @@
 <div class="grid gap-5 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-start">
     <form wire:submit="save" class="app-panel border-mauve-200 bg-mauve-50 lg:sticky lg:top-36">
-        <p class="app-eyebrow border-mauve-200 bg-white text-mauve-900"><x-ui.icon name="journal" class="h-4 w-4" /> 📝 Journal</p>
+        <p class="app-eyebrow border-mauve-200 bg-white text-mauve-900"><x-ui.icon name="journal" class="h-4 w-4" /> Journal</p>
         <h1 class="mt-3 text-2xl font-black tracking-normal text-slate-950">{{ $editingId ? 'Edit journal entry' : 'New journal entry' }}</h1>
 
         <div class="mt-5 space-y-4">
@@ -52,7 +52,7 @@
                 <span class="bg-emerald-500"></span>
             </div>
             <div class="p-5 sm:p-6">
-                <p class="app-eyebrow border-sky-200 bg-sky-50 text-sky-900"><x-ui.icon name="journal" class="h-4 w-4" /> 📝 Reflections</p>
+                <p class="app-eyebrow border-sky-200 bg-sky-50 text-sky-900"><x-ui.icon name="journal" class="h-4 w-4" /> Reflections</p>
                 <h2 class="mt-3 app-section-title">Reflection journal</h2>
                 <p class="mt-2 text-sm text-slate-600">Private entries tied to your devotional growth.</p>
             </div>

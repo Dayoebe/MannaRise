@@ -8,11 +8,11 @@
             <span class="bg-emerald-500"></span>
         </div>
         <div class="p-5 sm:p-6">
-            <p class="app-eyebrow border-rose-200 bg-rose-50 text-rose-900"><x-ui.icon name="send" class="h-4 w-4" /> 🕊️ Prayer request</p>
+            <p class="app-eyebrow border-rose-200 bg-rose-50 text-rose-900"><x-ui.icon name="send" class="h-4 w-4" /> Prayer request</p>
             <h1 class="mt-3 app-section-title">Prayer request</h1>
             <p class="mt-3 text-sm leading-6 text-slate-600">
             Submit a request for prayer. Public requests can be included in community prayer lists, while private requests stay with the ministry team.
-            </p>
+</p>
         </div>
     </section>
 
@@ -44,7 +44,7 @@
 
         <label class="mt-4 flex items-center gap-2 rounded-xl border border-rose-200 bg-white px-3 py-3 text-sm font-bold text-slate-700">
             <input type="checkbox" wire:model="is_public" class="rounded border-rose-300 text-rose-700 focus:ring-rose-600">
-            Share publicly 🙏
+            <x-ui.icon name="message-circle" class="h-4 w-4" /> Share publicly
         </label>
 
         <button type="submit" class="mt-6 btn-primary w-full bg-rose-700 hover:bg-rose-800 sm:w-auto"><x-ui.icon name="send" class="h-4 w-4" /> Submit request</button>

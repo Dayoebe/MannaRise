@@ -10,11 +10,11 @@
         </div>
         <div class="flex flex-col gap-4 p-5 sm:p-6 md:flex-row md:items-end md:justify-between">
             <div>
-                <p class="app-eyebrow border-rose-200 bg-rose-50 text-rose-900"><x-ui.icon name="heart" class="h-4 w-4" /> 🙏 Prayer wall</p>
+                <p class="app-eyebrow border-rose-200 bg-rose-50 text-rose-900"><x-ui.icon name="heart" class="h-4 w-4" /> Prayer wall</p>
                 <h1 class="mt-3 app-section-title">Prayer wall</h1>
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Pray with the community, track answered requests, and let people know someone stood with them.</p>
             </div>
-            <a href="{{ route('prayer-requests.submit') }}" class="btn-primary w-full bg-rose-700 hover:bg-rose-800 sm:w-auto"><x-ui.icon name="send" class="h-4 w-4" /> Submit request 🕊️</a>
+            <a href="{{ route('prayer-requests.submit') }}" class="btn-primary w-full bg-rose-700 hover:bg-rose-800 sm:w-auto"><x-ui.icon name="send" class="h-4 w-4" /> Submit request</a>
         </div>
     </div>
 
@@ -24,7 +24,7 @@
             <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search prayer requests" class="field-input border-rose-300 focus:border-rose-600 focus:ring-rose-100">
         </label>
         <label class="block">
-            <span class="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700">🌤️ Status</span>
+            <span class="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="star" class="h-4 w-4 text-rose-700" /> Status</span>
             <select wire:model.live="status" class="field-input border-rose-300 focus:border-rose-600 focus:ring-rose-100">
                 <option value="open">Open requests</option>
                 <option value="answered">Answered prayers</option>
@@ -41,8 +41,8 @@
             <article class="app-panel border-t-4 {{ $request->is_answered ? 'border-t-emerald-500' : 'border-t-amber-400' }}">
                 <div class="flex items-center justify-between gap-3">
                     <span class="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-normal {{ $request->is_answered ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900' }}">
-                        {{ $request->is_answered ? 'Answered ✅' : 'Open 🙏' }}
-                    </span>
+                        {{ $request->is_answered ? 'Answered' : 'Open' }}
+</span>
                     <span class="text-xs font-bold text-slate-500">{{ $request->created_at->diffForHumans() }}</span>
                 </div>
                 <h2 class="mt-3 text-lg font-black tracking-normal text-slate-950">{{ $request->title }}</h2>
@@ -50,7 +50,7 @@
                 <p class="mt-3 text-sm leading-6 text-slate-700">{{ $request->body }}</p>
                 <div class="mt-5 flex items-center justify-between gap-3">
                     <span class="text-sm font-bold text-rose-800">{{ $request->prayed_count }} prayed</span>
-                    <button type="button" wire:click="pray({{ $request->id }})" class="btn-secondary border-rose-200 px-3 hover:bg-rose-50">I prayed 🙏</button>
+                    <button type="button" wire:click="pray({{ $request->id }})" class="btn-secondary border-rose-200 px-3 hover:bg-rose-50"><x-ui.icon name="heart" class="h-4 w-4" /> I prayed</button>
                 </div>
             </article>
         @empty
