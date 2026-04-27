@@ -64,6 +64,17 @@
         text-rendering: optimizeLegibility;
     }
 
+    body::before {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        content: '';
+        background:
+            radial-gradient(circle at top left, rgba(16, 185, 129, 0.12), transparent 28rem),
+            radial-gradient(circle at top right, rgba(245, 158, 11, 0.10), transparent 26rem),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(245, 248, 250, 0.96));
+    }
+
     h1,
     h2,
     h3 {
@@ -78,15 +89,19 @@
 
 @layer components {
     .app-surface {
-        @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+        @apply rounded-2xl border border-slate-200 bg-white shadow-sm;
     }
 
     .app-surface-soft {
-        @apply rounded-xl border border-mist-200 bg-mist-50 shadow-sm;
+        @apply rounded-2xl border border-mist-200 bg-mist-50 shadow-sm;
     }
 
     .app-panel {
-        @apply rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6;
+        @apply rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6;
+    }
+
+    .app-panel-hover {
+        @apply transition duration-200 hover:-translate-y-0.5 hover:shadow-lg;
     }
 
     .app-section-title {
@@ -126,7 +141,7 @@
     }
 
     .mobile-bottom-nav {
-        @apply fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_30px_rgba(15,23,42,0.12)] lg:hidden;
+        @apply fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_30px_rgba(15,23,42,0.12)] backdrop-blur lg:hidden;
     }
 
     .mobile-more-panel {
@@ -146,11 +161,11 @@
     }
 
     .btn-secondary {
-        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 shadow-sm transition hover:bg-slate-50;
+        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 shadow-sm transition hover:bg-slate-50 disabled:opacity-60;
     }
 
     .btn-warm {
-        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-amber-500 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-sm transition hover:bg-amber-400;
+        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-amber-500 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-sm transition hover:bg-amber-400 disabled:opacity-60;
     }
 
     .icon-badge {
@@ -166,7 +181,7 @@
     }
 
     .metric-card {
-        @apply rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5;
+        @apply rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5;
     }
 
     .field-input {
@@ -187,5 +202,41 @@
 
     .responsive-actions {
         @apply grid gap-2 sm:inline-flex sm:flex-wrap;
+    }
+
+    .empty-state {
+        @apply flex min-h-48 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white/75 p-6 text-center shadow-sm;
+    }
+
+    .empty-state-icon {
+        @apply inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-2xl shadow-sm;
+    }
+
+    .page-hero {
+        @apply overflow-hidden rounded-3xl border bg-white shadow-sm;
+    }
+
+    .page-hero-body {
+        @apply grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,32rem)] lg:items-end;
+    }
+
+    .status-pill {
+        @apply inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-xs font-black uppercase tracking-normal;
+    }
+
+    .loading-hint {
+        @apply rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900 shadow-sm;
+    }
+
+    .dashboard-action-card {
+        @apply flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md;
+    }
+
+    .table-shell {
+        @apply overflow-x-auto rounded-2xl border bg-white shadow-sm;
+    }
+
+    .soft-divider {
+        @apply border-t border-slate-200;
     }
 }
