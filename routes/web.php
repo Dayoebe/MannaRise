@@ -15,6 +15,8 @@ use App\Livewire\Favorites\Index as FavoritesIndex;
 use App\Livewire\Journal\Index as JournalIndex;
 use App\Livewire\Pages\Home;
 use App\Livewire\PrayerRequests\Submit as SubmitPrayerRequest;
+use App\Livewire\PrayerRequests\Wall as PrayerWall;
+use App\Livewire\Testimonies\Index as TestimonyIndex;
 use App\Livewire\Testimonies\Submit as SubmitTestimony;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +26,8 @@ Route::get('/', Home::class)->name('home');
 Route::get('/devotionals', DevotionalIndex::class)->name('devotionals.index');
 Route::get('/devotionals/{slug}', DevotionalShow::class)->name('devotionals.show');
 Route::get('/prayer-request', SubmitPrayerRequest::class)->name('prayer-requests.submit');
+Route::get('/prayer-wall', PrayerWall::class)->name('prayer-requests.wall');
+Route::get('/testimonies', TestimonyIndex::class)->name('testimonies.index');
 Route::get('/testimony', SubmitTestimony::class)->name('testimonies.submit');
 
 Route::middleware('guest')->group(function (): void {

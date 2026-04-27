@@ -166,5 +166,7 @@ class DatabaseSeeder extends Seeder
                 'is_approved' => true,
             ],
         );
+
+        $this->call(MannaRiseContentSeeder::class);
     }
 }

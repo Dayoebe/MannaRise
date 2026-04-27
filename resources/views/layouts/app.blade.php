@@ -10,7 +10,7 @@
 
         @livewireStyles
     </head>
-    <body class="min-h-screen bg-stone-50 text-stone-950 antialiased">
+    <body class="flex min-h-screen flex-col bg-stone-50 text-stone-950 antialiased">
         <header class="border-b border-stone-200 bg-white/95">
             <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
                 <div class="flex flex-wrap items-center justify-between gap-3">
@@ -20,8 +20,9 @@
 
                     <nav class="flex flex-wrap items-center gap-2 text-sm font-medium text-stone-700">
                         <a href="{{ route('devotionals.index') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('devotionals.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Devotionals</a>
-                        <a href="{{ route('prayer-requests.submit') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('prayer-requests.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Prayer</a>
-                        <a href="{{ route('testimonies.submit') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('testimonies.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Testimony</a>
+                        <a href="{{ route('prayer-requests.wall') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('prayer-requests.wall') ? 'bg-emerald-50 text-emerald-800' : '' }}">Prayer Wall</a>
+                        <a href="{{ route('prayer-requests.submit') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('prayer-requests.submit') ? 'bg-emerald-50 text-emerald-800' : '' }}">Request Prayer</a>
+                        <a href="{{ route('testimonies.index') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('testimonies.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Testimonies</a>
 
                         @auth
                             <a href="{{ route('dashboard') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('dashboard') || request()->routeIs('journal.*') || request()->routeIs('favorites.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Dashboard</a>
@@ -55,7 +56,7 @@
             </div>
         </header>
 
-        <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
             @if (session('status'))
                 <div class="mb-6 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-900">
                     {{ session('status') }}
