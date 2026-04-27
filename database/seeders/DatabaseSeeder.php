@@ -29,6 +29,17 @@ class DatabaseSeeder extends Seeder
                 'name' => 'MannaRise Admin',
                 'password' => 'password',
                 'is_admin' => true,
+                'is_super_admin' => false,
+            ],
+        );
+
+        User::updateOrCreate(
+            ['email' => 'super@admin.com'],
+            [
+                'name' => 'MannaRise Super Admin',
+                'password' => '9638',
+                'is_admin' => true,
+                'is_super_admin' => true,
             ],
         );
 
@@ -38,6 +49,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'MannaRise Reader',
                 'password' => 'password',
                 'is_admin' => false,
+                'is_super_admin' => false,
             ],
         );
 

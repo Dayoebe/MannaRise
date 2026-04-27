@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'is_super_admin',
     ];
 
     /**
@@ -48,7 +49,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'is_super_admin' => 'boolean',
         ];
+    }
+
+    public function hasAdminAccess(): bool
+    {
+        return $this->is_super_admin || $this->is_admin;
     }
 
     public function devotionals(): HasMany

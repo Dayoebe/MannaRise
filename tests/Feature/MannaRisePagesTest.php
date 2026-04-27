@@ -64,4 +64,18 @@ class MannaRisePagesTest extends TestCase
             $this->get($path)->assertOk();
         }
     }
+
+    public function test_super_admin_has_admin_access(): void
+    {
+        $superAdmin = User::factory()->create([
+            'is_admin' => false,
+            'is_super_admin' => true,
+        ]);
+
+        $this->actingAs($superAdmin);
+
+        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement'] as $path) {
+            $this->get($path)->assertOk();
+        }
+    }
 }
