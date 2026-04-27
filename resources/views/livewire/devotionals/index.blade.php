@@ -1,37 +1,55 @@
-<div class="space-y-6">
-    <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-            <h1 class="text-3xl font-semibold text-stone-950">Devotionals</h1>
-            <p class="mt-2 text-sm text-stone-600">Search, filter, and keep growing one reading at a time.</p>
+<div class="space-y-6 sm:space-y-8">
+    <div class="app-panel overflow-hidden border-amber-200 p-0 sm:p-0">
+        <div class="color-strip rounded-none">
+            <span class="bg-amber-400"></span>
+            <span class="bg-yellow-400"></span>
+            <span class="bg-lime-500"></span>
+            <span class="bg-emerald-500"></span>
+            <span class="bg-teal-500"></span>
+            <span class="bg-sky-500"></span>
+            <span class="bg-pink-500"></span>
         </div>
+        <div class="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30rem)] lg:items-end">
+            <div>
+                <p class="app-eyebrow border-amber-200 bg-amber-50 text-amber-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> ✨ Devotionals</p>
+                <h1 class="mt-3 app-section-title">Devotionals</h1>
+                <p class="mt-2 text-sm leading-6 text-slate-600">Search, filter, and keep growing one reading at a time.</p>
+            </div>
 
-        <div class="grid gap-3 sm:grid-cols-2">
-            <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search devotionals" class="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
-            <select wire:model.live="category" class="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
-                <option value="">All topics</option>
-                @foreach ($categories as $category)
-                    <option value="{{ $category->slug }}">{{ $category->name }}</option>
-                @endforeach
-            </select>
+            <div class="grid gap-3 sm:grid-cols-2">
+                <label class="block">
+                    <span class="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="search" class="h-4 w-4 text-amber-700" /> Search</span>
+                    <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search devotionals" class="field-input border-amber-300 focus:border-amber-600 focus:ring-amber-100">
+                </label>
+                <label class="block">
+                    <span class="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700">🌿 Topic</span>
+                    <select wire:model.live="category" class="field-input border-amber-300 focus:border-amber-600 focus:ring-amber-100">
+                        <option value="">All topics</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->slug }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                </label>
+            </div>
         </div>
     </div>
 
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         @forelse ($devotionals as $devotional)
-            <article class="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+            <article class="app-panel border-t-4 border-t-amber-400 hover:border-amber-300 even:border-t-emerald-500">
                 <div class="flex items-center justify-between gap-3">
-                    <span class="text-xs font-semibold uppercase tracking-normal text-emerald-800">{{ $devotional->category?->name }}</span>
-                    <span class="text-xs text-stone-500">{{ $devotional->reading_time }} min</span>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-emerald-900">🌿 {{ $devotional->category?->name }}</span>
+                    <span class="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-900">{{ $devotional->reading_time }} min</span>
                 </div>
-                <h2 class="mt-3 text-xl font-semibold text-stone-950">{{ $devotional->title }}</h2>
+                <h2 class="mt-3 text-xl font-black tracking-normal text-slate-950">{{ $devotional->title }}</h2>
                 @if ($devotional->bible_reference)
-                    <p class="mt-2 text-sm font-medium text-stone-700">{{ $devotional->bible_reference }}</p>
+                    <p class="mt-2 inline-flex items-center gap-2 text-sm font-bold text-olive-800">📖 {{ $devotional->bible_reference }}</p>
                 @endif
-                <p class="mt-3 text-sm leading-6 text-stone-600">{{ \Illuminate\Support\Str::limit(strip_tags($devotional->content), 160) }}</p>
-                <a href="{{ route('devotionals.show', $devotional->slug) }}" class="mt-4 inline-flex rounded-md bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800">Read devotional</a>
+                <p class="mt-3 text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit(strip_tags($devotional->content), 165) }}</p>
+                <a href="{{ route('devotionals.show', $devotional->slug) }}" class="mt-4 btn-primary px-3">Read devotional <x-ui.icon name="chevron-right" class="h-4 w-4" /></a>
             </article>
         @empty
-            <div class="rounded-lg border border-dashed border-stone-300 bg-white p-6 text-sm text-stone-600 md:col-span-2 xl:col-span-3">
+            <div class="app-panel border-dashed border-slate-300 text-sm text-slate-600 md:col-span-2 xl:col-span-3">
                 No devotionals match this search.
             </div>
         @endforelse

@@ -1,11 +1,12 @@
-<div class="grid gap-6 lg:grid-cols-[24rem_minmax(0,1fr)]">
-    <form wire:submit="save" class="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
-        <h1 class="text-2xl font-semibold text-stone-950">{{ $editingId ? 'Edit journal entry' : 'New journal entry' }}</h1>
+<div class="grid gap-5 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-start">
+    <form wire:submit="save" class="app-panel border-mauve-200 bg-mauve-50 lg:sticky lg:top-36">
+        <p class="app-eyebrow border-mauve-200 bg-white text-mauve-900"><x-ui.icon name="journal" class="h-4 w-4" /> 📝 Journal</p>
+        <h1 class="mt-3 text-2xl font-black tracking-normal text-slate-950">{{ $editingId ? 'Edit journal entry' : 'New journal entry' }}</h1>
 
         <div class="mt-5 space-y-4">
             <div>
-                <label class="block text-sm font-medium text-stone-700">Devotional</label>
-                <select wire:model="devotional_id" class="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+                <label class="block text-sm font-bold text-slate-700">Devotional</label>
+                <select wire:model="devotional_id" class="field-input mt-1 border-mauve-300 focus:border-mauve-600 focus:ring-mauve-100">
                     <option value="">No linked devotional</option>
                     @foreach ($devotionals as $devotional)
                         <option value="{{ $devotional->id }}">{{ $devotional->title }}</option>
@@ -15,55 +16,65 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-stone-700">Title</label>
-                <input type="text" wire:model="title" class="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+                <label class="block text-sm font-bold text-slate-700">Title</label>
+                <input type="text" wire:model="title" class="field-input mt-1 border-mauve-300 focus:border-mauve-600 focus:ring-mauve-100">
                 @error('title') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-stone-700">Date</label>
-                <input type="date" wire:model="entry_date" class="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+                <label class="block text-sm font-bold text-slate-700">Date</label>
+                <input type="date" wire:model="entry_date" class="field-input mt-1 border-mauve-300 focus:border-mauve-600 focus:ring-mauve-100">
                 @error('entry_date') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-stone-700">Reflection</label>
-                <textarea wire:model="content" rows="8" class="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"></textarea>
+                <label class="block text-sm font-bold text-slate-700">Reflection</label>
+                <textarea wire:model="content" rows="8" class="field-input mt-1 border-mauve-300 focus:border-mauve-600 focus:ring-mauve-100"></textarea>
                 @error('content') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
             </div>
         </div>
 
         <div class="mt-5 flex flex-wrap gap-2">
-            <button type="submit" class="rounded-md bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800">Save</button>
+            <button type="submit" class="btn-primary bg-mauve-700 hover:bg-mauve-800"><x-ui.icon name="send" class="h-4 w-4" /> Save</button>
             @if ($editingId)
-                <button type="button" wire:click="resetForm" class="rounded-md border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-800 hover:bg-stone-100">Cancel</button>
+                <button type="button" wire:click="resetForm" class="btn-secondary border-slate-300">Cancel</button>
             @endif
         </div>
     </form>
 
     <section>
-        <div class="mb-4">
-            <h2 class="text-3xl font-semibold text-stone-950">Reflection journal</h2>
-            <p class="mt-2 text-sm text-stone-600">Private entries tied to your devotional growth.</p>
+        <div class="mb-4 app-panel overflow-hidden border-sky-200 p-0 sm:p-0">
+            <div class="color-strip rounded-none">
+                <span class="bg-mauve-500"></span>
+                <span class="bg-violet-500"></span>
+                <span class="bg-sky-500"></span>
+                <span class="bg-cyan-500"></span>
+                <span class="bg-emerald-500"></span>
+            </div>
+            <div class="p-5 sm:p-6">
+                <p class="app-eyebrow border-sky-200 bg-sky-50 text-sky-900"><x-ui.icon name="journal" class="h-4 w-4" /> 📝 Reflections</p>
+                <h2 class="mt-3 app-section-title">Reflection journal</h2>
+                <p class="mt-2 text-sm text-slate-600">Private entries tied to your devotional growth.</p>
+            </div>
         </div>
 
         <div class="space-y-3">
             @forelse ($entries as $entry)
-                <article class="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+                <article class="app-panel border-sky-200">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                            <h3 class="text-lg font-semibold text-stone-950">{{ $entry->title }}</h3>
-                            <p class="mt-1 text-sm text-stone-500">{{ $entry->entry_date->format('M j, Y') }} @if ($entry->devotional) · {{ $entry->devotional->title }} @endif</p>
+                            <h3 class="text-lg font-black tracking-normal text-slate-950">{{ $entry->title }}</h3>
+                            <p class="mt-1 text-sm font-bold text-slate-500">{{ $entry->entry_date->format('M j, Y') }} @if ($entry->devotional) · {{ $entry->devotional->title }} @endif</p>
                         </div>
                         <div class="flex gap-2">
-                            <button type="button" wire:click="edit({{ $entry->id }})" class="rounded-md border border-stone-300 px-3 py-1.5 text-sm font-semibold text-stone-800 hover:bg-stone-100">Edit</button>
-                            <button type="button" wire:click="delete({{ $entry->id }})" wire:confirm="Delete this journal entry?" class="rounded-md border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-700 hover:bg-red-50">Delete</button>
+                            <button type="button" wire:click="edit({{ $entry->id }})" class="btn-secondary min-h-10 border-sky-200 px-3 py-1.5">Edit</button>
+                            <button type="button" wire:click="delete({{ $entry->id }})" wire:confirm="Delete this journal entry?" class="inline-flex min-h-10 items-center justify-center rounded-full border border-red-200 bg-white px-3 py-1.5 text-sm font-bold text-red-700 hover:bg-red-50">Delete</button>
                         </div>
                     </div>
-                    <p class="mt-3 text-sm leading-6 text-stone-600">{{ $entry->content }}</p>
+                    <p class="mt-3 text-sm leading-6 text-slate-600">{{ $entry->content }}</p>
                 </article>
             @empty
-                <p class="rounded-lg border border-dashed border-stone-300 bg-white p-5 text-sm text-stone-600">No journal entries yet.</p>
+                <p class="app-panel border-dashed border-slate-300 text-sm text-slate-600">No journal entries yet.</p>
             @endforelse
         </div>
 

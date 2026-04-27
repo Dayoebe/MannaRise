@@ -8,4 +8,130 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-taupe-50: #f8f5f1;
+    --color-taupe-100: #eee8df;
+    --color-taupe-200: #ded2c4;
+    --color-taupe-300: #cbb7a3;
+    --color-taupe-400: #b79b83;
+    --color-taupe-500: #9d7f68;
+    --color-taupe-600: #806550;
+    --color-taupe-700: #634d3e;
+    --color-taupe-800: #47382e;
+    --color-taupe-900: #30261f;
+    --color-mauve-50: #fbf6f9;
+    --color-mauve-100: #f3e6ef;
+    --color-mauve-200: #e6cce0;
+    --color-mauve-300: #d3a9c7;
+    --color-mauve-400: #bb82aa;
+    --color-mauve-500: #9f638e;
+    --color-mauve-600: #804b70;
+    --color-mauve-700: #633a56;
+    --color-mauve-800: #472a3e;
+    --color-mauve-900: #301c2b;
+    --color-mist-50: #f5f8fa;
+    --color-mist-100: #e8eef2;
+    --color-mist-200: #d4e0e7;
+    --color-mist-300: #b7cbd6;
+    --color-mist-400: #93b0bf;
+    --color-mist-500: #6f93a5;
+    --color-mist-600: #557789;
+    --color-mist-700: #405b6a;
+    --color-mist-800: #2f424d;
+    --color-mist-900: #202d34;
+    --color-olive-50: #f7f8ee;
+    --color-olive-100: #ecedd2;
+    --color-olive-200: #dcdda8;
+    --color-olive-300: #c8c978;
+    --color-olive-400: #abad51;
+    --color-olive-500: #8c8f3a;
+    --color-olive-600: #6d702d;
+    --color-olive-700: #535622;
+    --color-olive-800: #3d3f1a;
+    --color-olive-900: #2b2c12;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background-color: var(--color-mist-50);
+        color: var(--color-slate-950);
+    }
+
+    ::selection {
+        background-color: var(--color-amber-200);
+        color: var(--color-slate-950);
+    }
+}
+
+@layer components {
+    .app-surface {
+        @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+    }
+
+    .app-surface-soft {
+        @apply rounded-xl border border-mist-200 bg-mist-50 shadow-sm;
+    }
+
+    .app-panel {
+        @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6;
+    }
+
+    .app-section-title {
+        @apply text-2xl font-bold tracking-normal text-slate-950 sm:text-3xl;
+    }
+
+    .app-eyebrow {
+        @apply inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-emerald-800;
+    }
+
+    .nav-pill {
+        @apply inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-transparent px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-200 hover:bg-white;
+    }
+
+    .nav-pill-active {
+        @apply border-emerald-200 bg-emerald-50 text-emerald-900 shadow-sm;
+    }
+
+    .subnav-pill {
+        @apply inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border border-transparent px-3 py-2 text-sm font-semibold text-slate-600 hover:border-slate-200 hover:bg-white;
+    }
+
+    .subnav-pill-active {
+        @apply border-sky-200 bg-sky-50 text-sky-900 shadow-sm;
+    }
+
+    .btn-primary {
+        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-800 disabled:opacity-60;
+    }
+
+    .btn-secondary {
+        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 shadow-sm transition hover:bg-slate-50;
+    }
+
+    .btn-warm {
+        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-amber-500 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-sm transition hover:bg-amber-400;
+    }
+
+    .icon-badge {
+        @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/70 bg-white text-lg shadow-sm;
+    }
+
+    .color-strip {
+        @apply flex h-2 overflow-hidden rounded-full bg-white;
+    }
+
+    .color-strip > span {
+        @apply block h-full flex-1;
+    }
+
+    .metric-card {
+        @apply rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5;
+    }
+
+    .field-input {
+        @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100;
+    }
 }

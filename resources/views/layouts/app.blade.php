@@ -10,68 +10,116 @@
 
         @livewireStyles
     </head>
-    <body class="flex min-h-screen flex-col bg-stone-50 text-stone-950 antialiased">
-        <header class="border-b border-stone-200 bg-white/95">
-            <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <a href="{{ route('home') }}" class="text-xl font-semibold tracking-normal text-emerald-800">
-                        MannaRise
+    <body class="flex min-h-screen flex-col bg-mist-50 text-slate-950 antialiased">
+        <header class="sticky top-0 z-40 border-b border-slate-200 bg-mist-50/95 backdrop-blur">
+            <div class="color-strip rounded-none">
+                <span class="bg-red-500"></span>
+                <span class="bg-orange-500"></span>
+                <span class="bg-amber-400"></span>
+                <span class="bg-yellow-400"></span>
+                <span class="bg-lime-500"></span>
+                <span class="bg-green-500"></span>
+                <span class="bg-emerald-500"></span>
+                <span class="bg-teal-500"></span>
+                <span class="bg-cyan-500"></span>
+                <span class="bg-sky-500"></span>
+                <span class="bg-blue-500"></span>
+                <span class="bg-indigo-500"></span>
+                <span class="bg-violet-500"></span>
+                <span class="bg-purple-500"></span>
+                <span class="bg-fuchsia-500"></span>
+                <span class="bg-pink-500"></span>
+                <span class="bg-rose-500"></span>
+            </div>
+
+            <div class="mx-auto flex max-w-7xl flex-col gap-3 px-3 py-3 sm:px-5 lg:px-8">
+                <div class="flex items-center justify-between gap-3">
+                    <a href="{{ route('home') }}" class="group inline-flex min-h-12 items-center gap-3 rounded-2xl border border-emerald-200 bg-white px-3 py-2 shadow-sm transition hover:border-emerald-300">
+                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-700 text-lg text-white">🌿</span>
+                        <span>
+                            <span class="block text-lg font-black tracking-normal text-emerald-900">MannaRise</span>
+                            <span class="block text-xs font-semibold text-slate-500">grow daily</span>
+                        </span>
                     </a>
 
-                    <nav class="flex flex-wrap items-center gap-2 text-sm font-medium text-stone-700">
-                        <a href="{{ route('devotionals.index') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('devotionals.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Devotionals</a>
-                        <a href="{{ route('bible') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('bible') ? 'bg-emerald-50 text-emerald-800' : '' }}">Bible</a>
-                        <a href="{{ route('library.index') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('library.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Library</a>
-                        <a href="{{ route('prayer-requests.wall') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('prayer-requests.wall') ? 'bg-emerald-50 text-emerald-800' : '' }}">Prayer Wall</a>
-                        <a href="{{ route('prayer-requests.submit') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('prayer-requests.submit') ? 'bg-emerald-50 text-emerald-800' : '' }}">Request Prayer</a>
-                        <a href="{{ route('testimonies.index') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('testimonies.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Testimonies</a>
-
+                    <div class="flex shrink-0 items-center gap-2">
                         @auth
-                            <a href="{{ route('dashboard') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('dashboard') || request()->routeIs('journal.*') || request()->routeIs('favorites.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Dashboard</a>
-                            @if (auth()->user()->is_admin)
-                                <a href="{{ route('admin.dashboard') }}" class="rounded-md px-3 py-2 hover:bg-stone-100 {{ request()->routeIs('admin.*') ? 'bg-emerald-50 text-emerald-800' : '' }}">Admin</a>
-                            @endif
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="rounded-md border border-stone-300 px-3 py-2 hover:bg-stone-100">Log out</button>
+                                <button type="submit" class="btn-secondary px-3" title="Log out">
+                                    <x-ui.icon name="log-out" class="h-4 w-4" />
+                                    <span class="hidden sm:inline">Log out</span>
+                                </button>
                             </form>
                         @else
-                            <a href="{{ route('login') }}" class="rounded-md px-3 py-2 hover:bg-stone-100">Log in</a>
-                            <a href="{{ route('register') }}" class="rounded-md bg-emerald-700 px-3 py-2 text-white hover:bg-emerald-800">Create account</a>
+                            <a href="{{ route('login') }}" class="btn-secondary px-3">
+                                <x-ui.icon name="log-in" class="h-4 w-4" />
+                                <span class="hidden sm:inline">Log in</span>
+                            </a>
+                            <a href="{{ route('register') }}" class="btn-primary px-3">
+                                <x-ui.icon name="sparkles" class="h-4 w-4" />
+                                <span class="hidden sm:inline">Join</span>
+                            </a>
                         @endauth
-                    </nav>
+                    </div>
                 </div>
 
-                @auth
-                    <nav class="flex flex-wrap gap-2 text-sm text-stone-600">
-                        <a href="{{ route('journal.index') }}" class="rounded-md px-3 py-1.5 hover:bg-stone-100 {{ request()->routeIs('journal.*') ? 'bg-white text-stone-950 shadow-sm ring-1 ring-stone-200' : '' }}">Journal</a>
-                        <a href="{{ route('favorites.index') }}" class="rounded-md px-3 py-1.5 hover:bg-stone-100 {{ request()->routeIs('favorites.*') ? 'bg-white text-stone-950 shadow-sm ring-1 ring-stone-200' : '' }}">Favorites</a>
+                <nav class="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 text-sm [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <a href="{{ route('devotionals.index') }}" class="nav-pill {{ request()->routeIs('devotionals.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="sparkles" class="h-4 w-4" />✨ Devotionals</a>
+                    <a href="{{ route('bible') }}" class="nav-pill {{ request()->routeIs('bible') ? 'nav-pill-active' : '' }}"><x-ui.icon name="book-open" class="h-4 w-4" />📖 Bible</a>
+                    <a href="{{ route('library.index') }}" class="nav-pill {{ request()->routeIs('library.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="library" class="h-4 w-4" />📚 Library</a>
+                    <a href="{{ route('prayer-requests.wall') }}" class="nav-pill {{ request()->routeIs('prayer-requests.wall') ? 'nav-pill-active' : '' }}"><x-ui.icon name="heart" class="h-4 w-4" />🙏 Prayer Wall</a>
+                    <a href="{{ route('prayer-requests.submit') }}" class="nav-pill {{ request()->routeIs('prayer-requests.submit') ? 'nav-pill-active' : '' }}"><x-ui.icon name="send" class="h-4 w-4" />🕊️ Request</a>
+                    <a href="{{ route('testimonies.index') }}" class="nav-pill {{ request()->routeIs('testimonies.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="message-circle" class="h-4 w-4" />🌈 Testimonies</a>
+                    @auth
+                        <a href="{{ route('dashboard') }}" class="nav-pill {{ request()->routeIs('dashboard') || request()->routeIs('journal.*') || request()->routeIs('favorites.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="layout-dashboard" class="h-4 w-4" />🏠 Dashboard</a>
                         @if (auth()->user()->is_admin)
-                            <a href="{{ route('admin.categories') }}" class="rounded-md px-3 py-1.5 hover:bg-stone-100 {{ request()->routeIs('admin.categories') ? 'bg-white text-stone-950 shadow-sm ring-1 ring-stone-200' : '' }}">Categories</a>
-                            <a href="{{ route('admin.devotionals') }}" class="rounded-md px-3 py-1.5 hover:bg-stone-100 {{ request()->routeIs('admin.devotionals') ? 'bg-white text-stone-950 shadow-sm ring-1 ring-stone-200' : '' }}">Devotionals</a>
-                            <a href="{{ route('admin.prayer-requests') }}" class="rounded-md px-3 py-1.5 hover:bg-stone-100 {{ request()->routeIs('admin.prayer-requests') ? 'bg-white text-stone-950 shadow-sm ring-1 ring-stone-200' : '' }}">Requests</a>
-                            <a href="{{ route('admin.testimonies') }}" class="rounded-md px-3 py-1.5 hover:bg-stone-100 {{ request()->routeIs('admin.testimonies') ? 'bg-white text-stone-950 shadow-sm ring-1 ring-stone-200' : '' }}">Moderation</a>
-                            <a href="{{ route('admin.engagement') }}" class="rounded-md px-3 py-1.5 hover:bg-stone-100 {{ request()->routeIs('admin.engagement') ? 'bg-white text-stone-950 shadow-sm ring-1 ring-stone-200' : '' }}">Engagement</a>
+                            <a href="{{ route('admin.dashboard') }}" class="nav-pill {{ request()->routeIs('admin.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="shield" class="h-4 w-4" />🛡️ Admin</a>
+                        @endif
+                    @endauth
+                </nav>
+
+                @auth
+                    <nav class="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 text-sm [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                        <a href="{{ route('journal.index') }}" class="subnav-pill {{ request()->routeIs('journal.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="journal" class="h-4 w-4" />📝 Journal</a>
+                        <a href="{{ route('favorites.index') }}" class="subnav-pill {{ request()->routeIs('favorites.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bookmark" class="h-4 w-4" />💚 Favorites</a>
+                        @if (auth()->user()->is_admin)
+                            <a href="{{ route('admin.categories') }}" class="subnav-pill {{ request()->routeIs('admin.categories') ? 'subnav-pill-active' : '' }}">🏷️ Categories</a>
+                            <a href="{{ route('admin.devotionals') }}" class="subnav-pill {{ request()->routeIs('admin.devotionals') ? 'subnav-pill-active' : '' }}">✍️ Devotionals</a>
+                            <a href="{{ route('admin.prayer-requests') }}" class="subnav-pill {{ request()->routeIs('admin.prayer-requests') ? 'subnav-pill-active' : '' }}">🙏 Requests</a>
+                            <a href="{{ route('admin.testimonies') }}" class="subnav-pill {{ request()->routeIs('admin.testimonies') ? 'subnav-pill-active' : '' }}">🌟 Moderation</a>
+                            <a href="{{ route('admin.engagement') }}" class="subnav-pill {{ request()->routeIs('admin.engagement') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bar-chart" class="h-4 w-4" />📊 Engagement</a>
                         @endif
                     </nav>
                 @endauth
             </div>
         </header>
 
-        <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+        <main class="mx-auto w-full max-w-7xl flex-1 px-3 py-5 sm:px-5 sm:py-8 lg:px-8">
             @if (session('status'))
-                <div class="mb-6 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-900">
-                    {{ session('status') }}
+                <div class="mb-6 app-surface border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-900">
+                    ✅ {{ session('status') }}
                 </div>
             @endif
 
             {{ $slot }}
         </main>
 
-        <footer class="border-t border-stone-200 bg-white">
-            <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-                <span>MannaRise devotional and spiritual growth platform.</span>
-                <span>{{ now()->year }}</span>
+        <footer class="border-t border-slate-200 bg-white">
+            <div class="mx-auto flex max-w-7xl flex-col gap-4 px-3 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-5 lg:px-8">
+                <span class="inline-flex items-center gap-2 font-semibold text-slate-700"><span>🌿</span> MannaRise devotional and spiritual growth platform.</span>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="h-3 w-3 rounded-full bg-taupe-400"></span>
+                    <span class="h-3 w-3 rounded-full bg-mauve-400"></span>
+                    <span class="h-3 w-3 rounded-full bg-mist-400"></span>
+                    <span class="h-3 w-3 rounded-full bg-olive-500"></span>
+                    <span class="h-3 w-3 rounded-full bg-slate-400"></span>
+                    <span class="h-3 w-3 rounded-full bg-gray-400"></span>
+                    <span class="h-3 w-3 rounded-full bg-zinc-400"></span>
+                    <span class="h-3 w-3 rounded-full bg-neutral-400"></span>
+                    <span class="h-3 w-3 rounded-full bg-stone-400"></span>
+                    <span class="ml-1">{{ now()->year }}</span>
+                </div>
             </div>
         </footer>
 
