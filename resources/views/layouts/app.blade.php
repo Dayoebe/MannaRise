@@ -39,7 +39,7 @@
                             <x-ui.icon name="sparkles" class="h-5 w-5" />
                         </span>
                         <span>
-                            <span class="block text-lg font-black tracking-normal text-emerald-900">MannaRise</span>
+                            <span class="block font-display text-lg font-bold tracking-normal text-emerald-900">MannaRise</span>
                             <span class="block text-xs font-semibold text-slate-500">grow daily</span>
                         </span>
                     </a>
@@ -66,7 +66,7 @@
                     </div>
                 </div>
 
-                <nav class="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 text-sm [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <nav class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3 lg:flex lg:flex-wrap">
                     <a href="{{ route('devotionals.index') }}" class="nav-pill {{ request()->routeIs('devotionals.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="sparkles" class="h-4 w-4" /> Devotionals</a>
                     <a href="{{ route('bible') }}" class="nav-pill {{ request()->routeIs('bible') ? 'nav-pill-active' : '' }}"><x-ui.icon name="book-open" class="h-4 w-4" /> Bible</a>
                     <a href="{{ route('library.index') }}" class="nav-pill {{ request()->routeIs('library.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="library" class="h-4 w-4" /> Library</a>
@@ -82,7 +82,7 @@
                 </nav>
 
                 @auth
-                    <nav class="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 text-sm [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <nav class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3 lg:flex lg:flex-wrap">
                         <a href="{{ route('journal.index') }}" class="subnav-pill {{ request()->routeIs('journal.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="journal" class="h-4 w-4" /> Journal</a>
                         <a href="{{ route('favorites.index') }}" class="subnav-pill {{ request()->routeIs('favorites.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bookmark" class="h-4 w-4" /> Favorites</a>
                         @if (auth()->user()->is_admin)

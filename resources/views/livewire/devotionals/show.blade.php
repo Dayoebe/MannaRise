@@ -27,12 +27,12 @@
                             <p class="flex items-center gap-2 text-sm font-black text-amber-900"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $devotional->bible_reference }}</p>
                         @endif
                         @if ($devotional->bible_text)
-                            <p class="mt-3 text-base leading-7 text-slate-800">{!! nl2br(e($devotional->bible_text)) !!}</p>
+                            <p class="reading-copy mt-3">{!! nl2br(e($devotional->bible_text)) !!}</p>
                         @endif
                     </blockquote>
                 @endif
 
-                <div class="mt-8 max-w-none text-base leading-8 text-slate-800 sm:text-lg">
+                <div class="reading-copy mt-8 max-w-none">
                     {!! nl2br(e($devotional->content)) !!}
                 </div>
             </div>
@@ -68,10 +68,10 @@
             <div class="mt-4 space-y-3">
                 <button type="button" wire:click="toggleFavorite" class="btn-secondary w-full border-emerald-200">
                     <x-ui.icon name="bookmark" class="h-4 w-4" /> {{ $isFavorited ? 'Remove favorite' : 'Save favorite' }}
-</button>
+                </button>
                 <button type="button" wire:click="markCompleted" class="btn-primary w-full">
                     <x-ui.icon name="sparkles" class="h-4 w-4" /> {{ $completedToday ? 'Completed today' : 'Mark completed' }}
-</button>
+                </button>
             </div>
         </div>
 

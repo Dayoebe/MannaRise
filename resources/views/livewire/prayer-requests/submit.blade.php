@@ -1,4 +1,4 @@
-<div class="mx-auto grid max-w-5xl gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+<div class="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start">
     <section class="app-panel overflow-hidden border-rose-200 p-0 sm:p-0">
         <div class="color-strip rounded-none">
             <span class="bg-rose-500"></span>
@@ -11,8 +11,8 @@
             <p class="app-eyebrow border-rose-200 bg-rose-50 text-rose-900"><x-ui.icon name="send" class="h-4 w-4" /> Prayer request</p>
             <h1 class="mt-3 app-section-title">Prayer request</h1>
             <p class="mt-3 text-sm leading-6 text-slate-600">
-            Submit a request for prayer. Public requests can be included in community prayer lists, while private requests stay with the ministry team.
-</p>
+                Submit a request for prayer. Public requests can be included in community prayer lists, while private requests stay with the ministry team.
+            </p>
         </div>
     </section>
 

@@ -33,13 +33,13 @@
 
                 <button type="submit" class="btn-primary w-full" wire:loading.attr="disabled">
                     <x-ui.icon name="log-in" class="h-4 w-4" /> Log in
-</button>
+                </button>
             </form>
 
             <p class="mt-6 text-center text-sm text-slate-600">
                 New to MannaRise?
                 <a href="{{ route('register') }}" class="font-bold text-emerald-800 hover:underline">Create an account</a>
-</p>
+            </p>
         </div>
     </div>
 </div>

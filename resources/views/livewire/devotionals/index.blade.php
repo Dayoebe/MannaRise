@@ -34,10 +34,10 @@
         </div>
     </div>
 
-    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div class="public-card-grid">
         @forelse ($devotionals as $devotional)
-            <article class="app-panel border-t-4 border-t-amber-400 hover:border-amber-300 even:border-t-emerald-500">
-                <div class="flex items-center justify-between gap-3">
+            <article class="app-panel public-card border-t-4 border-t-amber-400 hover:border-amber-300 even:border-t-emerald-500">
+                <div class="flex flex-wrap items-center justify-between gap-3">
                     <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-emerald-900"><x-ui.icon name="bookmark" class="h-4 w-4" /> {{ $devotional->category?->name }}</span>
                     <span class="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-900">{{ $devotional->reading_time }} min</span>
                 </div>
@@ -45,8 +45,8 @@
                 @if ($devotional->bible_reference)
                     <p class="mt-2 inline-flex items-center gap-2 text-sm font-bold text-olive-800"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $devotional->bible_reference }}</p>
                 @endif
-                <p class="mt-3 text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit(strip_tags($devotional->content), 165) }}</p>
-                <a href="{{ route('devotionals.show', $devotional->slug) }}" class="mt-4 btn-primary px-3">Read devotional <x-ui.icon name="chevron-right" class="h-4 w-4" /></a>
+                <p class="mt-3 flex-1 text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit(strip_tags($devotional->content), 165) }}</p>
+                <a href="{{ route('devotionals.show', $devotional->slug) }}" class="mt-4 btn-primary w-full px-3 sm:w-fit">Read devotional <x-ui.icon name="chevron-right" class="h-4 w-4" /></a>
             </article>
         @empty
             <div class="app-panel border-dashed border-slate-300 text-sm text-slate-600 md:col-span-2 xl:col-span-3">

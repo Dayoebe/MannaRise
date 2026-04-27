@@ -54,7 +54,7 @@
                     <a href="{{ route('devotionals.show', $devotional->slug) }}" class="block rounded-xl border border-emerald-100 bg-emerald-50 p-4 hover:border-emerald-300">
                         <span class="block font-black tracking-normal text-slate-950">{{ $devotional->title }}</span>
                         <span class="mt-1 block text-sm font-bold text-emerald-800">{{ $devotional->category?->name }}</span>
-</a>
+                    </a>
                 @empty
                     <p class="rounded-xl border border-dashed border-emerald-200 bg-emerald-50 p-4 text-sm text-slate-600">Saved devotionals will appear here.</p>
                 @endforelse

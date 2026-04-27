@@ -78,23 +78,23 @@
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p class="inline-flex items-center gap-2 rounded-full border border-olive-200 bg-olive-50 px-3 py-1 text-sm font-black uppercase tracking-normal text-olive-800"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $book?->testament }}</p>
-                    <h2 class="mt-3 text-3xl font-black tracking-normal text-slate-950 sm:text-4xl">{{ $book?->name }} {{ $chapter }}</h2>
+                    <h2 class="mt-3 break-words text-3xl font-black tracking-normal text-slate-950 sm:text-4xl">{{ $book?->name }} {{ $chapter }}</h2>
                 </div>
                 <div class="grid grid-cols-2 gap-2 sm:flex">
                     <button type="button" wire:click="previousChapter" class="btn-secondary border-slate-300 px-3">
                         <x-ui.icon name="chevron-left" class="h-4 w-4" /> Previous
-</button>
+                    </button>
                     <button type="button" wire:click="nextChapter" class="btn-primary px-3">
                         Next <x-ui.icon name="chevron-right" class="h-4 w-4" />
-</button>
+                    </button>
                 </div>
             </div>
 
-            <div class="mt-6 space-y-4">
+            <div class="reading-copy mt-6 space-y-4">
                 @foreach ($verses as $verse)
-                    <p class="text-lg leading-8 text-slate-800">
+                    <p>
                         <sup class="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-amber-100 px-1 text-xs font-black text-amber-900">{{ $verse->verse }}</sup>{{ $verse->text }}
-</p>
+                    </p>
                 @endforeach
             </div>
         </article>

@@ -2,7 +2,7 @@
     <aside class="app-panel border-cyan-200 bg-cyan-50 lg:sticky lg:top-36">
         <a href="{{ route('library.index') }}" class="inline-flex items-center gap-2 text-sm font-bold text-cyan-900 hover:text-cyan-700">
             <x-ui.icon name="chevron-left" class="h-4 w-4" /> Back to library
-</a>
+        </a>
 
         <h1 class="mt-4 text-2xl font-black tracking-normal text-slate-950">{{ $book->title }}</h1>
         <p class="mt-1 text-sm font-bold text-slate-500">{{ $book->author ?: 'Unknown author' }}</p>
@@ -14,7 +14,7 @@
                 @foreach ($chapters as $chapterOption)
                     <button type="button" wire:click="$set('chapter', {{ $chapterOption->chapter_number }})" class="min-h-11 w-full rounded-xl border px-3 py-2 text-left text-sm transition {{ $chapter === $chapterOption->chapter_number ? 'border-emerald-300 bg-emerald-700 font-black text-white shadow-sm' : 'border-cyan-200 bg-white font-bold text-slate-700 hover:border-cyan-400 hover:bg-cyan-100' }}">
                         <span class="block truncate">{{ $chapterOption->chapter_number }}. {{ $chapterOption->title }}</span>
-</button>
+                    </button>
                 @endforeach
             </nav>
         </div>
@@ -38,14 +38,14 @@
                 <div class="grid grid-cols-2 gap-2 sm:flex">
                     <button type="button" wire:click="previousChapter" class="btn-secondary border-slate-300 px-3">
                         <x-ui.icon name="chevron-left" class="h-4 w-4" /> Previous
-</button>
+                    </button>
                     <button type="button" wire:click="nextChapter" class="btn-primary px-3">
                         Next <x-ui.icon name="chevron-right" class="h-4 w-4" />
-</button>
+                    </button>
                 </div>
             </div>
 
-            <div class="space-y-5 px-5 pb-6 text-base leading-8 text-slate-800 sm:px-8 sm:pb-8 sm:text-lg">
+            <div class="reading-copy space-y-5 px-5 pb-6 sm:px-8 sm:pb-8">
                 @foreach (preg_split('/\n\n+/', trim($currentChapter->content)) as $paragraph)
                     <p>{{ $paragraph }}</p>
                 @endforeach

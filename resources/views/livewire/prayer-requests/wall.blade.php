@@ -36,19 +36,19 @@
         </div>
     </div>
 
-    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div class="public-card-grid">
         @forelse ($requests as $request)
-            <article class="app-panel border-t-4 {{ $request->is_answered ? 'border-t-emerald-500' : 'border-t-amber-400' }}">
-                <div class="flex items-center justify-between gap-3">
+            <article class="app-panel public-card border-t-4 {{ $request->is_answered ? 'border-t-emerald-500' : 'border-t-amber-400' }}">
+                <div class="flex flex-wrap items-center justify-between gap-3">
                     <span class="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-normal {{ $request->is_answered ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900' }}">
                         {{ $request->is_answered ? 'Answered' : 'Open' }}
-</span>
+                    </span>
                     <span class="text-xs font-bold text-slate-500">{{ $request->created_at->diffForHumans() }}</span>
                 </div>
                 <h2 class="mt-3 text-lg font-black tracking-normal text-slate-950">{{ $request->title }}</h2>
                 <p class="mt-2 text-sm font-bold text-slate-500">{{ $request->name ?: 'Anonymous' }}</p>
-                <p class="mt-3 text-sm leading-6 text-slate-700">{{ $request->body }}</p>
-                <div class="mt-5 flex items-center justify-between gap-3">
+                <p class="mt-3 flex-1 text-sm leading-6 text-slate-700">{{ $request->body }}</p>
+                <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
                     <span class="text-sm font-bold text-rose-800">{{ $request->prayed_count }} prayed</span>
                     <button type="button" wire:click="pray({{ $request->id }})" class="btn-secondary border-rose-200 px-3 hover:bg-rose-50"><x-ui.icon name="heart" class="h-4 w-4" /> I prayed</button>
                 </div>

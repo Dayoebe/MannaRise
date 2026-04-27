@@ -40,13 +40,13 @@
 
                 <button type="submit" class="btn-primary w-full bg-violet-700 hover:bg-violet-800" wire:loading.attr="disabled">
                     <x-ui.icon name="sparkles" class="h-4 w-4" /> Create account
-</button>
+                </button>
             </form>
 
             <p class="mt-6 text-center text-sm text-slate-600">
                 Already have an account?
                 <a href="{{ route('login') }}" class="font-bold text-violet-800 hover:underline">Log in</a>
-</p>
+            </p>
         </div>
     </div>
 </div>

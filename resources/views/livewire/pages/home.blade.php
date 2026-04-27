@@ -25,7 +25,7 @@
                 <h1 class="mt-4 max-w-3xl text-4xl font-black tracking-normal text-slate-950 sm:text-5xl">MannaRise</h1>
                 <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600">
                     Scripture, prayer, testimonies, journaling, the Bible, and classic spiritual books gathered for steady daily growth.
-</p>
+                </p>
                 <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                     <a href="{{ route('devotionals.index') }}" class="btn-primary w-full sm:w-auto"><x-ui.icon name="sparkles" class="h-4 w-4" /> Read devotionals</a>
                     <a href="{{ route('bible') }}" class="btn-warm w-full sm:w-auto"><x-ui.icon name="book-open" class="h-4 w-4" /> Open Bible</a>
@@ -34,14 +34,14 @@
 
                 <div class="mt-7 grid gap-3 text-sm font-bold text-slate-800 sm:grid-cols-3">
                     <a href="{{ route('library.index') }}" class="rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 hover:bg-cyan-100">
-                         Library
-</a>
+                        Library
+                    </a>
                     <a href="{{ route('prayer-requests.wall') }}" class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 hover:bg-rose-100">
-                         Prayer wall
-</a>
+                        Prayer wall
+                    </a>
                     <a href="{{ route('testimonies.index') }}" class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 hover:bg-violet-100">
-                         Testimonies
-</a>
+                        Testimonies
+                    </a>
                 </div>
             </div>
         </div>
@@ -53,7 +53,7 @@
                 <p class="mt-3 text-sm leading-6 text-emerald-50">{{ \Illuminate\Support\Str::limit(strip_tags($featuredDevotional->content), 180) }}</p>
                 <a href="{{ route('devotionals.show', $featuredDevotional->slug) }}" class="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-emerald-900 shadow-sm hover:bg-emerald-50">
                     Open devotional <x-ui.icon name="chevron-right" class="h-4 w-4" />
-</a>
+                </a>
             @else
                 <h2 class="mt-4 text-2xl font-black tracking-normal">No featured devotional yet</h2>
                 <p class="mt-3 text-sm leading-6 text-emerald-50">Publish a devotional from the admin dashboard to feature it here.</p>
@@ -71,15 +71,15 @@
             <a href="{{ route('devotionals.index') }}" class="btn-secondary w-full sm:w-auto">View all <x-ui.icon name="chevron-right" class="h-4 w-4" /></a>
         </div>
 
-        <div class="grid gap-4 md:grid-cols-3">
+        <div class="public-card-grid">
             @forelse ($latestDevotionals as $devotional)
-                <article class="app-panel border-t-4 odd:border-t-amber-400 even:border-t-sky-400">
+                <article class="app-panel public-card border-t-4 odd:border-t-amber-400 even:border-t-sky-400">
                     <p class="inline-flex items-center gap-2 rounded-full bg-olive-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-olive-800"><x-ui.icon name="bookmark" class="h-4 w-4" /> {{ $devotional->category?->name }}</p>
                     <h3 class="mt-3 text-lg font-black tracking-normal text-slate-950">{{ $devotional->title }}</h3>
-                    <p class="mt-2 text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit(strip_tags($devotional->content), 135) }}</p>
+                    <p class="mt-2 flex-1 text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit(strip_tags($devotional->content), 135) }}</p>
                     <a href="{{ route('devotionals.show', $devotional->slug) }}" class="mt-4 inline-flex items-center gap-1 text-sm font-bold text-emerald-800 hover:text-emerald-950">
                         Read <x-ui.icon name="chevron-right" class="h-4 w-4" />
-</a>
+                    </a>
                 </article>
             @empty
                 <div class="app-panel border-dashed border-slate-300 text-sm text-slate-600 md:col-span-3">No published devotionals yet.</div>
@@ -97,11 +97,11 @@
                         <span>
                             <span class="block font-black tracking-normal text-slate-950">{{ $category->name }}</span>
                             <span class="mt-1 block text-sm text-slate-600">{{ $category->devotionals_count }} readings</span>
-</span>
+                        </span>
                         <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lime-100 text-lime-800">
                             <x-ui.icon name="chevron-right" class="h-4 w-4" />
                         </span>
-</a>
+                    </a>
                 @empty
                     <p class="app-panel border-dashed border-slate-300 text-sm text-slate-600">No active categories yet.</p>
                 @endforelse

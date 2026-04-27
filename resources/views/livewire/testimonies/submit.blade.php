@@ -11,8 +11,8 @@
             <p class="app-eyebrow border-fuchsia-200 bg-fuchsia-50 text-fuchsia-900"><x-ui.icon name="message-circle" class="h-4 w-4" /> Share testimony</p>
             <h1 class="mt-3 app-section-title">Share testimony</h1>
             <p class="mt-3 text-sm leading-6 text-slate-600">
-            Testimonies are reviewed before appearing publicly so the community can be encouraged with care.
-</p>
+                Testimonies are reviewed before appearing publicly so the community can be encouraged with care.
+            </p>
         </div>
     </section>
 
