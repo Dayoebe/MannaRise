@@ -8,15 +8,16 @@ use App\Livewire\Admin\PrayerRequests as AdminPrayerRequests;
 use App\Livewire\Admin\Testimonies as AdminTestimonies;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
+use App\Livewire\Bible\Reader as BibleReader;
 use App\Livewire\Dashboard;
 use App\Livewire\Devotionals\Index as DevotionalIndex;
 use App\Livewire\Devotionals\Show as DevotionalShow;
 use App\Livewire\Favorites\Index as FavoritesIndex;
 use App\Livewire\Journal\Index as JournalIndex;
 use App\Livewire\Pages\Home;
-use App\Livewire\Bible\Reader as BibleReader;
 use App\Livewire\PrayerRequests\Submit as SubmitPrayerRequest;
 use App\Livewire\PrayerRequests\Wall as PrayerWall;
+use App\Livewire\Reminders\Settings as ReminderSettings;
 use App\Livewire\SpiritualLibrary\Index as LibraryIndex;
 use App\Livewire\SpiritualLibrary\Show as LibraryShow;
 use App\Livewire\Testimonies\Index as TestimonyIndex;
@@ -54,6 +55,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::get('/journal', JournalIndex::class)->name('journal.index');
     Route::get('/favorites', FavoritesIndex::class)->name('favorites.index');
+    Route::get('/reminders', ReminderSettings::class)->name('reminders.settings');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
