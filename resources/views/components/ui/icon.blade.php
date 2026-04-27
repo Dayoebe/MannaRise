@@ -75,6 +75,11 @@
             <path d="M12 16V7" />
             <path d="M17 16v-8" />
             @break
+        @case('more-horizontal')
+            <circle cx="5" cy="12" r="1" />
+            <circle cx="12" cy="12" r="1" />
+            <circle cx="19" cy="12" r="1" />
+            @break
         @default
             <circle cx="12" cy="12" r="9" />
             <path d="M12 8v4l3 3" />

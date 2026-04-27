@@ -107,7 +107,7 @@
             </div>
         </header>
 
-        <main class="mx-auto w-full max-w-7xl flex-1 px-3 pb-36 pt-5 sm:px-5 sm:pt-8 lg:px-8 lg:pb-8">
+        <main class="mx-auto w-full max-w-7xl flex-1 px-3 pb-28 pt-5 sm:px-5 sm:pt-8 lg:px-8 lg:pb-8">
             @if (session('status'))
                 <div class="mb-6 app-surface flex items-center gap-2 border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-900">
                     <x-ui.icon name="sparkles" class="h-4 w-4" /> {{ session('status') }}
@@ -118,7 +118,7 @@
         </main>
 
         <nav class="mobile-bottom-nav">
-            <div class="mx-auto grid max-w-md grid-cols-3 gap-2">
+            <div class="mx-auto grid max-w-md grid-cols-4 gap-2">
                 <a href="{{ route('devotionals.index') }}" class="mobile-tab {{ request()->routeIs('devotionals.*') ? 'mobile-tab-active' : '' }}">
                     <x-ui.icon name="sparkles" />
                     <span>Devotionals</span>
@@ -131,18 +131,27 @@
                     <x-ui.icon name="library" />
                     <span>Library</span>
                 </a>
-                <a href="{{ route('prayer-requests.wall') }}" class="mobile-tab {{ request()->routeIs('prayer-requests.wall') ? 'mobile-tab-active' : '' }}">
-                    <x-ui.icon name="heart" />
-                    <span>Prayer</span>
-                </a>
-                <a href="{{ route('prayer-requests.submit') }}" class="mobile-tab {{ request()->routeIs('prayer-requests.submit') ? 'mobile-tab-active' : '' }}">
-                    <x-ui.icon name="send" />
-                    <span>Request</span>
-                </a>
-                <a href="{{ route('testimonies.index') }}" class="mobile-tab {{ request()->routeIs('testimonies.*') ? 'mobile-tab-active' : '' }}">
-                    <x-ui.icon name="message-circle" />
-                    <span>Testimonies</span>
-                </a>
+                <details class="relative">
+                    <summary class="mobile-tab list-none cursor-pointer [&::-webkit-details-marker]:hidden {{ request()->routeIs('prayer-requests.*') || request()->routeIs('testimonies.*') ? 'mobile-tab-active' : '' }}">
+                        <x-ui.icon name="more-horizontal" />
+                        <span>More</span>
+                    </summary>
+
+                    <div class="mobile-more-panel">
+                        <a href="{{ route('prayer-requests.wall') }}" class="mobile-more-link {{ request()->routeIs('prayer-requests.wall') ? 'mobile-more-link-active' : '' }}">
+                            <x-ui.icon name="heart" class="h-4 w-4" />
+                            <span>Prayer Wall</span>
+                        </a>
+                        <a href="{{ route('prayer-requests.submit') }}" class="mobile-more-link {{ request()->routeIs('prayer-requests.submit') ? 'mobile-more-link-active' : '' }}">
+                            <x-ui.icon name="send" class="h-4 w-4" />
+                            <span>Request</span>
+                        </a>
+                        <a href="{{ route('testimonies.index') }}" class="mobile-more-link {{ request()->routeIs('testimonies.*') ? 'mobile-more-link-active' : '' }}">
+                            <x-ui.icon name="message-circle" class="h-4 w-4" />
+                            <span>Testimonies</span>
+                        </a>
+                    </div>
+                </details>
             </div>
         </nav>
 
