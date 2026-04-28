@@ -3,6 +3,9 @@
 namespace App\Livewire\PrayerRequests;
 
 use App\Models\PrayerRequest;
+use App\Models\PrayerRoomMembership;
+use App\Models\PrayerRoomPrayer;
+use Illuminate\Support\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -29,6 +32,17 @@ class Wall extends Component
         $request = PrayerRequest::where('is_public', true)->findOrFail($id);
         $request->increment('prayed_count');
 
+        if (auth()->check() && $request->prayer_room_id) {
+            PrayerRoomPrayer::create([
+                'user_id' => auth()->id(),
+                'prayer_room_id' => $request->prayer_room_id,
+                'prayer_request_id' => $request->id,
+                'prayed_on' => today(),
+            ]);
+
+            $this->updatePrayerRoomStreak($request->prayer_room_id);
+        }
+
         session()->flash('status', 'Prayer count updated.');
     }
 
@@ -50,6 +64,37 @@ class Wall extends Component
                 ->paginate(9),
             'openCount' => PrayerRequest::where('is_public', true)->where('is_answered', false)->count(),
             'answeredCount' => PrayerRequest::where('is_public', true)->where('is_answered', true)->count(),
+        ]);
+    }
+
+    private function updatePrayerRoomStreak(int $roomId): void
+    {
+        $membership = PrayerRoomMembership::query()->firstOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'prayer_room_id' => $roomId,
+            ],
+            ['joined_at' => now()],
+        );
+
+        $today = today();
+        $lastPrayedOn = $membership->last_prayed_on
+            ? Carbon::parse($membership->last_prayed_on)->startOfDay()
+            : null;
+
+        if ($lastPrayedOn?->isSameDay($today)) {
+            $currentStreak = $membership->current_streak;
+        } elseif ($lastPrayedOn?->isSameDay($today->copy()->subDay())) {
+            $currentStreak = $membership->current_streak + 1;
+        } else {
+            $currentStreak = 1;
+        }
+
+        $membership->update([
+            'last_prayed_on' => $today,
+            'current_streak' => $currentStreak,
+            'longest_streak' => max($membership->longest_streak, $currentStreak),
+            'total_prayers' => $membership->total_prayers + 1,
         ]);
     }
 }
