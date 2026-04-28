@@ -49,7 +49,7 @@ class MannaRisePagesTest extends TestCase
 
         $this->actingAs($user);
 
-        foreach (['/dashboard', '/journal', '/favorites'] as $path) {
+        foreach (['/dashboard', '/growth-path', '/journal', '/favorites'] as $path) {
             $this->get($path)->assertOk();
         }
     }

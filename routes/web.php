@@ -18,6 +18,7 @@ use App\Livewire\Dashboard;
 use App\Livewire\Devotionals\Index as DevotionalIndex;
 use App\Livewire\Devotionals\Show as DevotionalShow;
 use App\Livewire\Favorites\Index as FavoritesIndex;
+use App\Livewire\GrowthPath\Index as GrowthPathIndex;
 use App\Livewire\Journal\Index as JournalIndex;
 use App\Livewire\Pages\Home;
 use App\Livewire\PrayerRequests\Submit as SubmitPrayerRequest;
@@ -60,6 +61,7 @@ Route::post('/logout', function (Request $request) {
 
 Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
+    Route::get('/growth-path', GrowthPathIndex::class)->name('growth-path.index');
     Route::get('/journal', JournalIndex::class)->name('journal.index');
     Route::get('/favorites', FavoritesIndex::class)->name('favorites.index');
     Route::get('/reminders', ReminderSettings::class)->name('reminders.settings');

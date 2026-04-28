@@ -184,19 +184,17 @@ Key fields:
 
 ## Computed Features Without Dedicated Tables
 
-The current daily rhythm is computed from existing data:
+The base daily rhythm is computed from existing data:
 
 - Verse of the day uses `bible_verses`.
 - Bible-in-a-year assignment uses `bible_books.chapters`.
 - Daily affirmations are curated in application code.
 
-This is enough for public display. Personalized progress needs additional tables.
-
-## Pending Tables
+Public display can use computed data. Personalized progress uses the tracking tables below.
 
 ## Daily Rhythm Check-ins
 
-Needed to track whether a user completed the daily verse, affirmation, and challenge.
+Tracks whether a user completed the daily verse, affirmation, and challenge.
 
 Suggested fields:
 
@@ -211,7 +209,7 @@ Suggested fields:
 
 ## Bible Challenge Progress
 
-Needed for persistent Bible-in-a-year progress.
+Tracks persistent Bible-in-a-year chapter completion and catch-up mode.
 
 Suggested fields:
 
@@ -221,6 +219,17 @@ Suggested fields:
 - assigned_on
 - completed_at
 - source_plan
+
+## User Spiritual Profiles
+
+Stores the selected season for a user's personalized daily path.
+
+Suggested fields:
+
+- user_id
+- season
+
+## Pending Tables
 
 ## Devotional Plans
 

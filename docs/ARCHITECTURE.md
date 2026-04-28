@@ -17,6 +17,7 @@ MannaRise uses a Laravel-first architecture with custom Livewire screens. The go
 
 - Home and public discovery
 - Daily rhythm: verse of the day, affirmation, and Bible-in-a-year assignment
+- Spiritual growth score, personalized daily path, and Bible challenge catch-up mode
 - Devotionals and devotional categories
 - KJV Bible reader and Bible search
 - Public-domain spiritual library
@@ -39,7 +40,7 @@ The daily rhythm is intentionally computed from local data:
 - Daily affirmation rotates through a curated scripture-based list.
 - Bible-in-a-year reading assignment maps the current day of year across the total Bible chapter count.
 
-This keeps the experience deterministic and offline-friendly. Future user-specific progress should be stored separately so the assignment logic remains simple.
+This keeps the base experience deterministic and offline-friendly. User-specific check-ins and chapter completions are stored separately for growth scoring and catch-up mode.
 
 ## Dashboard Strategy
 

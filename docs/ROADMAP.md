@@ -22,6 +22,9 @@ This roadmap separates shipped foundation work from pending product work.
 - KJV Bible reader and search
 - Public-domain spiritual library
 - Daily rhythm page with verse of the day, daily affirmation, and Bible-in-a-year assignment
+- Spiritual growth score on the user dashboard
+- Personalized daily path
+- Bible-in-a-year catch-up mode with chapter completion tracking
 
 ## In Progress or Partial
 
@@ -33,8 +36,8 @@ This roadmap separates shipped foundation work from pending product work.
 
 ## Phase 1: Daily Growth Tracking
 
-- Persist daily rhythm check-ins
-- Track Bible-in-a-year chapter completion per user
+- Expand daily rhythm check-ins into milestone history
+- Add richer Bible challenge progress views
 - Show daily challenge streaks separately from devotional completion streaks
 - Add catch-up and missed-day states
 - Add dashboard widgets for weekly rhythm consistency

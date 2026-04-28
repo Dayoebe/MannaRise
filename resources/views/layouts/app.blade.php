@@ -62,6 +62,7 @@
                     <nav class="hidden gap-2 text-sm lg:flex lg:flex-wrap">
                         <a href="{{ route('journal.index') }}" class="subnav-pill {{ request()->routeIs('journal.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="journal" class="h-4 w-4" /> Journal</a>
                         <a href="{{ route('favorites.index') }}" class="subnav-pill {{ request()->routeIs('favorites.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bookmark" class="h-4 w-4" /> Favorites</a>
+                        <a href="{{ route('growth-path.index') }}" class="subnav-pill {{ request()->routeIs('growth-path.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="route" class="h-4 w-4" /> Path</a>
                         @if (auth()->user()->hasAdminAccess())
                             <a href="{{ route('admin.categories') }}" class="subnav-pill {{ request()->routeIs('admin.categories') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bookmark" class="h-4 w-4" /> Categories</a>
                             <a href="{{ route('admin.devotionals') }}" class="subnav-pill {{ request()->routeIs('admin.devotionals') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="sparkles" class="h-4 w-4" /> Devotionals</a>

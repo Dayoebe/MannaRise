@@ -9,6 +9,7 @@ The current baseline covers:
 - Public devotional discovery and reading
 - KJV Bible reader with search
 - Verse of the day, daily affirmation, and Bible-in-a-year challenge
+- Spiritual growth score, personalized daily path, and Bible challenge catch-up mode
 - Public-domain spiritual library
 - User registration, login, dashboard, favorites, journal, and reading streaks
 - Prayer request submission and public prayer wall
@@ -20,8 +21,8 @@ The current baseline covers:
 
 These are the main pending features to carry forward:
 
-- Persist Bible-in-a-year progress per user instead of computing only the daily assignment
-- Add daily rhythm completion tracking for verse, affirmation, and Bible challenge check-ins
+- Add richer growth-score history and milestone summaries
+- Add more personalized path seasons, rules, and plan recommendations
 - Add devotional plans with plan enrollment, day-by-day progress, plan completion, and reminders
 - Add richer notification delivery: email, push, reminder digest, missed-day nudges, and weekly summaries
 - Add shareable devotional and verse cards with image export and social previews

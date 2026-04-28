@@ -3,7 +3,8 @@
         $dailyVerse = $dailyRhythm['verse'];
         $dailyAffirmation = $dailyRhythm['affirmation'];
         $dailyChallenge = $dailyRhythm['challenge'];
-        $firstChallengeReading = $dailyChallenge ? $dailyChallenge['readings']->first() : null;
+        $dashboardChallenge = $catchUpPlan ?: $dailyChallenge;
+        $firstChallengeReading = $dashboardChallenge ? $dashboardChallenge['readings']->first() : null;
     @endphp
 
     <div wire:loading.flex class="loading-hint items-center gap-2">
@@ -47,6 +48,64 @@
         @endforeach
     </div>
 
+    <section class="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <article class="app-panel border-violet-200 bg-violet-50">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <p class="app-eyebrow border-violet-200 bg-white text-violet-900"><x-ui.icon name="bar-chart" class="h-4 w-4" /> Spiritual growth score</p>
+                    <h2 class="mt-3 text-5xl font-black tracking-normal text-slate-950">{{ $growthScore['score'] }}</h2>
+                    <p class="mt-1 text-sm font-black text-violet-900">{{ $growthScore['label'] }} · 7-day view</p>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-sm font-black text-violet-900 shadow-sm">
+                    {{ $growthScore['trend'] >= 0 ? '+' : '' }}{{ $growthScore['trend'] }} vs 30 days
+                </span>
+            </div>
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                @foreach ($growthScore['breakdown'] as $label => $value)
+                    <div>
+                        <div class="flex items-center justify-between gap-3 text-sm font-bold text-slate-700">
+                            <span>{{ $label }}</span>
+                            <span>{{ $value }}%</span>
+                        </div>
+                        <div class="mt-1 h-2 overflow-hidden rounded-full bg-white">
+                            <div class="h-full rounded-full bg-violet-700" style="width: {{ $value }}%"></div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </article>
+
+        <article class="app-panel border-emerald-200">
+            @php
+                $pathDefinition = $personalPath['definition'];
+                $pathDevotional = $personalPath['devotional'];
+            @endphp
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <p class="app-eyebrow border-emerald-200 bg-emerald-50 text-emerald-900"><x-ui.icon name="route" class="h-4 w-4" /> Personalized daily path</p>
+                    <h2 class="mt-3 app-section-title">{{ $pathDefinition['label'] }}</h2>
+                </div>
+                <a href="{{ route('growth-path.index') }}" class="btn-secondary w-full sm:w-auto">Tune path <x-ui.icon name="chevron-right" class="h-4 w-4" /></a>
+            </div>
+            <div class="mt-5 grid gap-3 md:grid-cols-2">
+                <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                    <p class="text-sm font-black text-emerald-900">Scripture</p>
+                    <p class="mt-1 font-black tracking-normal text-slate-950">{{ $pathDefinition['reference'] }}</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">{{ $pathDefinition['affirmation'] }}</p>
+                </div>
+                <div class="rounded-xl border border-sky-100 bg-sky-50 p-4">
+                    <p class="text-sm font-black text-sky-900">Journal prompt</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-700">{{ $pathDefinition['journal_prompt'] }}</p>
+                </div>
+            </div>
+            @if ($pathDevotional)
+                <a href="{{ route('devotionals.show', $pathDevotional->slug) }}" class="mt-4 inline-flex items-center gap-1 text-sm font-bold text-emerald-900 hover:text-emerald-950">
+                    Recommended: {{ $pathDevotional->title }} <x-ui.icon name="chevron-right" class="h-4 w-4" />
+                </a>
+            @endif
+        </article>
+    </section>
+
     <section class="grid gap-4 lg:grid-cols-3">
         <article class="app-panel border-blue-200 bg-blue-50">
             <p class="app-eyebrow border-blue-200 bg-white text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> Verse of the day</p>
@@ -67,9 +126,15 @@
         <article class="app-panel border-emerald-200 bg-emerald-50">
             <p class="app-eyebrow border-emerald-200 bg-white text-emerald-900"><x-ui.icon name="star" class="h-4 w-4" /> Bible-in-a-year</p>
             @if ($dailyChallenge)
-                <p class="mt-4 font-black tracking-normal text-slate-950">Day {{ $dailyChallenge['day'] }}: {{ $dailyChallenge['reading_label'] }}</p>
+                <p class="mt-4 font-black tracking-normal text-slate-950">
+                    @if ($catchUpPlan && $catchUpPlan['is_catch_up'])
+                        Catch-up: {{ $catchUpPlan['reading_label'] }}
+                    @else
+                        Day {{ $dailyChallenge['day'] }}: {{ $dailyChallenge['reading_label'] }}
+                    @endif
+                </p>
                 <div class="mt-3 h-3 overflow-hidden rounded-full bg-white">
-                    <div class="h-full rounded-full bg-emerald-700" style="width: {{ min(100, $dailyChallenge['progress_percent']) }}%"></div>
+                    <div class="h-full rounded-full bg-emerald-700" style="width: {{ min(100, $catchUpPlan['progress_percent'] ?? $dailyChallenge['progress_percent']) }}%"></div>
                 </div>
                 <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                     <a href="{{ route('daily.index') }}" class="btn-secondary border-emerald-200 px-3">Daily page</a>
