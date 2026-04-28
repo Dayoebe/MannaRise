@@ -1,46 +1,119 @@
 # MannaRise Roadmap
 
-## Phase 1: Foundation
+This roadmap separates shipped foundation work from pending product work.
 
-- Laravel project setup
-- Livewire authentication
-- Custom dashboard layout
+## Shipped Foundation
+
+- Laravel and Livewire application
+- Public home page
+- Authentication
+- User dashboard
 - Devotional categories
-- Devotional publishing structure
-- Public devotional listing
-- Devotional detail page
-
-## Phase 2: User Growth Features
-
-- Favorite devotionals
-- Reflection journal
+- Devotional publishing, listing, and detail pages
+- Favorites
+- Journal entries
 - Prayer request submission
-- Testimony submission
-- Mark devotional as completed
-- Basic reading streaks
-
-## Phase 3: Admin Features
-
+- Public prayer wall
+- Testimony submission and moderation
+- Devotional completions and basic streaks
 - Custom admin dashboard
-- Manage categories
-- Manage devotionals
-- Manage prayer requests
-- Moderate testimonies
-- View user engagement summary
+- Admin category, devotional, prayer request, testimony, and engagement screens
+- KJV Bible reader and search
+- Public-domain spiritual library
+- Daily rhythm page with verse of the day, daily affirmation, and Bible-in-a-year assignment
 
-## Phase 4: Experience Improvements
+## In Progress or Partial
 
-- Search and filtering
-- Shareable devotional links
-- Better landing page
-- Email notifications
-- PWA support
+- Reminder settings and devotional reminder delivery
+- Audio devotional public/admin flows
+- Role and permission management
+- PWA shell, manifest, offline page, and service worker
+- Offline-safe Bible import
 
-## Phase 5: Expansion
+## Phase 1: Daily Growth Tracking
 
-- Devotional plans
-- Audio devotionals
-- Author profiles
-- Church or ministry spaces
-- Paid devotional plans
-- Donation support
+- Persist daily rhythm check-ins
+- Track Bible-in-a-year chapter completion per user
+- Show daily challenge streaks separately from devotional completion streaks
+- Add catch-up and missed-day states
+- Add dashboard widgets for weekly rhythm consistency
+
+## Phase 2: Devotional Plans
+
+- Create multi-day devotional plans
+- Add plan enrollment
+- Add day-by-day plan progress
+- Support featured, seasonal, and topical plans
+- Add plan completion badges
+- Add admin plan builder
+
+## Phase 3: Notifications and Reminders
+
+- Harden scheduled reminder command behavior
+- Add notification delivery logs
+- Add email reminders
+- Add web push reminders
+- Add weekly reading digest
+- Add missed-day nudges
+- Add user timezone and reminder-day preferences
+
+## Phase 4: Sharing and Engagement
+
+- Generate shareable devotional cards
+- Generate verse of the day and affirmation cards
+- Add Open Graph previews for devotionals, testimonies, and daily pages
+- Add public share links with optional expiry
+- Add lightweight reactions or encouragement counts
+
+## Phase 5: Audio and Media
+
+- Add audio upload/storage support
+- Add transcripts and speaker profiles
+- Add duration display and playback progress
+- Add audio devotional collections
+- Add generated or uploaded cover artwork
+
+## Phase 6: Community and Ministry Spaces
+
+- Add church or ministry profiles
+- Add group reading plans
+- Add group prayer walls
+- Add group admin roles
+- Add invite links and member management
+
+## Phase 7: Admin Operations
+
+- Add content calendar
+- Add editorial review workflow
+- Add admin audit logs
+- Add moderation reports
+- Add spam/abuse handling
+- Add deeper engagement analytics
+
+## Phase 8: Growth and Sustainability
+
+- Add donation support
+- Add optional paid devotional plans
+- Add author/contributor profiles
+- Add email capture and onboarding series
+- Add referral or invite tracking
+
+## Phase 9: Accessibility, Localization, and Privacy
+
+- Add UI localization structure
+- Add translated devotional support
+- Add user font-size and reading comfort settings
+- Add account data export
+- Add account deletion workflow
+- Add privacy and notification preference center
+
+## Additional Ideas
+
+- Guided prayer sessions
+- Scripture memorization cards
+- Bible topic trails
+- Family devotional mode
+- Youth devotional mode
+- Offline reading packs
+- AI-assisted admin drafting with human review
+- Seasonal campaigns such as Lent, Advent, New Year fasting, and gratitude challenges

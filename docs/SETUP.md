@@ -16,7 +16,7 @@ Run the bootstrap script from the repository root.
 
 Update `.env` with your local database details.
 
-Recommended database name: `mannarise`
+Recommended database name: `mannarise`.
 
 ## Database
 
@@ -29,24 +29,20 @@ Seeded local accounts:
 - Admin: `admin@mannarise.test` / `password`
 - Reader: `reader@mannarise.test` / `password`
 
-The seeders create devotional categories, published devotionals, public prayer wall entries, approved testimonies, favorites, journal entries, completion history, Bible reader records, and a public-domain spiritual library.
+Seeded data covers devotional categories, published devotionals, public prayer wall entries, approved testimonies, favorites, journal entries, completion history, Bible reader records, and the public-domain spiritual library.
 
-## Offline-safe Bible import
+## Bible Import
 
-The Bible seeder now works safely with or without internet access.
+The preferred development setup is the full public-domain KJV import. If an offline-safe seeder is available in the checkout, it will try local files before the remote source.
 
-Preferred full import options:
+Preferred local file names:
 
-- Put a KJV JSON file at `database/seeders/data/kjv-verses.json`
-- Or put it at `database/seeders/data/verses-1769.json`
-- Or put it at `storage/app/private/kjv-verses.json`
-- Or put it at `storage/app/kjv-verses.json`
+- `database/seeders/data/kjv-verses.json`
+- `database/seeders/data/verses-1769.json`
+- `storage/app/private/kjv-verses.json`
+- `storage/app/kjv-verses.json`
 
-When a local file is found, the seeder imports from it first.
-
-When no local file is available, the seeder tries the remote public-domain KJV JSON source.
-
-When both local and remote sources are unavailable, the seeder no longer fails. It imports a small starter set of Bible verses so the app can still run offline.
+When no local file is available, the seeder may try the remote public-domain KJV JSON source. If your checkout does not include the offline fallback, the first full Bible import needs network access.
 
 ## Testing
 
@@ -65,6 +61,28 @@ Run the frontend watcher and Laravel server in separate terminals.
 `npm run dev`
 
 `php artisan serve`
+
+Core development routes:
+
+- `/daily`
+- `/bible`
+- `/library`
+- `/devotionals`
+- `/dashboard`
+- `/journal`
+- `/favorites`
+- `/admin`
+
+Expanded or partial feature routes, when enabled in the checkout:
+
+- `/audio-devotionals`
+- `/reminders`
+
+## XAMPP
+
+When the project is served through XAMPP under `htdocs`, the public URL may look like:
+
+`http://127.0.0.1/MannaRise/public`
 
 ## Dashboard Direction
 
