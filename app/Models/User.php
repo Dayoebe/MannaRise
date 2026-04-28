@@ -115,4 +115,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(DevotionalCompletion::class);
     }
+
+    public function dailyRhythmCheckIns(): HasMany
+    {
+        return $this->hasMany(DailyRhythmCheckIn::class);
+    }
+
+    public function bibleChapterCompletions(): HasMany
+    {
+        return $this->hasMany(BibleChapterCompletion::class);
+    }
+
+    public function spiritualProfile()
+    {
+        return $this->hasOne(UserSpiritualProfile::class);
+    }
 }

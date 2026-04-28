@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use App\Models\Devotional;
 use App\Support\DailySpiritualRhythm;
+use App\Support\PersonalizedDailyPath;
+use App\Support\SpiritualGrowthScore;
 use Carbon\CarbonImmutable;
 use Livewire\Component;
 
@@ -54,6 +56,9 @@ class Dashboard extends Component
 
         return view('livewire.dashboard', [
             'dailyRhythm' => DailySpiritualRhythm::forDate(),
+            'catchUpPlan' => DailySpiritualRhythm::catchUpPlanForUser($user),
+            'growthScore' => SpiritualGrowthScore::forUser($user),
+            'personalPath' => PersonalizedDailyPath::forSeason($user->spiritualProfile?->season),
             'stats' => [
                 'favorites' => $user->favoriteDevotionals()->count(),
                 'journal_entries' => $user->journalEntries()->count(),

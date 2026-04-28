@@ -3,7 +3,9 @@
 namespace App\Support;
 
 use App\Models\BibleBook;
+use App\Models\BibleChapterCompletion;
 use App\Models\BibleVerse;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
@@ -94,6 +96,76 @@ class DailySpiritualRhythm
             ->values();
     }
 
+    public static function catchUpPlanForUser(User $user, ?CarbonInterface $date = null): ?array
+    {
+        $date = self::normalizeDate($date);
+        $sequence = self::chapterSequence();
+
+        if ($sequence->isEmpty()) {
+            return null;
+        }
+
+        $normalPlan = self::readingPlanForDate($date);
+        $totalChapters = $sequence->count();
+        $daysInYear = (int) $date->endOfYear()->dayOfYear;
+        $expectedCompleted = (int) floor($date->dayOfYear * $totalChapters / $daysInYear);
+        $completedKeys = $user->bibleChapterCompletions()
+            ->get(['bible_book_id', 'chapter'])
+            ->mapWithKeys(fn (BibleChapterCompletion $completion) => [$completion->bible_book_id.':'.$completion->chapter => true]);
+
+        $completedCount = $completedKeys->count();
+        $missedCount = max(0, $expectedCompleted - $completedCount);
+        $dailyCount = max(1, $normalPlan ? $normalPlan['readings']->count() : 3);
+        $extraCount = $missedCount > 0 ? min(5, max(1, (int) ceil($missedCount / 7))) : 0;
+
+        $readings = $sequence
+            ->reject(fn (array $reading) => $completedKeys->has($reading['bible_book_id'].':'.$reading['chapter']))
+            ->take($dailyCount + $extraCount)
+            ->values();
+
+        return [
+            'date' => $date,
+            'readings' => $readings,
+            'reading_label' => self::formatReadingLabel($readings),
+            'missed_count' => $missedCount,
+            'completed_chapters' => $completedCount,
+            'expected_chapters' => $expectedCompleted,
+            'total_chapters' => $totalChapters,
+            'progress_percent' => round(($completedCount / $totalChapters) * 100, 1),
+            'is_catch_up' => $missedCount > 0,
+            'extra_chapters' => $extraCount,
+        ];
+    }
+
+    public static function completeReadingsForUser(User $user, iterable $readings, ?CarbonInterface $date = null): int
+    {
+        $date = self::normalizeDate($date);
+        $completed = 0;
+
+        foreach ($readings as $reading) {
+            if (! isset($reading['bible_book_id'], $reading['chapter'])) {
+                continue;
+            }
+
+            BibleChapterCompletion::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'bible_book_id' => $reading['bible_book_id'],
+                    'chapter' => $reading['chapter'],
+                ],
+                [
+                    'assigned_on' => $date->toDateString(),
+                    'source' => 'bible-in-a-year',
+                    'completed_at' => now(),
+                ],
+            );
+
+            $completed++;
+        }
+
+        return $completed;
+    }
+
     public static function readingPlanForDate(?CarbonInterface $date = null): ?array
     {
         $date = self::normalizeDate($date);
@@ -149,6 +221,15 @@ class DailySpiritualRhythm
             ->first();
     }
 
+    public static function chapterSequence(): Collection
+    {
+        $books = BibleBook::query()
+            ->orderBy('book_order')
+            ->get(['id', 'name', 'slug', 'testament', 'chapters']);
+
+        return self::readingsBetween($books, 0, max(0, (int) $books->sum('chapters') - 1));
+    }
+
     private static function readingsBetween(Collection $books, int $startIndex, int $endIndex): Collection
     {
         $readings = collect();
@@ -162,6 +243,7 @@ class DailySpiritualRhythm
 
                 if ($index >= $startIndex) {
                     $readings->push([
+                        'bible_book_id' => $book->id,
                         'book' => $book->name,
                         'slug' => $book->slug,
                         'testament' => $book->testament,
@@ -176,7 +258,7 @@ class DailySpiritualRhythm
         return $readings;
     }
 
-    private static function formatReadingLabel(Collection $readings): string
+    public static function formatReadingLabel(Collection $readings): string
     {
         if ($readings->isEmpty()) {
             return 'No reading assigned';

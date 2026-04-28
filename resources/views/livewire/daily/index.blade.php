@@ -3,7 +3,8 @@
         $verse = $dailyRhythm['verse'];
         $affirmation = $dailyRhythm['affirmation'];
         $challenge = $dailyRhythm['challenge'];
-        $firstReading = $challenge ? $challenge['readings']->first() : null;
+        $activeChallenge = $catchUpPlan ?: $challenge;
+        $firstReading = $activeChallenge ? $activeChallenge['readings']->first() : null;
     @endphp
 
     <section class="page-hero border-emerald-200">
@@ -51,6 +52,13 @@
                 <a href="{{ route('bible', ['book' => $verse->book->slug, 'chapter' => $verse->chapter]) }}" class="mt-5 btn-secondary border-blue-200 text-blue-900 hover:bg-white">
                     Read chapter <x-ui.icon name="chevron-right" class="h-4 w-4" />
                 </a>
+                @auth
+                    <button type="button" wire:click="markVerseComplete" class="mt-3 btn-primary bg-blue-700 hover:bg-blue-800">
+                        <x-ui.icon name="check-circle" class="h-4 w-4" /> {{ $checkIn?->verse_completed_at ? 'Verse completed' : 'Mark verse complete' }}
+                    </button>
+                @else
+                    <a href="{{ route('login') }}" class="mt-3 btn-secondary border-blue-200 text-blue-900">Log in to track</a>
+                @endauth
             @else
                 <p class="mt-4 rounded-2xl border border-dashed border-blue-200 bg-white p-4 text-sm text-slate-600">
                     The Bible has not been imported yet. Run `php artisan db:seed --class=BibleSeeder`.
@@ -64,6 +72,11 @@
                 {{ $affirmation['text'] }}
             </p>
             <p class="mt-4 text-sm font-black tracking-normal text-amber-900">{{ $affirmation['reference'] }}</p>
+            @auth
+                <button type="button" wire:click="markAffirmationComplete" class="mt-5 btn-primary bg-amber-600 text-slate-950 hover:bg-amber-500">
+                    <x-ui.icon name="check-circle" class="h-4 w-4" /> {{ $checkIn?->affirmation_completed_at ? 'Affirmation completed' : 'Mark affirmation complete' }}
+                </button>
+            @endauth
         </article>
     </section>
 
@@ -73,26 +86,47 @@
                 <p class="app-eyebrow border-emerald-200 bg-emerald-50 text-emerald-900"><x-ui.icon name="star" class="h-4 w-4" /> Bible-in-a-year challenge</p>
                 <h2 class="mt-3 app-section-title">Today&apos;s reading</h2>
             </div>
-            @if ($challenge)
+            @if ($activeChallenge)
                 <span class="inline-flex w-fit rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-900">
-                    Day {{ $challenge['day'] }} of {{ $challenge['days_in_year'] }}
+                    @if ($catchUpPlan)
+                        {{ $catchUpPlan['is_catch_up'] ? $catchUpPlan['missed_count'].' chapters behind' : 'On pace' }}
+                    @else
+                        Day {{ $challenge['day'] }} of {{ $challenge['days_in_year'] }}
+                    @endif
                 </span>
             @endif
         </div>
 
-        @if ($challenge)
+        @if ($activeChallenge)
             <div class="mt-5">
                 <div class="flex items-center justify-between gap-3 text-sm font-bold text-slate-700">
-                    <span>{{ $challenge['completed_chapters'] }} of {{ $challenge['total_chapters'] }} chapters</span>
-                    <span>{{ $challenge['progress_percent'] }}%</span>
+                    <span>{{ $activeChallenge['completed_chapters'] }} of {{ $activeChallenge['total_chapters'] }} chapters</span>
+                    <span>{{ $activeChallenge['progress_percent'] }}%</span>
                 </div>
                 <div class="mt-2 h-3 overflow-hidden rounded-full bg-slate-200">
-                    <div class="h-full rounded-full bg-emerald-700" style="width: {{ min(100, $challenge['progress_percent']) }}%"></div>
+                    <div class="h-full rounded-full bg-emerald-700" style="width: {{ min(100, $activeChallenge['progress_percent']) }}%"></div>
                 </div>
             </div>
 
+            @if ($catchUpPlan)
+                <div class="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+                    <p class="font-black tracking-normal text-slate-950">{{ $catchUpPlan['is_catch_up'] ? 'Catch-up mode' : "Today's pace" }}</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                        {{ $catchUpPlan['reading_label'] }}
+                        @if ($catchUpPlan['extra_chapters'] > 0)
+                            includes {{ $catchUpPlan['extra_chapters'] }} extra catch-up {{ \Illuminate\Support\Str::plural('chapter', $catchUpPlan['extra_chapters']) }}.
+                        @endif
+                    </p>
+                    <button type="button" wire:click="completeChallenge" class="mt-4 btn-primary">
+                        <x-ui.icon name="check-circle" class="h-4 w-4" /> {{ $checkIn?->challenge_completed_at ? 'Challenge completed today' : 'Mark challenge complete' }}
+                    </button>
+                </div>
+            @else
+                <a href="{{ route('login') }}" class="mt-5 btn-secondary border-emerald-200 text-emerald-900">Log in for catch-up tracking</a>
+            @endif
+
             <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                @foreach ($challenge['readings'] as $reading)
+                @foreach ($activeChallenge['readings'] as $reading)
                     <a href="{{ route('bible', ['book' => $reading['slug'], 'chapter' => $reading['chapter']]) }}" class="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 transition hover:border-emerald-300 hover:bg-emerald-100">
                         <span class="block text-xs font-black uppercase tracking-normal text-emerald-800">{{ $reading['testament'] }}</span>
                         <span class="mt-1 block font-black tracking-normal text-slate-950">{{ $reading['book'] }} {{ $reading['chapter'] }}</span>
