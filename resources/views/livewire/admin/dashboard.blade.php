@@ -178,7 +178,7 @@
                     @forelse ($recentPrayerRequests as $request)
                         <div class="rounded-xl border border-rose-100 bg-rose-50 p-4">
                             <p class="font-black tracking-normal text-slate-950">{{ $request->title }}</p>
-                            <p class="mt-1 text-sm font-bold text-slate-500">{{ $request->name ?: 'Anonymous' }} · {{ $request->is_answered ? 'Answered' : 'Open' }}</p>
+                            <p class="mt-1 text-sm font-bold text-slate-500">{{ $request->name ?: 'Anonymous' }} · {{ $request->room?->name ?? 'General' }} · {{ $request->is_answered ? 'Answered' : 'Open' }}</p>
                         </div>
                     @empty
                         <p class="rounded-xl border border-dashed border-rose-200 bg-rose-50 p-4 text-sm text-slate-600">No prayer requests yet.</p>

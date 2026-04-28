@@ -14,6 +14,7 @@ This roadmap separates shipped foundation work from pending product work.
 - Journal entries
 - Prayer request submission
 - Public prayer wall
+- Focused prayer rooms with joins, "I prayed", prayer streaks, and answered-prayer updates
 - Testimony submission and moderation
 - Devotional completions and basic streaks
 - Custom admin dashboard
@@ -81,7 +82,7 @@ This roadmap separates shipped foundation work from pending product work.
 
 - Add church or ministry profiles
 - Add group reading plans
-- Add group prayer walls
+- Expand focused prayer rooms into group and ministry prayer walls
 - Add group admin roles
 - Add invite links and member management
 

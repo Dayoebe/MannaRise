@@ -40,9 +40,14 @@
         @forelse ($requests as $request)
             <article class="app-panel public-card border-t-4 {{ $request->is_answered ? 'border-t-emerald-500' : 'border-t-amber-400' }}">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                    <span class="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-normal {{ $request->is_answered ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900' }}">
-                        {{ $request->is_answered ? 'Answered' : 'Open' }}
-                    </span>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-normal {{ $request->is_answered ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900' }}">
+                            {{ $request->is_answered ? 'Answered' : 'Open' }}
+                        </span>
+                        @if ($request->room)
+                            <a href="{{ route('prayer-rooms.show', $request->room->slug) }}" class="rounded-full bg-rose-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-rose-900 hover:bg-rose-100">{{ $request->room->name }}</a>
+                        @endif
+                    </div>
                     <span class="text-xs font-bold text-slate-500">{{ $request->created_at->diffForHumans() }}</span>
                 </div>
                 <h2 class="mt-3 text-lg font-black tracking-normal text-slate-950">{{ $request->title }}</h2>

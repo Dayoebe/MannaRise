@@ -3,6 +3,7 @@
 namespace App\Livewire\PrayerRequests;
 
 use App\Models\PrayerRequest;
+use App\Models\PrayerRoom;
 use Livewire\Component;
 
 class Submit extends Component
@@ -17,11 +18,22 @@ class Submit extends Component
 
     public bool $is_public = false;
 
+    public string $room = '';
+
     public function mount(): void
     {
+        PrayerRoom::syncDefaults();
+
         if (auth()->check()) {
             $this->name = auth()->user()->name;
             $this->email = auth()->user()->email;
+        }
+
+        $room = request()->query('room');
+
+        if (is_string($room)) {
+            $selectedRoom = PrayerRoom::where('slug', $room)->where('is_active', true)->first();
+            $this->room = $selectedRoom ? (string) $selectedRoom->id : '';
         }
     }
 
@@ -33,11 +45,17 @@ class Submit extends Component
             'title' => ['required', 'string', 'max:255'],
             'body' => ['required', 'string', 'min:10'],
             'is_public' => ['boolean'],
+            'room' => ['nullable', 'exists:prayer_rooms,id'],
         ]);
 
         PrayerRequest::create([
-            ...$validated,
             'user_id' => auth()->id(),
+            'prayer_room_id' => $validated['room'] ?: null,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'title' => $validated['title'],
+            'body' => $validated['body'],
+            'is_public' => $validated['is_public'],
         ]);
 
         $this->reset('title', 'body', 'is_public');
@@ -46,6 +64,10 @@ class Submit extends Component
 
     public function render()
     {
-        return view('livewire.prayer-requests.submit');
+        PrayerRoom::syncDefaults();
+
+        return view('livewire.prayer-requests.submit', [
+            'rooms' => PrayerRoom::where('is_active', true)->orderBy('sort_order')->get(),
+        ]);
     }
 }

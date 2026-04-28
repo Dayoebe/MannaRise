@@ -1,18 +1,14 @@
 <?php
 
-use App\Livewire\Admin\AudioDevotionals as AdminAudioDevotionals;
 use App\Livewire\Admin\Categories as AdminCategories;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\Devotionals as AdminDevotionals;
 use App\Livewire\Admin\Engagement as AdminEngagement;
 use App\Livewire\Admin\PrayerRequests as AdminPrayerRequests;
-use App\Livewire\Admin\Roles as AdminRoles;
 use App\Livewire\Admin\Settings as AdminSettings;
 use App\Livewire\Admin\Testimonies as AdminTestimonies;
-use App\Livewire\AudioDevotionals\Index as AudioDevotionalIndex;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
-use App\Livewire\Bible\Reader as BibleReader;
 use App\Livewire\Daily\Index as DailyIndex;
 use App\Livewire\Dashboard;
 use App\Livewire\Devotionals\Index as DevotionalIndex;
@@ -21,9 +17,11 @@ use App\Livewire\Favorites\Index as FavoritesIndex;
 use App\Livewire\GrowthPath\Index as GrowthPathIndex;
 use App\Livewire\Journal\Index as JournalIndex;
 use App\Livewire\Pages\Home;
+use App\Livewire\Bible\Reader as BibleReader;
+use App\Livewire\PrayerRooms\Index as PrayerRoomIndex;
+use App\Livewire\PrayerRooms\Show as PrayerRoomShow;
 use App\Livewire\PrayerRequests\Submit as SubmitPrayerRequest;
 use App\Livewire\PrayerRequests\Wall as PrayerWall;
-use App\Livewire\Reminders\Settings as ReminderSettings;
 use App\Livewire\SpiritualLibrary\Index as LibraryIndex;
 use App\Livewire\SpiritualLibrary\Show as LibraryShow;
 use App\Livewire\Testimonies\Index as TestimonyIndex;
@@ -39,7 +37,8 @@ Route::get('/library', LibraryIndex::class)->name('library.index');
 Route::get('/library/{slug}/{chapter?}', LibraryShow::class)->name('library.show');
 Route::get('/devotionals', DevotionalIndex::class)->name('devotionals.index');
 Route::get('/devotionals/{slug}', DevotionalShow::class)->name('devotionals.show');
-Route::get('/audio-devotionals', AudioDevotionalIndex::class)->name('audio-devotionals.index');
+Route::get('/prayer-rooms', PrayerRoomIndex::class)->name('prayer-rooms.index');
+Route::get('/prayer-rooms/{room}', PrayerRoomShow::class)->name('prayer-rooms.show');
 Route::get('/prayer-request', SubmitPrayerRequest::class)->name('prayer-requests.submit');
 Route::get('/prayer-wall', PrayerWall::class)->name('prayer-requests.wall');
 Route::get('/testimonies', TestimonyIndex::class)->name('testimonies.index');
@@ -64,17 +63,14 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/growth-path', GrowthPathIndex::class)->name('growth-path.index');
     Route::get('/journal', JournalIndex::class)->name('journal.index');
     Route::get('/favorites', FavoritesIndex::class)->name('favorites.index');
-    Route::get('/reminders', ReminderSettings::class)->name('reminders.settings');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', AdminDashboard::class)->name('dashboard');
     Route::get('/categories', AdminCategories::class)->name('categories');
     Route::get('/devotionals', AdminDevotionals::class)->name('devotionals');
-    Route::get('/audio-devotionals', AdminAudioDevotionals::class)->name('audio-devotionals');
     Route::get('/prayer-requests', AdminPrayerRequests::class)->name('prayer-requests');
     Route::get('/testimonies', AdminTestimonies::class)->name('testimonies');
     Route::get('/engagement', AdminEngagement::class)->name('engagement');
     Route::get('/settings', AdminSettings::class)->name('settings');
-    Route::get('/roles', AdminRoles::class)->middleware('permission:manage-roles')->name('roles');
 });

@@ -78,6 +78,7 @@ Stores public and private prayer requests.
 Key fields:
 
 - user_id
+- prayer_room_id
 - name
 - email
 - title
@@ -85,6 +86,56 @@ Key fields:
 - is_public
 - is_answered
 - prayed_count
+
+## Prayer Rooms
+
+Stores focused prayer spaces for healing, family, business, exams, marriage, and salvation.
+
+Key fields:
+
+- name
+- slug
+- description
+- scripture_reference
+- accent
+- sort_order
+- is_active
+
+## Prayer Room Memberships
+
+Tracks which users joined each room plus prayer streaks.
+
+Key fields:
+
+- user_id
+- prayer_room_id
+- joined_at
+- last_prayed_on
+- current_streak
+- longest_streak
+- total_prayers
+
+## Prayer Room Prayers
+
+Stores each "I prayed" event for room activity and user streaks.
+
+Key fields:
+
+- user_id
+- prayer_room_id
+- prayer_request_id
+- prayed_on
+
+## Prayer Request Updates
+
+Stores answered-prayer updates attached to prayer requests.
+
+Key fields:
+
+- prayer_request_id
+- user_id
+- body
+- is_answered_update
 
 ## Testimonies
 

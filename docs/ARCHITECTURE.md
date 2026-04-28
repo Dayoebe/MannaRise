@@ -22,7 +22,7 @@ MannaRise uses a Laravel-first architecture with custom Livewire screens. The go
 - KJV Bible reader and Bible search
 - Public-domain spiritual library
 - Favorites, journal entries, devotional completions, and streaks
-- Prayer requests and public prayer wall
+- Prayer requests, focused prayer rooms, public prayer wall, prayer streaks, and answered-prayer updates
 - Testimonies and moderation
 - Audio devotionals
 - Platform settings
@@ -48,7 +48,7 @@ The app does not use Filament. User and admin dashboards are custom Livewire com
 
 ## Route Groups
 
-- Public routes: home, daily rhythm, Bible, library, devotionals, audio devotionals, prayer wall, testimony pages
+- Public routes: home, daily rhythm, Bible, library, devotionals, audio devotionals, prayer rooms, prayer wall, testimony pages
 - Guest routes: login and registration
 - Auth routes: dashboard, journal, favorites, reminder settings
 - Admin routes: dashboard, categories, devotionals, settings, audio devotionals, prayer requests, testimonies, engagement, roles

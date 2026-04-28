@@ -8,6 +8,7 @@ use App\Models\DevotionalCompletion;
 use App\Models\DevotionalFavorite;
 use App\Models\JournalEntry;
 use App\Models\PrayerRequest;
+use App\Models\PrayerRoom;
 use App\Models\Testimony;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -52,6 +53,9 @@ class DatabaseSeeder extends Seeder
                 'is_super_admin' => false,
             ],
         );
+
+        PrayerRoom::syncDefaults();
+        $familyPrayerRoom = PrayerRoom::where('slug', 'family')->first();
 
         $categories = collect([
             ['name' => 'Faith', 'description' => 'Trusting God with daily obedience.'],
@@ -159,6 +163,7 @@ class DatabaseSeeder extends Seeder
             ['title' => 'Wisdom for a family decision'],
             [
                 'user_id' => $reader->id,
+                'prayer_room_id' => $familyPrayerRoom?->id,
                 'name' => $reader->name,
                 'email' => $reader->email,
                 'body' => 'Please pray for clarity, unity, and peace as our family makes an important decision.',

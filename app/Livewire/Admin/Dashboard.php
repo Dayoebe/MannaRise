@@ -11,6 +11,8 @@ use App\Models\DevotionalFavorite;
 use App\Models\JournalEntry;
 use App\Models\PlatformSetting;
 use App\Models\PrayerRequest;
+use App\Models\PrayerRoom;
+use App\Models\PrayerRoomPrayer;
 use App\Models\SpiritualBook;
 use App\Models\SpiritualBookChapter;
 use App\Models\Testimony;
@@ -85,11 +87,14 @@ class Dashboard extends Component
 
     public function render()
     {
+        PrayerRoom::syncDefaults();
+
         $publishedDevotionals = Devotional::where('is_published', true)->count();
         $draftDevotionals = Devotional::where('is_published', false)->count();
         $openPrayers = PrayerRequest::where('is_answered', false)->count();
         $answeredPrayers = PrayerRequest::where('is_answered', true)->count();
         $pendingTestimonies = Testimony::where('is_approved', false)->count();
+        $prayerRooms = PrayerRoom::where('is_active', true)->count();
 
         return view('livewire.admin.dashboard', [
             'metricGroups' => [
@@ -98,11 +103,13 @@ class Dashboard extends Component
                 ['label' => 'Published', 'value' => $publishedDevotionals, 'icon' => 'check-circle', 'classes' => 'border-emerald-200 bg-emerald-50 text-emerald-900'],
                 ['label' => 'Drafts', 'value' => $draftDevotionals, 'icon' => 'journal', 'classes' => 'border-slate-200 bg-slate-50 text-slate-900'],
                 ['label' => 'Open prayers', 'value' => $openPrayers, 'icon' => 'heart', 'classes' => 'border-rose-200 bg-rose-50 text-rose-900'],
+                ['label' => 'Prayer rooms', 'value' => $prayerRooms, 'icon' => 'users', 'classes' => 'border-sky-200 bg-sky-50 text-sky-900'],
                 ['label' => 'Pending testimonies', 'value' => $pendingTestimonies, 'icon' => 'message-circle', 'classes' => 'border-fuchsia-200 bg-fuchsia-50 text-fuchsia-900'],
                 ['label' => 'Completions', 'value' => DevotionalCompletion::count(), 'icon' => 'star', 'classes' => 'border-lime-200 bg-lime-50 text-lime-900'],
-                ['label' => 'Bible verses', 'value' => BibleVerse::count(), 'icon' => 'book-open', 'classes' => 'border-blue-200 bg-blue-50 text-blue-900'],
+                ['label' => 'Room prayers today', 'value' => PrayerRoomPrayer::whereDate('prayed_on', today())->count(), 'icon' => 'check-circle', 'classes' => 'border-blue-200 bg-blue-50 text-blue-900'],
+                ['label' => 'Bible verses', 'value' => BibleVerse::count(), 'icon' => 'book-open', 'classes' => 'border-indigo-200 bg-indigo-50 text-indigo-900'],
             ],
-            'contentAreas' => $this->contentAreas($publishedDevotionals, $draftDevotionals, $openPrayers, $answeredPrayers, $pendingTestimonies),
+            'contentAreas' => $this->contentAreas($publishedDevotionals, $draftDevotionals, $openPrayers, $answeredPrayers, $pendingTestimonies, $prayerRooms),
             'projectSnapshot' => $this->projectSnapshot(),
             'settingsSnapshot' => [
                 ['label' => 'Verse of the day', 'value' => PlatformSetting::value('daily.verse_enabled') ? 'On' : 'Off'],
@@ -112,17 +119,18 @@ class Dashboard extends Component
             ],
             'categories' => DevotionalCategory::orderBy('name')->get(),
             'recentDevotionals' => Devotional::with('category')->latest()->take(6)->get(),
-            'recentPrayerRequests' => PrayerRequest::latest()->take(5)->get(),
+            'recentPrayerRequests' => PrayerRequest::with('room')->latest()->take(5)->get(),
             'recentTestimonies' => Testimony::latest()->take(5)->get(),
         ]);
     }
 
-    private function contentAreas(int $publishedDevotionals, int $draftDevotionals, int $openPrayers, int $answeredPrayers, int $pendingTestimonies): array
+    private function contentAreas(int $publishedDevotionals, int $draftDevotionals, int $openPrayers, int $answeredPrayers, int $pendingTestimonies, int $prayerRooms): array
     {
         return collect([
             $this->area('Devotional input', 'Create, publish, feature, and edit devotionals.', 'sparkles', 'admin.devotionals', "{$publishedDevotionals} published, {$draftDevotionals} drafts"),
             $this->area('Categories', 'Manage devotional topics and public browsing structure.', 'bookmark', 'admin.categories', DevotionalCategory::count().' topics'),
             $this->area('Prayer moderation', 'Review prayer wall visibility and answered requests.', 'heart', 'admin.prayer-requests', "{$openPrayers} open, {$answeredPrayers} answered"),
+            $this->area('Prayer rooms', 'Review focused rooms, streak activity, and room-based requests.', 'users', 'prayer-rooms.index', "{$prayerRooms} rooms"),
             $this->area('Testimony moderation', 'Approve reader testimonies before public display.', 'message-circle', 'admin.testimonies', "{$pendingTestimonies} pending"),
             $this->area('Engagement', 'Review completions, favorites, journals, and prayer activity.', 'bar-chart', 'admin.engagement', DevotionalCompletion::count().' completions'),
             $this->area('Settings', 'Configure site copy, daily modules, and moderation defaults.', 'settings', 'admin.settings', PlatformSetting::allWithDefaults()->count().' settings'),
@@ -141,6 +149,8 @@ class Dashboard extends Component
             ['label' => 'Favorites', 'value' => DevotionalFavorite::count()],
             ['label' => 'Journal entries', 'value' => JournalEntry::count()],
             ['label' => 'Prayer requests', 'value' => PrayerRequest::count()],
+            ['label' => 'Prayer rooms', 'value' => PrayerRoom::count()],
+            ['label' => 'Room prayer logs', 'value' => PrayerRoomPrayer::count()],
             ['label' => 'Testimonies', 'value' => Testimony::count()],
             ['label' => 'Bible books', 'value' => BibleBook::count()],
             ['label' => 'Bible verses', 'value' => BibleVerse::count()],

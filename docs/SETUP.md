@@ -29,7 +29,7 @@ Seeded local accounts:
 - Admin: `admin@mannarise.test` / `password`
 - Reader: `reader@mannarise.test` / `password`
 
-Seeded data covers devotional categories, published devotionals, public prayer wall entries, approved testimonies, favorites, journal entries, completion history, Bible reader records, and the public-domain spiritual library.
+Seeded data covers devotional categories, published devotionals, prayer rooms, public prayer wall entries, approved testimonies, favorites, journal entries, completion history, Bible reader records, and the public-domain spiritual library.
 
 ## Bible Import
 
@@ -67,6 +67,7 @@ Core development routes:
 - `/daily`
 - `/bible`
 - `/library`
+- `/prayer-rooms`
 - `/devotionals`
 - `/dashboard`
 - `/journal`

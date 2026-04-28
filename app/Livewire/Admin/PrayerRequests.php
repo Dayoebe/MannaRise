@@ -33,10 +33,14 @@ class PrayerRequests extends Component
     {
         return view('livewire.admin.prayer-requests', [
             'requests' => PrayerRequest::query()
-                ->when($this->search !== '', fn ($query) => $query
-                    ->where('title', 'like', "%{$this->search}%")
-                    ->orWhere('name', 'like', "%{$this->search}%")
-                    ->orWhere('email', 'like', "%{$this->search}%"))
+                ->with(['room', 'updates' => fn ($query) => $query->latest()])
+                ->when($this->search !== '', fn ($query) => $query->where(function ($query) {
+                    $query
+                        ->where('title', 'like', "%{$this->search}%")
+                        ->orWhere('name', 'like', "%{$this->search}%")
+                        ->orWhere('email', 'like', "%{$this->search}%")
+                        ->orWhereHas('room', fn ($roomQuery) => $roomQuery->where('name', 'like', "%{$this->search}%"));
+                }))
                 ->latest()
                 ->paginate(12),
         ]);

@@ -4,9 +4,9 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -15,6 +15,11 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'email',
@@ -23,11 +28,21 @@ class User extends Authenticatable
         'is_super_admin',
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
@@ -40,50 +55,7 @@ class User extends Authenticatable
 
     public function hasAdminAccess(): bool
     {
-        return $this->is_super_admin
-            || $this->is_admin
-            || $this->hasAnyRole(['super-admin', 'admin', 'editor', 'moderator']);
-    }
-
-    public function hasRole(string $role): bool
-    {
-        return $this->roles()->where('name', $role)->exists();
-    }
-
-    public function hasAnyRole(array $roles): bool
-    {
-        return $this->roles()->whereIn('name', $roles)->exists();
-    }
-
-    public function canDo(string $permission): bool
-    {
-        if ($this->is_super_admin || $this->hasRole('super-admin')) {
-            return true;
-        }
-
-        return $this->roles()
-            ->whereHas('permissions', fn ($query) => $query->where('name', $permission))
-            ->exists();
-    }
-
-    public function assignRole(string|Role $role): void
-    {
-        $roleModel = is_string($role) ? Role::where('name', $role)->firstOrFail() : $role;
-        $this->roles()->syncWithoutDetaching([$roleModel->id]);
-    }
-
-    public function removeRole(string|Role $role): void
-    {
-        $roleModel = is_string($role) ? Role::where('name', $role)->first() : $role;
-
-        if ($roleModel) {
-            $this->roles()->detach($roleModel->id);
-        }
-    }
-
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class)->withTimestamps();
+        return $this->is_super_admin || $this->is_admin;
     }
 
     public function devotionals(): HasMany
@@ -99,6 +71,23 @@ class User extends Authenticatable
     public function prayerRequests(): HasMany
     {
         return $this->hasMany(PrayerRequest::class);
+    }
+
+    public function prayerRoomMemberships(): HasMany
+    {
+        return $this->hasMany(PrayerRoomMembership::class);
+    }
+
+    public function prayerRooms(): BelongsToMany
+    {
+        return $this->belongsToMany(PrayerRoom::class, 'prayer_room_memberships')
+            ->withPivot(['joined_at', 'last_prayed_on', 'current_streak', 'longest_streak', 'total_prayers'])
+            ->withTimestamps();
+    }
+
+    public function prayerRoomPrayers(): HasMany
+    {
+        return $this->hasMany(PrayerRoomPrayer::class);
     }
 
     public function testimonies(): HasMany

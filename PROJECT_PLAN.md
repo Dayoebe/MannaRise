@@ -12,7 +12,7 @@ The current baseline covers:
 - Spiritual growth score, personalized daily path, and Bible challenge catch-up mode
 - Public-domain spiritual library
 - User registration, login, dashboard, favorites, journal, and reading streaks
-- Prayer request submission and public prayer wall
+- Prayer request submission, focused prayer rooms, public prayer wall, prayer streaks, and answered-prayer updates
 - Testimony submission and moderation
 - Custom admin control center for quick content input, settings, moderation, core content, and engagement
 - Starter seed data for local development
@@ -28,7 +28,7 @@ These are the main pending features to carry forward:
 - Add shareable devotional and verse cards with image export and social previews
 - Expand audio devotionals with upload/storage handling, transcript text, duration metadata, and admin publishing workflow
 - Add author profiles and contributor attribution for devotionals and audio content
-- Add church, ministry, or group spaces with shared reading plans and group prayer walls
+- Add church, ministry, or group spaces with shared reading plans and expanded group prayer walls
 - Add donation support, sponsored plans, and optional paid devotional content
 - Add content calendar tooling for scheduled devotionals, seasonal campaigns, and editorial review
 - Add user preferences for timezone, reminder days, Bible version preference, notification channels, and accessibility settings

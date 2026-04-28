@@ -8,6 +8,8 @@ use App\Models\DevotionalCompletion;
 use App\Models\DevotionalFavorite;
 use App\Models\JournalEntry;
 use App\Models\PrayerRequest;
+use App\Models\PrayerRequestUpdate;
+use App\Models\PrayerRoom;
 use App\Models\Testimony;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -41,6 +43,9 @@ class MannaRiseContentSeeder extends Seeder
             ['email' => $reader['email']],
             ['name' => $reader['name'], 'password' => 'password', 'is_admin' => false, 'is_super_admin' => false],
         ));
+
+        PrayerRoom::syncDefaults();
+        $prayerRooms = PrayerRoom::pluck('id', 'slug');
 
         $categories = collect([
             ['name' => 'Faith', 'description' => 'Trusting God with daily obedience.'],
@@ -205,27 +210,28 @@ class MannaRiseContentSeeder extends Seeder
         }
 
         $prayers = [
-            ['Healing for my mother', 'Please pray for strength, accurate diagnosis, and peace for our family while my mother receives treatment.', true, false, 34],
-            ['Direction for a new job', 'I need wisdom about a job offer and courage to choose what honors God over fear.', true, false, 21],
-            ['Restoration in marriage', 'Please pray for humility, forgiveness, and honest communication in our marriage.', true, false, 48],
-            ['Peace during exams', 'Pray for focus, calm, and good recall as I prepare for final exams.', true, false, 15],
-            ['Provision for rent', 'I am trusting God for provision and wise next steps after a difficult month.', true, false, 27],
-            ['Salvation for my brother', 'Please pray that my brother encounters Christ and finds a faithful community.', true, false, 42],
-            ['Strength after loss', 'Our family is grieving. Please pray for comfort and daily strength.', true, false, 39],
-            ['Business wisdom', 'Pray for integrity, clarity, and provision as I rebuild my small business.', true, false, 18],
-            ['Answered: school admission', 'God opened a door for admission after months of waiting. Thank you for praying.', true, true, 66],
-            ['Answered: safe delivery', 'We welcomed a healthy baby after a difficult pregnancy. We are grateful.', true, true, 73],
-            ['Answered: restored peace', 'A long family conflict softened after prayer and a hard conversation.', true, true, 58],
-            ['Private family matter', 'Please pray for wisdom and protection around a sensitive family concern.', false, false, 0],
+            ['Healing for my mother', 'Please pray for strength, accurate diagnosis, and peace for our family while my mother receives treatment.', true, false, 34, 'healing'],
+            ['Direction for a new job', 'I need wisdom about a job offer and courage to choose what honors God over fear.', true, false, 21, 'business'],
+            ['Restoration in marriage', 'Please pray for humility, forgiveness, and honest communication in our marriage.', true, false, 48, 'marriage'],
+            ['Peace during exams', 'Pray for focus, calm, and good recall as I prepare for final exams.', true, false, 15, 'exams'],
+            ['Provision for rent', 'I am trusting God for provision and wise next steps after a difficult month.', true, false, 27, 'business'],
+            ['Salvation for my brother', 'Please pray that my brother encounters Christ and finds a faithful community.', true, false, 42, 'salvation'],
+            ['Strength after loss', 'Our family is grieving. Please pray for comfort and daily strength.', true, false, 39, 'healing'],
+            ['Business wisdom', 'Pray for integrity, clarity, and provision as I rebuild my small business.', true, false, 18, 'business'],
+            ['Answered: school admission', 'God opened a door for admission after months of waiting. Thank you for praying.', true, true, 66, 'exams'],
+            ['Answered: safe delivery', 'We welcomed a healthy baby after a difficult pregnancy. We are grateful.', true, true, 73, 'family'],
+            ['Answered: restored peace', 'A long family conflict softened after prayer and a hard conversation.', true, true, 58, 'family'],
+            ['Private family matter', 'Please pray for wisdom and protection around a sensitive family concern.', false, false, 0, 'family'],
         ];
 
-        foreach ($prayers as $index => [$title, $body, $isPublic, $isAnswered, $count]) {
+        foreach ($prayers as $index => [$title, $body, $isPublic, $isAnswered, $count, $roomSlug]) {
             $reader = $readers[$index % $readers->count()];
 
-            PrayerRequest::updateOrCreate(
+            $request = PrayerRequest::updateOrCreate(
                 ['title' => $title],
                 [
                     'user_id' => $reader->id,
+                    'prayer_room_id' => $prayerRooms[$roomSlug] ?? null,
                     'name' => $reader->name,
                     'email' => $reader->email,
                     'body' => $body,
@@ -236,6 +242,16 @@ class MannaRiseContentSeeder extends Seeder
                     'updated_at' => now()->subDays(max(0, $index - 1)),
                 ],
             );
+
+            if ($isAnswered) {
+                PrayerRequestUpdate::updateOrCreate(
+                    ['prayer_request_id' => $request->id, 'body' => $body],
+                    [
+                        'user_id' => $reader->id,
+                        'is_answered_update' => true,
+                    ],
+                );
+            }
         }
 
         $extraPrayerSubjects = [
@@ -249,11 +265,13 @@ class MannaRiseContentSeeder extends Seeder
         foreach ($extraPrayerSubjects as $index => $title) {
             $reader = $readers[$index % $readers->count()];
             $answered = $index % 6 === 0;
+            $roomSlug = ['business', 'family', 'salvation', 'healing', 'business', 'family', 'exams', 'healing', 'family', 'business', 'marriage', 'salvation'][$index % 12];
 
-            PrayerRequest::updateOrCreate(
+            $request = PrayerRequest::updateOrCreate(
                 ['title' => $title],
                 [
                     'user_id' => $reader->id,
+                    'prayer_room_id' => $prayerRooms[$roomSlug] ?? null,
                     'name' => $reader->name,
                     'email' => $reader->email,
                     'body' => $answered
@@ -266,6 +284,16 @@ class MannaRiseContentSeeder extends Seeder
                     'updated_at' => now()->subDays($index + 2),
                 ],
             );
+
+            if ($answered) {
+                PrayerRequestUpdate::updateOrCreate(
+                    ['prayer_request_id' => $request->id, 'body' => 'This prayer has seen encouraging progress. Thank you for praying with us.'],
+                    [
+                        'user_id' => $reader->id,
+                        'is_answered_update' => true,
+                    ],
+                );
+            }
         }
 
         $testimonies = [

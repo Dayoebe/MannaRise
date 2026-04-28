@@ -37,6 +37,7 @@ class Wall extends Component
         return view('livewire.prayer-requests.wall', [
             'requests' => PrayerRequest::query()
                 ->where('is_public', true)
+                ->with('room')
                 ->when($this->status === 'open', fn ($query) => $query->where('is_answered', false))
                 ->when($this->status === 'answered', fn ($query) => $query->where('is_answered', true))
                 ->when($this->search !== '', fn ($query) => $query->where(function ($query) {

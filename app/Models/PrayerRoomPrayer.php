@@ -2,33 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class PrayerRequest extends Model
+class PrayerRoomPrayer extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id',
         'prayer_room_id',
-        'name',
-        'email',
-        'title',
-        'body',
-        'is_public',
-        'is_answered',
-        'prayed_count',
+        'prayer_request_id',
+        'prayed_on',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_public' => 'boolean',
-            'is_answered' => 'boolean',
-            'prayed_count' => 'integer',
+            'prayed_on' => 'date',
         ];
     }
 
@@ -42,8 +31,8 @@ class PrayerRequest extends Model
         return $this->belongsTo(PrayerRoom::class, 'prayer_room_id');
     }
 
-    public function updates(): HasMany
+    public function request(): BelongsTo
     {
-        return $this->hasMany(PrayerRequestUpdate::class);
+        return $this->belongsTo(PrayerRequest::class, 'prayer_request_id');
     }
 }

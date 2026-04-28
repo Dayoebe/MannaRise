@@ -37,6 +37,17 @@
         </div>
 
         <div class="mt-4">
+            <label class="block text-sm font-bold text-slate-700">Prayer room</label>
+            <select wire:model="room" class="field-input mt-1 border-rose-300 focus:border-rose-600 focus:ring-rose-100">
+                <option value="">General prayer wall</option>
+                @foreach ($rooms as $prayerRoom)
+                    <option value="{{ $prayerRoom->id }}">{{ $prayerRoom->name }} prayer room</option>
+                @endforeach
+            </select>
+            @error('room') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+        </div>
+
+        <div class="mt-4">
             <label class="block text-sm font-bold text-slate-700">Request</label>
             <textarea wire:model="body" rows="7" class="field-input mt-1 border-rose-300 focus:border-rose-600 focus:ring-rose-100"></textarea>
             @error('body') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
