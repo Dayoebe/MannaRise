@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Devotional;
+use App\Support\DailySpiritualRhythm;
 use Carbon\CarbonImmutable;
 use Livewire\Component;
 
@@ -52,6 +53,7 @@ class Dashboard extends Component
         $user = auth()->user();
 
         return view('livewire.dashboard', [
+            'dailyRhythm' => DailySpiritualRhythm::forDate(),
             'stats' => [
                 'favorites' => $user->favoriteDevotionals()->count(),
                 'journal_entries' => $user->journalEntries()->count(),

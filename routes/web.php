@@ -12,6 +12,7 @@ use App\Livewire\AudioDevotionals\Index as AudioDevotionalIndex;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Bible\Reader as BibleReader;
+use App\Livewire\Daily\Index as DailyIndex;
 use App\Livewire\Dashboard;
 use App\Livewire\Devotionals\Index as DevotionalIndex;
 use App\Livewire\Devotionals\Show as DevotionalShow;
@@ -30,6 +31,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
+Route::get('/daily', DailyIndex::class)->name('daily.index');
 Route::get('/bible/{book?}/{chapter?}', BibleReader::class)->name('bible');
 Route::get('/library', LibraryIndex::class)->name('library.index');
 Route::get('/library/{slug}/{chapter?}', LibraryShow::class)->name('library.show');

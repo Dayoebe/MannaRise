@@ -1,4 +1,11 @@
 <div class="space-y-6 sm:space-y-8">
+    @php
+        $dailyVerse = $dailyRhythm['verse'];
+        $dailyAffirmation = $dailyRhythm['affirmation'];
+        $dailyChallenge = $dailyRhythm['challenge'];
+        $firstChallengeReading = $dailyChallenge ? $dailyChallenge['readings']->first() : null;
+    @endphp
+
     <div wire:loading.flex class="loading-hint items-center gap-2">
         <x-ui.icon name="sparkles" class="h-4 w-4 animate-pulse" /> Updating your dashboard...
     </div>
@@ -39,6 +46,42 @@
             </div>
         @endforeach
     </div>
+
+    <section class="grid gap-4 lg:grid-cols-3">
+        <article class="app-panel border-blue-200 bg-blue-50">
+            <p class="app-eyebrow border-blue-200 bg-white text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> Verse of the day</p>
+            @if ($dailyVerse)
+                <blockquote class="mt-4 font-serif text-lg font-semibold leading-7 text-slate-950">"{{ $dailyVerse->text }}"</blockquote>
+                <p class="mt-3 text-sm font-black text-blue-900">{{ $dailyVerse->book->name }} {{ $dailyVerse->chapter }}:{{ $dailyVerse->verse }} KJV</p>
+            @else
+                <p class="mt-4 text-sm leading-6 text-slate-600">Import Bible seed data to show today&apos;s verse.</p>
+            @endif
+        </article>
+
+        <article class="app-panel border-amber-200 bg-amber-50">
+            <p class="app-eyebrow border-amber-200 bg-white text-amber-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> Daily affirmation</p>
+            <p class="mt-4 font-serif text-lg font-semibold leading-7 text-slate-950">{{ $dailyAffirmation['text'] }}</p>
+            <p class="mt-3 text-sm font-black text-amber-900">{{ $dailyAffirmation['reference'] }}</p>
+        </article>
+
+        <article class="app-panel border-emerald-200 bg-emerald-50">
+            <p class="app-eyebrow border-emerald-200 bg-white text-emerald-900"><x-ui.icon name="star" class="h-4 w-4" /> Bible-in-a-year</p>
+            @if ($dailyChallenge)
+                <p class="mt-4 font-black tracking-normal text-slate-950">Day {{ $dailyChallenge['day'] }}: {{ $dailyChallenge['reading_label'] }}</p>
+                <div class="mt-3 h-3 overflow-hidden rounded-full bg-white">
+                    <div class="h-full rounded-full bg-emerald-700" style="width: {{ min(100, $dailyChallenge['progress_percent']) }}%"></div>
+                </div>
+                <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                    <a href="{{ route('daily.index') }}" class="btn-secondary border-emerald-200 px-3">Daily page</a>
+                    @if ($firstChallengeReading)
+                        <a href="{{ route('bible', ['book' => $firstChallengeReading['slug'], 'chapter' => $firstChallengeReading['chapter']]) }}" class="btn-primary px-3">Start</a>
+                    @endif
+                </div>
+            @else
+                <p class="mt-4 text-sm leading-6 text-slate-600">Import Bible seed data to generate the challenge.</p>
+            @endif
+        </article>
+    </section>
 
     <section class="grid gap-4 md:grid-cols-3">
         <a href="{{ route('devotionals.index') }}" class="dashboard-action-card">

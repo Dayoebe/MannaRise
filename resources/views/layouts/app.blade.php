@@ -47,6 +47,7 @@
                 <nav class="hidden gap-2 text-sm lg:flex lg:flex-wrap">
                     <a href="{{ route('devotionals.index') }}" class="nav-pill {{ request()->routeIs('devotionals.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="sparkles" class="h-4 w-4" /> Devotionals</a>
                     <a href="{{ route('bible') }}" class="nav-pill {{ request()->routeIs('bible') ? 'nav-pill-active' : '' }}"><x-ui.icon name="book-open" class="h-4 w-4" /> Bible</a>
+                    <a href="{{ route('daily.index') }}" class="nav-pill {{ request()->routeIs('daily.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="star" class="h-4 w-4" /> Daily</a>
                     <a href="{{ route('library.index') }}" class="nav-pill {{ request()->routeIs('library.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="library" class="h-4 w-4" /> Library</a>
                     <a href="{{ route('prayer-requests.wall') }}" class="nav-pill {{ request()->routeIs('prayer-requests.wall') ? 'nav-pill-active' : '' }}"><x-ui.icon name="heart" class="h-4 w-4" /> Prayer Wall</a>
                     <a href="{{ route('prayer-requests.submit') }}" class="nav-pill {{ request()->routeIs('prayer-requests.submit') ? 'nav-pill-active' : '' }}"><x-ui.icon name="send" class="h-4 w-4" /> Request</a>
@@ -79,9 +80,10 @@
         </main>
 
         <nav class="mobile-bottom-nav">
-            <div class="mx-auto grid max-w-md grid-cols-4 gap-2">
+            <div class="mx-auto grid max-w-lg grid-cols-5 gap-2">
                 <a href="{{ route('devotionals.index') }}" class="mobile-tab {{ request()->routeIs('devotionals.*') ? 'mobile-tab-active' : '' }}"><x-ui.icon name="sparkles" /><span>Devotionals</span></a>
                 <a href="{{ route('bible') }}" class="mobile-tab {{ request()->routeIs('bible') ? 'mobile-tab-active' : '' }}"><x-ui.icon name="book-open" /><span>Bible</span></a>
+                <a href="{{ route('daily.index') }}" class="mobile-tab {{ request()->routeIs('daily.*') ? 'mobile-tab-active' : '' }}"><x-ui.icon name="star" /><span>Daily</span></a>
                 <a href="{{ route('library.index') }}" class="mobile-tab {{ request()->routeIs('library.*') ? 'mobile-tab-active' : '' }}"><x-ui.icon name="library" /><span>Library</span></a>
                 <details class="relative"><summary class="mobile-tab list-none cursor-pointer [&::-webkit-details-marker]:hidden {{ request()->routeIs('prayer-requests.*') || request()->routeIs('testimonies.*') ? 'mobile-tab-active' : '' }}"><x-ui.icon name="more-horizontal" /><span>More</span></summary><div class="mobile-more-panel"><a href="{{ route('prayer-requests.wall') }}" class="mobile-more-link {{ request()->routeIs('prayer-requests.wall') ? 'mobile-more-link-active' : '' }}"><x-ui.icon name="heart" class="h-4 w-4" /><span>Prayer Wall</span></a><a href="{{ route('prayer-requests.submit') }}" class="mobile-more-link {{ request()->routeIs('prayer-requests.submit') ? 'mobile-more-link-active' : '' }}"><x-ui.icon name="send" class="h-4 w-4" /><span>Request</span></a><a href="{{ route('testimonies.index') }}" class="mobile-more-link {{ request()->routeIs('testimonies.*') ? 'mobile-more-link-active' : '' }}"><x-ui.icon name="message-circle" class="h-4 w-4" /><span>Testimonies</span></a></div></details>
             </div>
