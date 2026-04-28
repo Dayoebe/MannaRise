@@ -17,6 +17,7 @@ This roadmap separates shipped foundation work from pending product work.
 - Testimony submission and moderation
 - Devotional completions and basic streaks
 - Custom admin dashboard
+- Admin control center with quick content input and settings
 - Admin category, devotional, prayer request, testimony, and engagement screens
 - KJV Bible reader and search
 - Public-domain spiritual library

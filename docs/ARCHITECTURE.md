@@ -24,6 +24,7 @@ MannaRise uses a Laravel-first architecture with custom Livewire screens. The go
 - Prayer requests and public prayer wall
 - Testimonies and moderation
 - Audio devotionals
+- Platform settings
 - Reminder settings and devotional reminder delivery
 - Admin content management
 - Engagement reporting
@@ -49,7 +50,7 @@ The app does not use Filament. User and admin dashboards are custom Livewire com
 - Public routes: home, daily rhythm, Bible, library, devotionals, audio devotionals, prayer wall, testimony pages
 - Guest routes: login and registration
 - Auth routes: dashboard, journal, favorites, reminder settings
-- Admin routes: categories, devotionals, audio devotionals, prayer requests, testimonies, engagement, roles
+- Admin routes: dashboard, categories, devotionals, settings, audio devotionals, prayer requests, testimonies, engagement, roles
 
 ## Access Control
 

@@ -13,7 +13,7 @@ The current baseline covers:
 - User registration, login, dashboard, favorites, journal, and reading streaks
 - Prayer request submission and public prayer wall
 - Testimony submission and moderation
-- Custom admin dashboard for core content and engagement
+- Custom admin control center for quick content input, settings, moderation, core content, and engagement
 - Starter seed data for local development
 
 ## Pending Feature Backlog

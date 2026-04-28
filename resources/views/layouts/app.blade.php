@@ -68,6 +68,7 @@
                             <a href="{{ route('admin.prayer-requests') }}" class="subnav-pill {{ request()->routeIs('admin.prayer-requests') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="heart" class="h-4 w-4" /> Requests</a>
                             <a href="{{ route('admin.testimonies') }}" class="subnav-pill {{ request()->routeIs('admin.testimonies') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="message-circle" class="h-4 w-4" /> Moderation</a>
                             <a href="{{ route('admin.engagement') }}" class="subnav-pill {{ request()->routeIs('admin.engagement') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bar-chart" class="h-4 w-4" /> Engagement</a>
+                            <a href="{{ route('admin.settings') }}" class="subnav-pill {{ request()->routeIs('admin.settings') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="settings" class="h-4 w-4" /> Settings</a>
                         @endif
                     </nav>
                 @endauth

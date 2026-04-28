@@ -75,6 +75,30 @@
             <path d="M12 16V7" />
             <path d="M17 16v-8" />
             @break
+        @case('settings')
+            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5z" />
+            <path d="m19.4 15 .2 2.2-2 1.2-1.8-1a7.7 7.7 0 0 1-1.7.7L13.5 20h-3l-.6-1.9a7.7 7.7 0 0 1-1.7-.7l-1.8 1-2-1.2.2-2.2a7 7 0 0 1-.9-1.5L2 12l1.7-1.5c.2-.5.5-1 .9-1.5l-.2-2.2 2-1.2 1.8 1c.5-.3 1.1-.5 1.7-.7L10.5 4h3l.6 1.9c.6.2 1.2.4 1.7.7l1.8-1 2 1.2-.2 2.2c.4.5.7 1 .9 1.5L22 12l-1.7 1.5c-.2.5-.5 1-.9 1.5z" />
+            @break
+        @case('users')
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.9" />
+            <path d="M16 3.1a4 4 0 0 1 0 7.8" />
+            @break
+        @case('check-circle')
+            <circle cx="12" cy="12" r="9" />
+            <path d="m9 12 2 2 4-5" />
+            @break
+        @case('database')
+            <ellipse cx="12" cy="5" rx="8" ry="3" />
+            <path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5" />
+            <path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
+            @break
+        @case('headphones')
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z" />
+            <path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+            @break
         @case('more-horizontal')
             <circle cx="5" cy="12" r="1" />
             <circle cx="12" cy="12" r="1" />

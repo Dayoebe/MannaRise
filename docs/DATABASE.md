@@ -169,6 +169,19 @@ Key fields:
 - is_published
 - published_at
 
+## Platform Settings
+
+Stores admin-managed site, content, daily rhythm, moderation, and notification defaults.
+
+Key fields:
+
+- setting_key
+- value
+- type
+- group
+- label
+- description
+
 ## Computed Features Without Dedicated Tables
 
 The current daily rhythm is computed from existing data:

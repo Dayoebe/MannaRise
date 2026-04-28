@@ -60,7 +60,7 @@ class MannaRisePagesTest extends TestCase
 
         $this->actingAs($admin);
 
-        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement'] as $path) {
+        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/settings'] as $path) {
             $this->get($path)->assertOk();
         }
     }
@@ -74,7 +74,7 @@ class MannaRisePagesTest extends TestCase
 
         $this->actingAs($superAdmin);
 
-        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement'] as $path) {
+        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/settings'] as $path) {
             $this->get($path)->assertOk();
         }
     }
