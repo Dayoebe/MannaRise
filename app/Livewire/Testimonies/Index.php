@@ -21,7 +21,7 @@ class Index extends Component
     {
         return view('livewire.testimonies.index', [
             'testimonies' => Testimony::query()
-                ->where('is_approved', true)
+                ->approved()
                 ->when($this->search !== '', fn ($query) => $query->where(function ($query) {
                     $query
                         ->where('title', 'like', "%{$this->search}%")
