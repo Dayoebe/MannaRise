@@ -89,53 +89,107 @@
                     </div>
                 </div>
 
-                <nav class="hidden gap-2 text-sm lg:flex lg:flex-wrap">
-                    <a href="{{ route('devotionals.index') }}" class="nav-pill {{ request()->routeIs('devotionals.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="sparkles" class="h-4 w-4" /> Devotionals</a>
-                    <a href="{{ route('bible') }}" class="nav-pill {{ request()->routeIs('bible') ? 'nav-pill-active' : '' }}"><x-ui.icon name="book-open" class="h-4 w-4" /> Bible</a>
-                    <a href="{{ route('daily.index') }}" class="nav-pill {{ request()->routeIs('daily.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="star" class="h-4 w-4" /> Daily</a>
-                    <a href="{{ route('devotional-plans.index') }}" class="nav-pill {{ request()->routeIs('devotional-plans.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="route" class="h-4 w-4" /> Plans</a>
-                    <a href="{{ route('library.index') }}" class="nav-pill {{ request()->routeIs('library.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="library" class="h-4 w-4" /> Library</a>
-                    <a href="{{ route('memory-verses.index') }}" class="nav-pill {{ request()->routeIs('memory-verses.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="bookmark" class="h-4 w-4" /> Memory</a>
-                    <a href="{{ route('scripture-cards.index') }}" class="nav-pill {{ request()->routeIs('scripture-cards.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="book-open" class="h-4 w-4" /> Cards</a>
-                    <a href="{{ route('prayer-sessions.index') }}" class="nav-pill {{ request()->routeIs('prayer-sessions.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="heart" class="h-4 w-4" /> Guided Prayer</a>
-                    <a href="{{ route('audio-devotionals.index') }}" class="nav-pill {{ request()->routeIs('audio-devotionals.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="headphones" class="h-4 w-4" /> Audio</a>
-                    <a href="{{ route('prayer-rooms.index') }}" class="nav-pill {{ request()->routeIs('prayer-rooms.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="users" class="h-4 w-4" /> Prayer Rooms</a>
-                    <a href="{{ route('prayer-requests.wall') }}" class="nav-pill {{ request()->routeIs('prayer-requests.wall') ? 'nav-pill-active' : '' }}"><x-ui.icon name="heart" class="h-4 w-4" /> Prayer Wall</a>
-                    <a href="{{ route('prayer-requests.submit') }}" class="nav-pill {{ request()->routeIs('prayer-requests.submit') ? 'nav-pill-active' : '' }}"><x-ui.icon name="send" class="h-4 w-4" /> Request</a>
-                    <a href="{{ route('testimonies.index') }}" class="nav-pill {{ request()->routeIs('testimonies.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="message-circle" class="h-4 w-4" /> Testimonies</a>
-                    @auth
-                        <a href="{{ route('dashboard') }}" class="nav-pill {{ request()->routeIs('dashboard') || request()->routeIs('journal.*') || request()->routeIs('favorites.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="layout-dashboard" class="h-4 w-4" /> Dashboard</a>
-                        @if (auth()->user()->hasAdminAccess())
-                            <a href="{{ route('admin.dashboard') }}" class="nav-pill {{ request()->routeIs('admin.*') ? 'nav-pill-active' : '' }}"><x-ui.icon name="shield" class="h-4 w-4" /> Admin</a>
-                        @endif
-                    @endauth
-                </nav>
+                @php
+                    $user = auth()->user();
 
-                @auth
-                    <nav class="hidden gap-2 text-sm lg:flex lg:flex-wrap">
-                        <a href="{{ route('journal.index') }}" class="subnav-pill {{ request()->routeIs('journal.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="journal" class="h-4 w-4" /> Journal</a>
-                        <a href="{{ route('favorites.index') }}" class="subnav-pill {{ request()->routeIs('favorites.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bookmark" class="h-4 w-4" /> Favorites</a>
-                        <a href="{{ route('growth-path.index') }}" class="subnav-pill {{ request()->routeIs('growth-path.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="route" class="h-4 w-4" /> Path</a>
-                        <a href="{{ route('reminders.settings') }}" class="subnav-pill {{ request()->routeIs('reminders.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="star" class="h-4 w-4" /> Reminders</a>
-                        <a href="{{ route('community-groups.index') }}" class="subnav-pill {{ request()->routeIs('community-groups.*') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="users" class="h-4 w-4" /> Groups</a>
-                        @if (auth()->user()->hasAdminAccess())
-                            <a href="{{ route('admin.categories') }}" class="subnav-pill {{ request()->routeIs('admin.categories') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bookmark" class="h-4 w-4" /> Categories</a>
-                            <a href="{{ route('admin.devotionals') }}" class="subnav-pill {{ request()->routeIs('admin.devotionals') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="sparkles" class="h-4 w-4" /> Devotionals</a>
-                            <a href="{{ route('admin.featured-content') }}" class="subnav-pill {{ request()->routeIs('admin.featured-content') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="star" class="h-4 w-4" /> Featured</a>
-                            <a href="{{ route('admin.moderation') }}" class="subnav-pill {{ request()->routeIs('admin.moderation') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="message-circle" class="h-4 w-4" /> Queue</a>
-                            <a href="{{ route('admin.prayer-requests') }}" class="subnav-pill {{ request()->routeIs('admin.prayer-requests') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="heart" class="h-4 w-4" /> Requests</a>
-                            <a href="{{ route('admin.testimonies') }}" class="subnav-pill {{ request()->routeIs('admin.testimonies') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="message-circle" class="h-4 w-4" /> Moderation</a>
-                            <a href="{{ route('admin.engagement') }}" class="subnav-pill {{ request()->routeIs('admin.engagement') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="bar-chart" class="h-4 w-4" /> Engagement</a>
-                            @if (auth()->user()->canDo('manage-audio-devotionals'))
-                                <a href="{{ route('admin.audio-devotionals') }}" class="subnav-pill {{ request()->routeIs('admin.audio-devotionals') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="headphones" class="h-4 w-4" /> Audio</a>
-                            @endif
-                            @if (auth()->user()->canDo('manage-roles'))
-                                <a href="{{ route('admin.roles') }}" class="subnav-pill {{ request()->routeIs('admin.roles') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="shield" class="h-4 w-4" /> Roles</a>
-                            @endif
-                            <a href="{{ route('admin.settings') }}" class="subnav-pill {{ request()->routeIs('admin.settings') ? 'subnav-pill-active' : '' }}"><x-ui.icon name="settings" class="h-4 w-4" /> Settings</a>
-                        @endif
-                    </nav>
-                @endauth
+                    $mainLinks = [
+                        ['label' => 'Daily', 'route' => 'daily.index', 'icon' => 'star', 'active' => ['daily.*']],
+                        ['label' => 'Devotionals', 'route' => 'devotionals.index', 'icon' => 'sparkles', 'active' => ['devotionals.*']],
+                        ['label' => 'Bible', 'route' => 'bible', 'icon' => 'book-open', 'active' => ['bible']],
+                        ['label' => 'Prayer', 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*', 'prayer-rooms.*', 'prayer-requests.*']],
+                    ];
+
+                    if ($user) {
+                        $mainLinks[] = ['label' => 'Journal', 'route' => 'journal.index', 'icon' => 'journal', 'active' => ['journal.*']];
+                    }
+
+                    $exploreLinks = [
+                        ['label' => 'Plans', 'route' => 'devotional-plans.index', 'icon' => 'route', 'active' => ['devotional-plans.*']],
+                        ['label' => 'Library', 'route' => 'library.index', 'icon' => 'library', 'active' => ['library.*']],
+                        ['label' => 'Memory', 'route' => 'memory-verses.index', 'icon' => 'bookmark', 'active' => ['memory-verses.*']],
+                        ['label' => 'Cards', 'route' => 'scripture-cards.index', 'icon' => 'book-open', 'active' => ['scripture-cards.*']],
+                        ['label' => 'Audio', 'route' => 'audio-devotionals.index', 'icon' => 'headphones', 'active' => ['audio-devotionals.*']],
+                        ['label' => 'Testimonies', 'route' => 'testimonies.index', 'icon' => 'message-circle', 'active' => ['testimonies.*']],
+                    ];
+
+                    if ($user) {
+                        $exploreLinks[] = ['label' => 'Groups', 'route' => 'community-groups.index', 'icon' => 'users', 'active' => ['community-groups.*']];
+                    }
+
+                    $accountLinks = [];
+
+                    if ($user) {
+                        $accountLinks = [
+                            ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'layout-dashboard', 'active' => ['dashboard']],
+                            ['label' => 'Favorites', 'route' => 'favorites.index', 'icon' => 'bookmark', 'active' => ['favorites.*']],
+                            ['label' => 'Path', 'route' => 'growth-path.index', 'icon' => 'route', 'active' => ['growth-path.*']],
+                            ['label' => 'Reminders', 'route' => 'reminders.settings', 'icon' => 'star', 'active' => ['reminders.*']],
+                        ];
+                    }
+
+                    $adminLinks = [];
+
+                    if ($user?->hasAdminAccess()) {
+                        $adminLinks = [
+                            ['label' => 'Admin Home', 'route' => 'admin.dashboard', 'icon' => 'shield', 'active' => ['admin.dashboard']],
+                            ['label' => 'Content', 'route' => 'admin.devotionals', 'icon' => 'sparkles', 'active' => ['admin.categories', 'admin.devotionals', 'admin.featured-content']],
+                            ['label' => 'Moderation', 'route' => 'admin.moderation', 'icon' => 'message-circle', 'active' => ['admin.moderation', 'admin.prayer-requests', 'admin.testimonies']],
+                            ['label' => 'Engagement', 'route' => 'admin.engagement', 'icon' => 'bar-chart', 'active' => ['admin.engagement']],
+                            ['label' => 'Settings', 'route' => 'admin.settings', 'icon' => 'settings', 'active' => ['admin.settings']],
+                        ];
+
+                        if ($user->canDo('manage-audio-devotionals')) {
+                            $adminLinks[] = ['label' => 'Audio Admin', 'route' => 'admin.audio-devotionals', 'icon' => 'headphones', 'active' => ['admin.audio-devotionals']];
+                        }
+
+                        if ($user->canDo('manage-roles')) {
+                            $adminLinks[] = ['label' => 'Roles', 'route' => 'admin.roles', 'icon' => 'shield', 'active' => ['admin.roles']];
+                        }
+                    }
+
+                    $desktopNavGroups = array_filter([
+                        ['label' => 'Main', 'links' => $mainLinks],
+                        ['label' => 'Explore', 'links' => $exploreLinks],
+                        ['label' => 'My Space', 'links' => $accountLinks],
+                        ['label' => 'Admin', 'links' => $adminLinks],
+                    ], fn (array $group) => count($group['links']) > 0);
+
+                    $mobileMoreGroups = [
+                        ['label' => 'Explore', 'links' => $exploreLinks],
+                        ['label' => 'Prayer', 'links' => [
+                            ['label' => 'Guided Prayer', 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*']],
+                            ['label' => 'Prayer Rooms', 'route' => 'prayer-rooms.index', 'icon' => 'users', 'active' => ['prayer-rooms.*']],
+                            ['label' => 'Prayer Wall', 'route' => 'prayer-requests.wall', 'icon' => 'heart', 'active' => ['prayer-requests.wall']],
+                            ['label' => 'Request Prayer', 'route' => 'prayer-requests.submit', 'icon' => 'send', 'active' => ['prayer-requests.submit']],
+                        ]],
+                    ];
+
+                    if ($user) {
+                        $mobileMoreGroups[] = ['label' => 'My Space', 'links' => $accountLinks];
+                    }
+
+                    if ($user?->hasAdminAccess()) {
+                        $mobileMoreGroups[] = ['label' => 'Admin', 'links' => $adminLinks];
+                    }
+
+                    $mobileMoreActiveRoutes = collect($mobileMoreGroups)
+                        ->flatMap(fn (array $group) => collect($group['links'])->flatMap(fn (array $link) => $link['active']))
+                        ->all();
+                @endphp
+
+                <nav class="hidden flex-col gap-2 text-sm lg:flex">
+                    @foreach ($desktopNavGroups as $group)
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="min-w-16 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{{ $group['label'] }}</span>
+
+                            @foreach ($group['links'] as $link)
+                                <a href="{{ route($link['route']) }}" class="nav-pill {{ request()->routeIs(...$link['active']) ? 'nav-pill-active' : '' }}">
+                                    <x-ui.icon :name="$link['icon']" class="h-4 w-4" /> {{ $link['label'] }}
+                                </a>
+                            @endforeach
+                        </div>
+                    @endforeach
+                </nav>
             </div>
         </header>
 
@@ -168,58 +222,26 @@
                     <span>Library</span>
                 </a>
                 <details class="relative">
-                    <summary class="mobile-tab list-none cursor-pointer [&::-webkit-details-marker]:hidden {{ request()->routeIs('devotional-plans.*') || request()->routeIs('memory-verses.*') || request()->routeIs('scripture-cards.*') || request()->routeIs('prayer-sessions.*') || request()->routeIs('audio-devotionals.*') || request()->routeIs('prayer-rooms.*') || request()->routeIs('prayer-requests.*') || request()->routeIs('testimonies.*') || request()->routeIs('community-groups.*') || request()->routeIs('reminders.*') ? 'mobile-tab-active' : '' }}">
+                    <summary class="mobile-tab list-none cursor-pointer [&::-webkit-details-marker]:hidden {{ request()->routeIs(...$mobileMoreActiveRoutes) ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="more-horizontal" />
                         <span>More</span>
                     </summary>
 
                     <div class="mobile-more-panel">
-                        <a href="{{ route('devotional-plans.index') }}" class="mobile-more-link {{ request()->routeIs('devotional-plans.*') ? 'mobile-more-link-active' : '' }}">
-                            <x-ui.icon name="route" class="h-4 w-4" />
-                            <span>Plans</span>
-                        </a>
-                        <a href="{{ route('memory-verses.index') }}" class="mobile-more-link {{ request()->routeIs('memory-verses.*') ? 'mobile-more-link-active' : '' }}">
-                            <x-ui.icon name="bookmark" class="h-4 w-4" />
-                            <span>Memory verses</span>
-                        </a>
-                        <a href="{{ route('scripture-cards.index') }}" class="mobile-more-link {{ request()->routeIs('scripture-cards.*') ? 'mobile-more-link-active' : '' }}">
-                            <x-ui.icon name="book-open" class="h-4 w-4" />
-                            <span>Scripture cards</span>
-                        </a>
-                        <a href="{{ route('prayer-sessions.index') }}" class="mobile-more-link {{ request()->routeIs('prayer-sessions.*') ? 'mobile-more-link-active' : '' }}">
-                            <x-ui.icon name="heart" class="h-4 w-4" />
-                            <span>Guided prayer</span>
-                        </a>
-                        <a href="{{ route('audio-devotionals.index') }}" class="mobile-more-link {{ request()->routeIs('audio-devotionals.*') ? 'mobile-more-link-active' : '' }}">
-                            <x-ui.icon name="headphones" class="h-4 w-4" />
-                            <span>Audio devotionals</span>
-                        </a>
-                        @auth
-                            <a href="{{ route('community-groups.index') }}" class="mobile-more-link {{ request()->routeIs('community-groups.*') ? 'mobile-more-link-active' : '' }}">
-                                <x-ui.icon name="users" class="h-4 w-4" />
-                                <span>Groups</span>
-                            </a>
-                            <a href="{{ route('reminders.settings') }}" class="mobile-more-link {{ request()->routeIs('reminders.*') ? 'mobile-more-link-active' : '' }}">
-                                <x-ui.icon name="star" class="h-4 w-4" />
-                                <span>Reminders</span>
-                            </a>
-                        @endauth
-                        <a href="{{ route('prayer-rooms.index') }}" class="mobile-more-link {{ request()->routeIs('prayer-rooms.*') ? 'mobile-more-link-active' : '' }}">
-                            <x-ui.icon name="users" class="h-4 w-4" />
-                            <span>Prayer Rooms</span>
-                        </a>
-                        <a href="{{ route('prayer-requests.wall') }}" class="mobile-more-link {{ request()->routeIs('prayer-requests.wall') ? 'mobile-more-link-active' : '' }}">
-                            <x-ui.icon name="heart" class="h-4 w-4" />
-                            <span>Prayer Wall</span>
-                        </a>
-                        <a href="{{ route('prayer-requests.submit') }}" class="mobile-more-link {{ request()->routeIs('prayer-requests.submit') ? 'mobile-more-link-active' : '' }}">
-                            <x-ui.icon name="send" class="h-4 w-4" />
-                            <span>Request</span>
-                        </a>
-                        <a href="{{ route('testimonies.index') }}" class="mobile-more-link {{ request()->routeIs('testimonies.*') ? 'mobile-more-link-active' : '' }}">
-                            <x-ui.icon name="message-circle" class="h-4 w-4" />
-                            <span>Testimonies</span>
-                        </a>
+                        @foreach ($mobileMoreGroups as $group)
+                            <div class="mb-3 last:mb-0">
+                                <p class="mb-2 px-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-slate-400">{{ $group['label'] }}</p>
+
+                                <div class="space-y-1">
+                                    @foreach ($group['links'] as $link)
+                                        <a href="{{ route($link['route']) }}" class="mobile-more-link {{ request()->routeIs(...$link['active']) ? 'mobile-more-link-active' : '' }}">
+                                            <x-ui.icon :name="$link['icon']" class="h-4 w-4" />
+                                            <span>{{ $link['label'] }}</span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </details>
             </div>
