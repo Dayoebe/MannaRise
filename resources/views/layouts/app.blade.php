@@ -1,23 +1,52 @@
+@php
+    $seo = \App\Support\Seo::meta($seo ?? []);
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-        <meta name="theme-color" content="#047857">
+        <meta name="theme-color" content="{{ config('seo.theme_color') }}">
         <meta name="color-scheme" content="light">
-        <meta name="application-name" content="MannaRise">
+        <meta name="application-name" content="{{ $seo['site_name'] }}">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-title" content="MannaRise">
+        <meta name="apple-mobile-web-app-title" content="{{ $seo['site_name'] }}">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="robots" content="{{ $seo['robots'] }}">
+        <meta name="description" content="{{ $seo['description'] }}">
+        <meta name="author" content="{{ $seo['site_name'] }}">
 
-        <title>{{ $title ?? config('app.name') }}</title>
+        <title>{{ $seo['title'] }}</title>
+        <link rel="canonical" href="{{ $seo['canonical'] }}">
+
+        <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}">
+        <meta property="og:site_name" content="{{ $seo['site_name'] }}">
+        <meta property="og:type" content="{{ $seo['type'] }}">
+        <meta property="og:title" content="{{ $seo['title'] }}">
+        <meta property="og:description" content="{{ $seo['description'] }}">
+        <meta property="og:url" content="{{ $seo['canonical'] }}">
+        <meta property="og:image" content="{{ $seo['image'] }}">
+        <meta property="og:image:alt" content="{{ $seo['raw_title'] }}">
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ $seo['title'] }}">
+        <meta name="twitter:description" content="{{ $seo['description'] }}">
+        <meta name="twitter:image" content="{{ $seo['image'] }}">
+        @if ($seo['twitter_site'])
+            <meta name="twitter:site" content="{{ $seo['twitter_site'] }}">
+        @endif
 
         <link rel="manifest" href="/manifest.webmanifest">
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png">
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-        <link rel="mask-icon" href="/icons/icon-512.svg" color="#047857">
+        <link rel="mask-icon" href="/icons/icon-512.svg" color="{{ config('seo.theme_color') }}">
+
+        @foreach ($seo['schema'] as $schema)
+            <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}</script>
+        @endforeach
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
