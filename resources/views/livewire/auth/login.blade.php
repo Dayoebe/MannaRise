@@ -24,8 +24,9 @@
                     <label for="password" class="block text-sm font-bold text-slate-700">Password</label>
                     <div class="relative mt-1">
                         <input id="password" type="password" wire:model="password" autocomplete="current-password" class="field-input w-full pr-10">
-                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500" aria-label="Toggle password visibility" onclick="togglePasswordVisibility()">
-                            <x-ui.icon name="eye" id="password-toggle-icon" class="h-5 w-5" />
+                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500" aria-label="Show password" onclick="togglePasswordVisibility()">
+                            <x-ui.icon name="eye" id="password-show-icon" class="h-5 w-5" />
+                            <x-ui.icon name="eye-off" id="password-hide-icon" class="hidden h-5 w-5" />
                         </button>
                     </div>
                     @error('password') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
@@ -37,7 +38,7 @@
                 </label>
 
                 <button type="submit" class="btn-primary w-full" wire:loading.attr="disabled">
-                    <x-ui.icon name="log-in" class="h-4 w-4" /> Log in
+                    <x-ui.icon name="eye" class="h-4 w-4" /> Log in
                 </button>
             </form>
 
@@ -48,3 +49,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const showIcon = document.getElementById('password-show-icon');
+        const hideIcon = document.getElementById('password-hide-icon');
+        const isPassword = passwordInput.type === 'password';
+
+        passwordInput.type = isPassword ? 'text' : 'password';
+        showIcon?.classList.toggle('hidden', !isPassword);
+        hideIcon?.classList.toggle('hidden', isPassword);
+        const button = showIcon?.closest('button');
+        if (button) {
+            button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+        }
+    }
+</script>

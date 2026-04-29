@@ -29,13 +29,25 @@
 
                 <div>
                     <label for="password" class="block text-sm font-bold text-slate-700">Password</label>
-                    <input id="password" type="password" wire:model="password" autocomplete="new-password" class="field-input mt-1 border-violet-300 focus:border-violet-600 focus:ring-violet-100">
+                    <div class="relative">
+                        <input id="password" type="password" wire:model="password" autocomplete="new-password" class="field-input mt-1 border-violet-300 focus:border-violet-600 focus:ring-violet-100 pr-10">
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                            <x-ui.icon name="eye" class="h-4 w-4 text-gray-400" id="eye-open" />
+                            <x-ui.icon name="eye-off" class="h-4 w-4 text-gray-400 hidden" id="eye-closed" />
+                        </button>
+                    </div>
                     @error('password') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label for="password_confirmation" class="block text-sm font-bold text-slate-700">Confirm password</label>
-                    <input id="password_confirmation" type="password" wire:model="password_confirmation" autocomplete="new-password" class="field-input mt-1 border-violet-300 focus:border-violet-600 focus:ring-violet-100">
+                    <div class="relative">
+                        <input id="password_confirmation" type="password" wire:model="password_confirmation" autocomplete="new-password" class="field-input mt-1 border-violet-300 focus:border-violet-600 focus:ring-violet-100 pr-10">
+                        <button type="button" onclick="togglePasswordConfirm()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                            <x-ui.icon name="eye" class="h-4 w-4 text-gray-400" id="eye-open-confirm" />
+                            <x-ui.icon name="eye-off" class="h-4 w-4 text-gray-400 hidden" id="eye-closed-confirm" />
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-primary w-full bg-violet-700 hover:bg-violet-800" wire:loading.attr="disabled">
@@ -47,6 +59,37 @@
                 Already have an account?
                 <a href="{{ route('login') }}" class="font-bold text-violet-800 hover:underline">Log in</a>
             </p>
+<script>
+function togglePassword() {
+    const input = document.getElementById('password');
+    const open = document.getElementById('eye-open');
+    const closed = document.getElementById('eye-closed');
+    if (input.type === 'password') {
+        input.type = 'text';
+        open.classList.add('hidden');
+        closed.classList.remove('hidden');
+    } else {
+        input.type = 'password';
+        open.classList.remove('hidden');
+        closed.classList.add('hidden');
+    }
+}
+
+function togglePasswordConfirm() {
+    const input = document.getElementById('password_confirmation');
+    const open = document.getElementById('eye-open-confirm');
+    const closed = document.getElementById('eye-closed-confirm');
+    if (input.type === 'password') {
+        input.type = 'text';
+        open.classList.add('hidden');
+        closed.classList.remove('hidden');
+    } else {
+        input.type = 'password';
+        open.classList.remove('hidden');
+        closed.classList.add('hidden');
+    }
+}
+</script>
         </div>
     </div>
 </div>

@@ -54,13 +54,17 @@
 
 @layer base {
     html {
+        min-height: 100%;
         scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
     }
 
     body {
         background-color: var(--color-mist-50);
         color: var(--color-slate-950);
         font-family: var(--font-sans);
+        min-height: 100svh;
+        overscroll-behavior-y: none;
         text-rendering: optimizeLegibility;
     }
 
@@ -88,6 +92,10 @@
 }
 
 @layer components {
+    .app-shell {
+        padding-top: env(safe-area-inset-top);
+    }
+
     .app-surface {
         @apply rounded-2xl border border-slate-200 bg-white shadow-sm;
     }
@@ -238,5 +246,127 @@
 
     .soft-divider {
         @apply border-t border-slate-200;
+    }
+
+    @media (max-width: 1023px) {
+        body::before {
+            display: none;
+        }
+
+        .app-shell {
+            background:
+                linear-gradient(180deg, rgba(236, 253, 245, 0.92), rgba(248, 250, 252, 0.98) 18rem),
+                var(--color-mist-50);
+        }
+
+        .app-topbar {
+            border-color: rgba(15, 23, 42, 0.08);
+            background: rgba(255, 255, 255, 0.9);
+            padding-top: env(safe-area-inset-top);
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        .app-topbar-inner {
+            gap: 0.65rem;
+            padding: 0.7rem 0.85rem;
+        }
+
+        .app-brand {
+            min-height: 2.75rem;
+            border-color: transparent;
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .app-brand > span:first-child {
+            height: 2.55rem;
+            width: 2.55rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 22px rgba(4, 120, 87, 0.22);
+        }
+
+        .app-topbar .btn-primary,
+        .app-topbar .btn-secondary {
+            min-height: 2.55rem;
+            width: 2.55rem;
+            border-radius: 1rem;
+            padding: 0;
+        }
+
+        .app-main {
+            max-width: 34rem;
+            padding: 1rem 0.85rem calc(6.35rem + env(safe-area-inset-bottom));
+        }
+
+        .app-footer {
+            display: none;
+        }
+
+        .mobile-bottom-nav {
+            border-top: 0;
+            background: transparent;
+            padding: 0 0.8rem calc(0.8rem + env(safe-area-inset-bottom));
+            box-shadow: none;
+        }
+
+        .mobile-bottom-nav > div {
+            max-width: 34rem;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            border-radius: 1.45rem;
+            background: rgba(255, 255, 255, 0.94);
+            padding: 0.35rem;
+            box-shadow: 0 18px 38px rgba(15, 23, 42, 0.18);
+            -webkit-backdrop-filter: blur(18px);
+            backdrop-filter: blur(18px);
+        }
+
+        .mobile-tab {
+            min-height: 3.65rem;
+            border-radius: 1.1rem;
+            font-size: 0.68rem;
+        }
+
+        .mobile-tab-active {
+            background: #047857;
+            border-color: #047857;
+            color: white;
+            box-shadow: 0 10px 22px rgba(4, 120, 87, 0.24);
+        }
+
+        .mobile-more-panel {
+            right: -0.35rem;
+            width: min(20rem, calc(100vw - 1.6rem));
+            max-height: min(70vh, 31rem);
+            overflow-y: auto;
+            border-radius: 1.35rem;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+        }
+
+        .page-hero,
+        .app-panel,
+        .app-surface,
+        .app-surface-soft,
+        .metric-card,
+        .dashboard-action-card,
+        .table-shell {
+            border-radius: 1.15rem;
+        }
+
+        .app-section-title {
+            font-size: 1.75rem;
+            line-height: 1.12;
+        }
+
+        .field-input,
+        .btn-primary,
+        .btn-secondary,
+        .btn-warm {
+            font-size: 1rem;
+        }
+
+        .public-card-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
     }
 }

@@ -42,7 +42,7 @@ class MannaRisePagesTest extends TestCase
             'is_approved' => true,
         ]);
 
-        foreach (['/', '/daily', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
+        foreach (['/', '/daily', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/audio-devotionals', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
             $this->get($path)->assertOk();
         }
     }
@@ -53,7 +53,7 @@ class MannaRisePagesTest extends TestCase
 
         $this->actingAs($user);
 
-        foreach (['/dashboard', '/growth-path', '/journal', '/favorites'] as $path) {
+        foreach (['/dashboard', '/growth-path', '/journal', '/favorites', '/reminders', '/groups'] as $path) {
             $this->get($path)->assertOk();
         }
     }
@@ -64,7 +64,7 @@ class MannaRisePagesTest extends TestCase
 
         $this->actingAs($admin);
 
-        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/settings'] as $path) {
+        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/featured-content', '/admin/moderation', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/settings'] as $path) {
             $this->get($path)->assertOk();
         }
     }
@@ -78,7 +78,7 @@ class MannaRisePagesTest extends TestCase
 
         $this->actingAs($superAdmin);
 
-        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/settings'] as $path) {
+        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/featured-content', '/admin/moderation', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/audio-devotionals', '/admin/roles', '/admin/settings'] as $path) {
             $this->get($path)->assertOk();
         }
     }
@@ -127,5 +127,26 @@ class MannaRisePagesTest extends TestCase
             'is_answered' => true,
             'prayed_count' => 1,
         ]);
+    }
+
+    public function test_pwa_assets_are_configured(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('/manifest.webmanifest', false)
+            ->assertSee('apple-mobile-web-app-capable', false)
+            ->assertSee('/icons/apple-touch-icon.png', false);
+
+        $manifest = json_decode(file_get_contents(public_path('manifest.webmanifest')), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertSame('standalone', $manifest['display']);
+        $this->assertSame('/', $manifest['scope']);
+        $this->assertFileExists(public_path('sw.js'));
+        $this->assertFileExists(public_path('offline.html'));
+        $this->assertFileExists(public_path('icons/icon-192.png'));
+        $this->assertFileExists(public_path('icons/icon-512.png'));
+        $this->assertFileExists(public_path('icons/maskable-512.png'));
+        $this->assertFileExists(public_path('icons/apple-touch-icon.png'));
+        $this->assertFileDoesNotExist(public_path('hot'));
     }
 }

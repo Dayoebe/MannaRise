@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -55,7 +56,27 @@ class User extends Authenticatable
 
     public function hasAdminAccess(): bool
     {
-        return $this->is_super_admin || $this->is_admin;
+        return $this->is_super_admin || $this->is_admin || $this->canDo('manage-dashboard');
+    }
+
+    public function canDo(string $permission): bool
+    {
+        if ($this->is_super_admin) {
+            return true;
+        }
+
+        try {
+            return $this->roles()
+                ->whereHas('permissions', fn ($query) => $query->where('name', $permission))
+                ->exists();
+        } catch (QueryException) {
+            return false;
+        }
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class)->withTimestamps();
     }
 
     public function devotionals(): HasMany

@@ -2,25 +2,68 @@
     "name": "MannaRise",
     "short_name": "MannaRise",
     "description": "Daily devotionals, Bible reading, prayer, testimonies, and spiritual growth.",
-    "start_url": "/",
+    "id": "/",
+    "start_url": "/?source=pwa",
     "scope": "/",
     "display": "standalone",
+    "display_override": ["standalone", "minimal-ui", "browser"],
     "background_color": "#f5f8fa",
     "theme_color": "#047857",
     "orientation": "portrait-primary",
     "categories": ["books", "education", "lifestyle"],
     "icons": [
         {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
             "src": "/icons/icon-192.svg",
             "sizes": "192x192",
             "type": "image/svg+xml",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
             "src": "/icons/icon-512.svg",
             "sizes": "512x512",
             "type": "image/svg+xml",
-            "purpose": "any maskable"
+            "purpose": "any"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Daily",
+            "short_name": "Daily",
+            "description": "Open today's devotional rhythm.",
+            "url": "/daily",
+            "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+        },
+        {
+            "name": "Bible",
+            "short_name": "Bible",
+            "description": "Open the Bible reader.",
+            "url": "/bible",
+            "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+        },
+        {
+            "name": "Prayer",
+            "short_name": "Prayer",
+            "description": "Open the prayer wall.",
+            "url": "/prayer-wall",
+            "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
         }
     ]
 }

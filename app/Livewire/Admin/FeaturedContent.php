@@ -70,7 +70,7 @@ class FeaturedContent extends Component
         FeaturedContentSlot::syncDefaults();
 
         return view('livewire.admin.featured-content', [
-            'slots' => FeaturedContentSlot::with('devotional.category')->orderBy('id')->get(),
+            'featuredSlots' => FeaturedContentSlot::with('devotional.category')->orderBy('id')->get(),
             'devotionals' => Devotional::query()
                 ->with('category')
                 ->where('is_published', true)
