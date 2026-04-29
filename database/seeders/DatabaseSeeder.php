@@ -24,31 +24,36 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::updateOrCreate(
-            ['email' => 'admin@mannarise.test'],
+        $author = User::updateOrCreate(
+            ['email' => 'content@mannarise.test'],
             [
-                'name' => 'MannaRise Admin',
-                'password' => 'password',
-                'is_admin' => true,
+                'name' => 'MannaRise Content Team',
+                'password' => Str::password(32),
+                'is_admin' => false,
                 'is_super_admin' => false,
             ],
         );
 
-        User::updateOrCreate(
-            ['email' => 'super@admin.com'],
-            [
-                'name' => 'MannaRise Super Admin',
-                'password' => '9638',
-                'is_admin' => true,
-                'is_super_admin' => true,
-            ],
-        );
+        $seedAdminEmail = env('MANNA_SEED_ADMIN_EMAIL');
+        $seedAdminPassword = env('MANNA_SEED_ADMIN_PASSWORD');
+
+        if ($seedAdminEmail && $seedAdminPassword) {
+            User::updateOrCreate(
+                ['email' => $seedAdminEmail],
+                [
+                    'name' => env('MANNA_SEED_ADMIN_NAME', 'MannaRise Admin'),
+                    'password' => $seedAdminPassword,
+                    'is_admin' => true,
+                    'is_super_admin' => true,
+                ],
+            );
+        }
 
         $reader = User::updateOrCreate(
             ['email' => 'reader@mannarise.test'],
             [
                 'name' => 'MannaRise Reader',
-                'password' => 'password',
+                'password' => Str::password(32),
                 'is_admin' => false,
                 'is_super_admin' => false,
             ],
@@ -118,7 +123,7 @@ class DatabaseSeeder extends Seeder
                 ['slug' => Str::slug($data['title'])],
                 [
                     'devotional_category_id' => $categories[$data['category']]->id,
-                    'user_id' => $admin->id,
+                    'user_id' => $author->id,
                     'title' => $data['title'],
                     'slug' => Str::slug($data['title']),
                     'bible_reference' => $data['bible_reference'],
