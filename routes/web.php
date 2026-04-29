@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SeoController;
 use App\Livewire\Admin\AudioDevotionals as AdminAudioDevotionals;
 use App\Livewire\Admin\Categories as AdminCategories;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
@@ -44,6 +45,9 @@ use App\Models\CommunityGroupMembership;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('seo.robots');
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('seo.sitemap');
 
 Route::get('/', Home::class)->name('home');
 Route::get('/daily', DailyIndex::class)->name('daily.index');
