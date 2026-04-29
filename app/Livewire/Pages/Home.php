@@ -28,7 +28,7 @@ class Home extends Component
                 ->withCount(['devotionals' => fn ($query) => $query->published()])
                 ->orderBy('name')
                 ->get(),
-            'testimonies' => Testimony::where('is_approved', true)
+            'testimonies' => Testimony::approved()
                 ->latest()
                 ->take(3)
                 ->get(),
