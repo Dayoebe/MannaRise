@@ -4,10 +4,10 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Illuminate\Database\QueryException;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -15,6 +15,11 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * @var array<string, bool>
+     */
+    protected array $permissionCache = [];
 
     /**
      * The attributes that are mass assignable.
@@ -65,12 +70,24 @@ class User extends Authenticatable
             return true;
         }
 
+        if (array_key_exists($permission, $this->permissionCache)) {
+            return $this->permissionCache[$permission];
+        }
+
         try {
-            return $this->roles()
+            if ($this->relationLoaded('roles')) {
+                $this->loadMissing('roles.permissions');
+
+                return $this->permissionCache[$permission] = $this->roles
+                    ->flatMap(fn (Role $role) => $role->permissions)
+                    ->contains('name', $permission);
+            }
+
+            return $this->permissionCache[$permission] = $this->roles()
                 ->whereHas('permissions', fn ($query) => $query->where('name', $permission))
                 ->exists();
         } catch (QueryException) {
-            return false;
+            return $this->permissionCache[$permission] = false;
         }
     }
 
