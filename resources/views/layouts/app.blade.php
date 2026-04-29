@@ -171,15 +171,7 @@
             <div class="mx-auto flex max-w-7xl flex-col gap-4 px-3 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-5 lg:px-8">
                 <span class="inline-flex items-center gap-2 font-semibold text-slate-700"><x-ui.icon name="sparkles" class="h-4 w-4 text-emerald-800" /> MannaRise devotional and spiritual growth platform.</span>
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="h-3 w-3 rounded-full bg-taupe-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-mauve-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-mist-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-olive-500"></span>
-                    <span class="h-3 w-3 rounded-full bg-slate-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-gray-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-zinc-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-neutral-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-stone-400"></span>
+                    <span class="h-3 w-3 rounded-full bg-taupe-400">Wireless Terminal</span>
                     <span class="ml-1">{{ now()->year }}</span>
                 </div>
             </div>

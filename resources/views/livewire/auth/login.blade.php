@@ -22,7 +22,12 @@
 
                 <div>
                     <label for="password" class="block text-sm font-bold text-slate-700">Password</label>
-                    <input id="password" type="password" wire:model="password" autocomplete="current-password" class="field-input mt-1">
+                    <div class="relative mt-1">
+                        <input id="password" type="password" wire:model="password" autocomplete="current-password" class="field-input w-full pr-10">
+                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500" aria-label="Toggle password visibility" onclick="togglePasswordVisibility()">
+                            <x-ui.icon name="eye" id="password-toggle-icon" class="h-5 w-5" />
+                        </button>
+                    </div>
                     @error('password') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
                 </div>
 
