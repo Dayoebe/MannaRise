@@ -109,6 +109,10 @@
             const downloadButton = root.querySelector('[data-card-download]');
             const copyButton = root.querySelector('[data-card-copy]');
             const ctx = canvas.getContext('2d');
+            const appUrl = @json($appUrl);
+            const sansFont = '"Source Sans 3", Arial, sans-serif';
+            const serifFont = 'Lora, Georgia, serif';
+            const displayFont = 'Cinzel, Lora, Georgia, serif';
 
             const sizes = {
                 square: { width: 1080, height: 1080 },
@@ -125,6 +129,8 @@
                     muted: '#92400e',
                     accent: '#f59e0b',
                     accentTwo: '#047857',
+                    glow: '#fef3c7',
+                    line: '#f3c98b',
                     strip: ['#ef4444', '#f59e0b', '#eab308', '#22c55e', '#0ea5e9', '#a855f7'],
                 },
                 river: {
@@ -135,6 +141,8 @@
                     muted: '#0f766e',
                     accent: '#0ea5e9',
                     accentTwo: '#84cc16',
+                    glow: '#cffafe',
+                    line: '#7dd3fc',
                     strip: ['#0ea5e9', '#14b8a6', '#22c55e', '#eab308', '#f97316', '#ec4899'],
                 },
                 bloom: {
@@ -145,6 +153,8 @@
                     muted: '#9f1239',
                     accent: '#e11d48',
                     accentTwo: '#7c3aed',
+                    glow: '#ffe4e6',
+                    line: '#f9a8d4',
                     strip: ['#e11d48', '#ec4899', '#a855f7', '#6366f1', '#0ea5e9', '#10b981'],
                 },
                 olive: {
@@ -155,6 +165,8 @@
                     muted: '#535622',
                     accent: '#8c8f3a',
                     accentTwo: '#d97706',
+                    glow: '#ecedd2',
+                    line: '#c8c978',
                     strip: ['#8c8f3a', '#22c55e', '#06b6d4', '#f59e0b', '#ef4444', '#8b5cf6'],
                 },
             };
@@ -184,6 +196,45 @@
                 ctx.lineTo(x, y + radius);
                 ctx.quadraticCurveTo(x, y, x + radius, y);
                 ctx.fill();
+            }
+
+            function strokeRoundRect(x, y, width, height, radius, color, lineWidth = 3) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = lineWidth;
+                ctx.beginPath();
+                ctx.moveTo(x + radius, y);
+                ctx.lineTo(x + width - radius, y);
+                ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                ctx.lineTo(x + width, y + height - radius);
+                ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                ctx.lineTo(x + radius, y + height);
+                ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                ctx.lineTo(x, y + radius);
+                ctx.quadraticCurveTo(x, y, x + radius, y);
+                ctx.stroke();
+            }
+
+            function fillGradientRect(x, y, width, height, topColor, bottomColor) {
+                const gradient = ctx.createLinearGradient(x, y, x, y + height);
+                gradient.addColorStop(0, topColor);
+                gradient.addColorStop(1, bottomColor);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, y, width, height);
+            }
+
+            function drawOrnament(centerX, y, palette) {
+                ctx.strokeStyle = palette.accentTwo;
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(centerX - 130, y);
+                ctx.quadraticCurveTo(centerX - 62, y - 32, centerX - 18, y);
+                ctx.quadraticCurveTo(centerX, y + 16, centerX + 18, y);
+                ctx.quadraticCurveTo(centerX + 62, y - 32, centerX + 130, y);
+                ctx.stroke();
+
+                fillRoundRect(centerX - 8, y - 8, 16, 16, 8, palette.accent);
+                fillRoundRect(centerX - 162, y - 3, 40, 6, 3, palette.line);
+                fillRoundRect(centerX + 122, y - 3, 40, 6, 3, palette.line);
             }
 
             function populateItems() {
@@ -224,7 +275,7 @@
 
             function fitLines(text, maxWidth, maxLines, startSize, minSize) {
                 for (let size = startSize; size >= minSize; size -= 2) {
-                    ctx.font = `600 ${size}px Lora, Georgia, serif`;
+                    ctx.font = `600 ${size}px ${serifFont}`;
                     const lines = wrapText(text, maxWidth);
 
                     if (lines.length <= maxLines) {
@@ -232,7 +283,7 @@
                     }
                 }
 
-                ctx.font = `600 ${minSize}px Lora, Georgia, serif`;
+                ctx.font = `600 ${minSize}px ${serifFont}`;
                 const lines = wrapText(text, maxWidth).slice(0, maxLines);
 
                 if (lines.length === maxLines) {
@@ -260,74 +311,86 @@
                 const height = dims.height;
                 const margin = Math.round(width * 0.07);
                 const innerWidth = width - margin * 2;
-                const maxBodyLines = height > 1500 ? 13 : height > 1200 ? 10 : 8;
+                const maxBodyLines = height > 1500 ? 10 : height > 1200 ? 6 : 3;
+                const panelX = margin + 42;
+                const panelY = margin + 84;
+                const panelWidth = innerWidth - 84;
+                const panelHeight = height - margin * 2 - 140;
 
                 canvas.width = width;
                 canvas.height = height;
 
-                ctx.fillStyle = palette.background;
-                ctx.fillRect(0, 0, width, height);
+                fillGradientRect(0, 0, width, height, palette.background, palette.glow);
                 drawStrip(width, palette);
 
-                fillRoundRect(margin, margin + 42, innerWidth, height - margin * 2 - 42, 44, palette.panel);
-                fillRoundRect(margin + 28, margin + 70, 16, height - margin * 2 - 98, 8, palette.accent);
-                fillRoundRect(width - margin - 132, margin + 70, 76, 14, 7, palette.soft);
-                fillRoundRect(width - margin - 210, margin + 70, 58, 14, 7, palette.accentTwo);
+                fillRoundRect(margin, margin + 44, innerWidth, height - margin * 2 - 60, 48, palette.panel);
+                strokeRoundRect(panelX, panelY, panelWidth, panelHeight, 34, palette.line, 4);
+                strokeRoundRect(panelX + 16, panelY + 16, panelWidth - 32, panelHeight - 32, 26, palette.soft, 2);
 
-                ctx.strokeStyle = palette.soft;
-                ctx.lineWidth = 4;
-                ctx.strokeRect(margin + 54, margin + 76, innerWidth - 108, height - margin * 2 - 110);
+                fillRoundRect(margin + 24, panelY + 18, 14, panelHeight - 36, 7, palette.accent);
+                fillRoundRect(width - margin - 38, panelY + 18, 14, panelHeight - 36, 7, palette.accentTwo);
+                fillRoundRect(width - margin - 178, margin + 64, 104, 14, 7, palette.soft);
+                fillRoundRect(width - margin - 268, margin + 64, 68, 14, 7, palette.accentTwo);
+                drawOrnament(width / 2, panelY + 66, palette);
 
-                fillRoundRect(margin + 78, margin + 116, 220, 56, 28, palette.background);
+                fillRoundRect(panelX + 40, panelY + 42, 286, 62, 31, palette.background);
                 ctx.fillStyle = palette.muted;
-                ctx.font = '800 28px Source Sans 3, Arial, sans-serif';
+                ctx.font = `700 34px ${displayFont}`;
                 ctx.textBaseline = 'top';
-                ctx.fillText(String(card.kind || 'Card').toUpperCase(), margin + 108, margin + 128);
+                ctx.fillText(String(card.kind || 'Card').toUpperCase(), panelX + 72, panelY + 55);
 
                 ctx.fillStyle = palette.ink;
-                ctx.font = '800 30px Source Sans 3, Arial, sans-serif';
+                ctx.font = `800 36px ${sansFont}`;
                 const dateText = card.date || new Date().toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
-                const dateWidth = Math.min(ctx.measureText(dateText).width + 56, innerWidth - 330);
-                fillRoundRect(width - margin - dateWidth - 78, margin + 116, dateWidth, 56, 28, palette.soft);
+                const dateWidth = Math.min(ctx.measureText(dateText).width + 72, innerWidth - 420);
+                fillRoundRect(width - margin - dateWidth - 88, panelY + 42, dateWidth, 62, 31, palette.soft);
                 ctx.fillStyle = palette.ink;
-                ctx.fillText(dateText, width - margin - dateWidth - 50, margin + 128);
+                ctx.fillText(dateText, width - margin - dateWidth - 52, panelY + 55);
 
                 ctx.fillStyle = palette.ink;
-                ctx.font = '800 52px Source Sans 3, Arial, sans-serif';
+                ctx.font = `700 58px ${displayFont}`;
                 wrapText(card.title || 'MannaRise', innerWidth - 160).slice(0, 2).forEach((line, index) => {
-                    ctx.fillText(line, margin + 78, margin + 214 + index * 58);
+                    ctx.fillText(line, panelX + 58, panelY + 156 + index * 66);
                 });
 
                 const titleLineCount = wrapText(card.title || 'MannaRise', innerWidth - 160).slice(0, 2).length;
-                const bodyStart = margin + 248 + titleLineCount * 64;
-                const fitted = fitLines(card.text, innerWidth - 190, maxBodyLines, height > 1500 ? 58 : 54, 38);
-                const lineHeight = Math.round(fitted.size * 1.45);
+                const bodyStart = panelY + 188 + titleLineCount * 72;
+                const fitted = fitLines(card.text, panelWidth - 172, maxBodyLines, height > 1500 ? 62 : 58, 40);
+                const lineHeight = Math.round(fitted.size * 1.42);
 
+                ctx.fillStyle = palette.line;
+                ctx.font = `700 120px ${displayFont}`;
+                ctx.fillText('“', panelX + 42, bodyStart - 22);
                 ctx.fillStyle = palette.ink;
-                ctx.font = `600 ${fitted.size}px Lora, Georgia, serif`;
+                ctx.font = `600 ${fitted.size}px ${serifFont}`;
                 fitted.lines.forEach((line, index) => {
-                    ctx.fillText(line, margin + 96, bodyStart + index * lineHeight);
+                    ctx.fillText(line, panelX + 98, bodyStart + index * lineHeight);
                 });
 
-                const referenceY = Math.min(height - margin - 190, bodyStart + fitted.lines.length * lineHeight + 60);
+                const referenceY = Math.min(height - margin - 316, bodyStart + fitted.lines.length * lineHeight + 68);
                 ctx.fillStyle = palette.muted;
-                ctx.font = '800 38px Source Sans 3, Arial, sans-serif';
-                wrapText(card.reference || 'MannaRise', innerWidth - 190).slice(0, 2).forEach((line, index) => {
-                    ctx.fillText(line, margin + 96, referenceY + index * 42);
+                ctx.font = `700 58px ${displayFont}`;
+                wrapText(card.reference || 'MannaRise', panelWidth - 172).slice(0, 2).forEach((line, index) => {
+                    ctx.fillText(line, panelX + 98, referenceY + index * 62);
                 });
 
-                fillRoundRect(margin + 96, height - margin - 126, 96, 10, 5, palette.accentTwo);
+                const footerTop = height - margin - 218;
+                fillRoundRect(panelX + 58, footerTop, panelWidth - 116, 2, 1, palette.line);
+                fillRoundRect(panelX + 58, footerTop + 34, 108, 10, 5, palette.accentTwo);
                 ctx.fillStyle = palette.ink;
-                ctx.font = '800 34px Source Sans 3, Arial, sans-serif';
-                ctx.fillText('MannaRise', margin + 96, height - margin - 92);
+                ctx.font = `700 50px ${displayFont}`;
+                ctx.fillText('MannaRise', panelX + 58, footerTop + 62);
                 ctx.fillStyle = palette.muted;
-                ctx.font = '700 28px Source Sans 3, Arial, sans-serif';
-                ctx.fillText('grow daily', margin + 96, height - margin - 52);
+                ctx.font = `800 34px ${sansFont}`;
+                ctx.fillText('grow daily', panelX + 58, footerTop + 118);
+                ctx.font = `800 28px ${sansFont}`;
+                ctx.fillText(appUrl, panelX + 58, footerTop + 158);
 
-                fillRoundRect(width - margin - 176, height - margin - 114, 98, 98, 24, palette.background);
+                fillRoundRect(width - margin - 188, footerTop + 54, 116, 116, 30, palette.background);
+                strokeRoundRect(width - margin - 188, footerTop + 54, 116, 116, 30, palette.line, 2);
                 ctx.fillStyle = palette.accent;
-                ctx.font = '800 44px Source Sans 3, Arial, sans-serif';
-                ctx.fillText('MR', width - margin - 146, height - margin - 88);
+                ctx.font = `700 62px ${displayFont}`;
+                ctx.fillText('MR', width - margin - 160, footerTop + 80);
             }
 
             function setStatus(message) {

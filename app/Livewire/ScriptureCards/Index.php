@@ -16,6 +16,7 @@ class Index extends Component
         $dailyRhythm = DailySpiritualRhythm::forDate();
 
         return view('livewire.scripture-cards.index', [
+            'appUrl' => $this->appUrl(),
             'cards' => [
                 'verse' => $this->verseCards($dailyRhythm),
                 'affirmation' => $this->affirmationCards($dailyRhythm),
@@ -170,5 +171,12 @@ class Index extends Component
             ->squish()
             ->limit(220, '')
             ->toString();
+    }
+
+    private function appUrl(): string
+    {
+        $url = rtrim((string) config('app.url'), '/');
+
+        return $url !== '' ? $url : 'MannaRise';
     }
 }
