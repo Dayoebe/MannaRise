@@ -78,6 +78,23 @@
                     <button type="button" data-card-copy class="btn-secondary w-full border-sky-200 hover:bg-white"><x-ui.icon name="copy" class="h-4 w-4" /> Copy image</button>
                 </div>
 
+                <details class="group rounded-2xl border border-sky-200 bg-white p-2 shadow-sm">
+                    <summary class="btn-secondary w-full cursor-pointer list-none border-sky-200 hover:bg-sky-50 [&::-webkit-details-marker]:hidden">
+                        <x-ui.icon name="share-2" class="h-4 w-4" />
+                        <span>Share</span>
+                        <x-ui.icon name="chevron-right" class="ml-auto h-4 w-4 transition group-open:rotate-90" />
+                    </summary>
+
+                    <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                        <button type="button" data-card-share="native" class="btn-secondary w-full border-sky-200 px-3 hover:bg-sky-50"><x-ui.icon name="share-2" class="h-4 w-4" /> Device share</button>
+                        <button type="button" data-card-share="whatsapp" class="btn-secondary w-full border-emerald-200 px-3 text-emerald-900 hover:bg-emerald-50"><x-ui.icon name="whatsapp" class="h-4 w-4" /> WhatsApp</button>
+                        <button type="button" data-card-share="facebook" class="btn-secondary w-full border-blue-200 px-3 text-blue-900 hover:bg-blue-50"><x-ui.icon name="facebook" class="h-4 w-4" /> Facebook</button>
+                        <button type="button" data-card-share="twitter" class="btn-secondary w-full border-slate-300 px-3 hover:bg-slate-50"><x-ui.icon name="x-twitter" class="h-4 w-4" /> X</button>
+                        <button type="button" data-card-share="linkedin" class="btn-secondary w-full border-sky-200 px-3 text-sky-900 hover:bg-sky-50"><x-ui.icon name="linkedin" class="h-4 w-4" /> LinkedIn</button>
+                        <button type="button" data-card-share="copy-link" class="btn-secondary w-full border-amber-200 px-3 text-amber-900 hover:bg-amber-50"><x-ui.icon name="link" class="h-4 w-4" /> Copy link</button>
+                    </div>
+                </details>
+
                 <p data-card-status class="min-h-5 text-sm font-bold text-sky-900"></p>
             </div>
         </div>
@@ -108,8 +125,10 @@
             const status = root.querySelector('[data-card-status]');
             const downloadButton = root.querySelector('[data-card-download]');
             const copyButton = root.querySelector('[data-card-copy]');
+            const shareButtons = root.querySelectorAll('[data-card-share]');
             const ctx = canvas.getContext('2d');
             const appUrl = @json($appUrl);
+            const shareUrl = window.location.href.split('#')[0];
             const sansFont = '"Source Sans 3", Arial, sans-serif';
             const serifFont = 'Lora, Georgia, serif';
             const displayFont = 'Cinzel, Lora, Georgia, serif';
@@ -433,6 +452,96 @@
                 }, 'image/png');
             }
 
+            function cardShareText() {
+                const card = currentCard();
+                const text = String(card.text || '').trim();
+                const reference = String(card.reference || '').trim();
+                const title = String(card.title || 'MannaRise Scripture card').trim();
+                const quote = text ? `"${text}"` : title;
+
+                return [quote, reference, 'Shared from MannaRise'].filter(Boolean).join('\n\n');
+            }
+
+            function canvasBlob() {
+                return new Promise((resolve) => {
+                    canvas.toBlob((blob) => resolve(blob), 'image/png');
+                });
+            }
+
+            async function shareNative() {
+                const card = currentCard();
+                const title = String(card.title || 'MannaRise Scripture card');
+                const text = cardShareText();
+
+                if (! navigator.share) {
+                    await copyShareLink();
+                    setStatus('Native sharing is not available, so the share link was copied.');
+                    return;
+                }
+
+                const blob = await canvasBlob();
+                const file = blob ? new File([blob], 'mannarise-scripture-card.png', { type: 'image/png' }) : null;
+                const payloadWithFile = file ? { title, text, url: shareUrl, files: [file] } : null;
+
+                try {
+                    if (payloadWithFile && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share(payloadWithFile);
+                    } else {
+                        await navigator.share({ title, text, url: shareUrl });
+                    }
+
+                    setStatus('Share sheet opened.');
+                } catch (error) {
+                    if (error?.name !== 'AbortError') {
+                        setStatus('Sharing was not completed.');
+                    }
+                }
+            }
+
+            async function copyShareLink() {
+                const text = `${cardShareText()}\n\n${shareUrl}`;
+
+                if (! navigator.clipboard) {
+                    setStatus('Clipboard copy is not available in this browser.');
+                    return;
+                }
+
+                await navigator.clipboard.writeText(text);
+                setStatus('Share text and link copied.');
+            }
+
+            function openShareWindow(url) {
+                window.open(url, '_blank', 'noopener,noreferrer,width=720,height=640');
+            }
+
+            async function shareTo(platform) {
+                const text = cardShareText();
+                const encodedText = encodeURIComponent(text);
+                const encodedUrl = encodeURIComponent(shareUrl);
+
+                if (platform === 'native') {
+                    await shareNative();
+                    return;
+                }
+
+                if (platform === 'copy-link') {
+                    await copyShareLink();
+                    return;
+                }
+
+                const urls = {
+                    whatsapp: `https://wa.me/?text=${encodedText}%0A%0A${encodedUrl}`,
+                    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`,
+                    twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+                    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+                };
+
+                if (urls[platform]) {
+                    openShareWindow(urls[platform]);
+                    setStatus('Share window opened. Download or copy the image first if you want to attach the PNG.');
+                }
+            }
+
             [typeSelect, itemSelect, sizeSelect, styleSelect].forEach((control) => {
                 control.addEventListener('change', () => {
                     if (control === typeSelect) {
@@ -445,6 +554,9 @@
 
             downloadButton.addEventListener('click', download);
             copyButton.addEventListener('click', copyImage);
+            shareButtons.forEach((button) => {
+                button.addEventListener('click', () => shareTo(button.dataset.cardShare));
+            });
 
             populateItems();
             draw();

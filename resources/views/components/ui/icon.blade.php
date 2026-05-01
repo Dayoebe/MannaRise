@@ -28,6 +28,36 @@
             <path d="m22 2-7 20-4-9-9-4z" />
             <path d="M22 2 11 13" />
             @break
+        @case('share-2')
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <path d="m8.6 10.5 6.8-4" />
+            <path d="m8.6 13.5 6.8 4" />
+            @break
+        @case('link')
+            <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" />
+            <path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1" />
+            @break
+        @case('whatsapp')
+            <path d="M3 21l1.3-4.7A8.5 8.5 0 1 1 7.7 19z" />
+            <path d="M9.2 8.7c.2-.5.4-.5.7-.5h.5c.2 0 .4.1.5.4l.7 1.6c.1.3.1.5-.1.7l-.4.5c-.1.2-.2.3 0 .6.4.7 1.3 1.7 2.4 2.2.3.1.5.1.6-.1l.7-.8c.2-.2.4-.2.7-.1l1.6.8c.3.1.4.3.4.5 0 .6-.5 1.5-1.1 1.7-.7.3-2 .3-4.1-.9-2.5-1.4-4.1-3.9-4.3-5.1-.2-.8.2-1.3.6-1.5z" />
+            @break
+        @case('facebook')
+            <path d="M14 8h3V4h-3a5 5 0 0 0-5 5v3H6v4h3v6h4v-6h3l1-4h-4V9a1 1 0 0 1 1-1z" />
+            @break
+        @case('x-twitter')
+            <path d="M4 4l12.5 16H20L7.5 4z" />
+            <path d="M4 20 10.8 13" />
+            <path d="M13.2 11 20 4" />
+            @break
+        @case('linkedin')
+            <path d="M6.5 10v8" />
+            <path d="M6.5 6v.1" />
+            <path d="M11 18v-8" />
+            <path d="M11 13.5a3.5 3.5 0 0 1 7 0V18" />
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            @break
         @case('download')
             <path d="M12 3v12" />
             <path d="m7 10 5 5 5-5" />
