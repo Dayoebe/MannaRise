@@ -11,33 +11,33 @@
         <x-ui.icon name="sparkles" class="h-4 w-4 animate-pulse" /> Updating your dashboard...
     </div>
 
-    <div class="page-hero border-emerald-200">
-        <div class="color-strip rounded-none">
-            <span class="bg-emerald-500"></span>
-            <span class="bg-teal-500"></span>
-            <span class="bg-cyan-500"></span>
-            <span class="bg-sky-500"></span>
-            <span class="bg-blue-500"></span>
-            <span class="bg-violet-500"></span>
-            <span class="bg-amber-400"></span>
-        </div>
-        <div class="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)] lg:items-end">
-            <div>
-                <p class="app-eyebrow"><x-ui.icon name="layout-dashboard" class="h-4 w-4" /> Personal growth dashboard</p>
-                <h1 class="mt-3 app-section-title">Welcome back, {{ auth()->user()->name }}</h1>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Your devotionals, saved readings, journal reflections, prayer life, and consistency rhythm are gathered here.</p>
+        <div class="page-hero border-emerald-200">
+            <div class="color-strip rounded-none">
+                <span class="bg-emerald-500"></span>
+                <span class="bg-teal-500"></span>
+                <span class="bg-cyan-500"></span>
+                <span class="bg-sky-500"></span>
+                <span class="bg-blue-500"></span>
+                <span class="bg-violet-500"></span>
+                <span class="bg-amber-400"></span>
             </div>
+            <div class="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)] lg:items-end">
+                <div>
+                    <p class="app-eyebrow"><x-ui.icon name="layout-dashboard" class="h-4 w-4" /> Personal growth dashboard</p>
+                    <h1 class="mt-3 app-section-title">Welcome back, {{ auth()->user()->name }}</h1>
+                    <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Your devotionals, saved readings, journal reflections, prayer life, and consistency rhythm are gathered here.</p>
+                </div>
 
-            <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-                @if ($todayDevotional)
-                    <a href="{{ route('devotionals.show', $todayDevotional->slug) }}" class="btn-primary w-full"><x-ui.icon name="sparkles" class="h-4 w-4" /> Continue today’s reading</a>
-                @else
-                    <a href="{{ route('devotionals.index') }}" class="btn-primary w-full"><x-ui.icon name="sparkles" class="h-4 w-4" /> Find a devotional</a>
-                @endif
-                <a href="{{ route('journal.index') }}" class="btn-secondary w-full"><x-ui.icon name="journal" class="h-4 w-4" /> Write reflection</a>
+                <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+                    @if ($todayDevotional)
+                        <a href="{{ route('devotionals.show', $todayDevotional->slug) }}" class="btn-primary w-full"><x-ui.icon name="sparkles" class="h-4 w-4" /> Continue today's reading</a>
+                    @else
+                        <a href="{{ route('devotionals.index') }}" class="btn-primary w-full"><x-ui.icon name="sparkles" class="h-4 w-4" /> Find a devotional</a>
+                    @endif
+                    <a href="{{ route('journal.index') }}" class="btn-secondary w-full"><x-ui.icon name="journal" class="h-4 w-4" /> Write reflection</a>
+                </div>
             </div>
         </div>
-    </div>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         @foreach ([['bookmark', 'Favorites', $stats['favorites'], 'border-emerald-200 bg-emerald-50 text-emerald-900'], ['journal', 'Journal', $stats['journal_entries'], 'border-sky-200 bg-sky-50 text-sky-900'], ['heart', 'Prayers', $stats['prayer_requests'], 'border-rose-200 bg-rose-50 text-rose-900'], ['sparkles', 'Completed', $stats['completed'], 'border-lime-200 bg-lime-50 text-lime-900'], ['star', 'Streak', $stats['streak'].' days', 'border-orange-200 bg-orange-50 text-orange-900']] as [$icon, $label, $value, $classes])

@@ -137,6 +137,14 @@
             <circle cx="12" cy="12" r="1" />
             <circle cx="19" cy="12" r="1" />
             @break
+        @case('bell')
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+            <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+            @break
+        @case('award')
+            <circle cx="12" cy="8" r="6" />
+            <path d="M15.5 13 17 22l-5-3-5 3 1.5-9" />
+            @break
         @default
             <circle cx="12" cy="12" r="9" />
             <path d="M12 8v4l3 3" />

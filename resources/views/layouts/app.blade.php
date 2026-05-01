@@ -53,6 +53,12 @@
         @livewireStyles
     </head>
     <body class="app-shell flex min-h-screen flex-col bg-mist-50 text-slate-950 antialiased">
+        @php
+            $user = auth()->user();
+            $usesAccountSidebar = (bool) $user;
+            $accountSidebarMenu = $usesAccountSidebar ? \App\Support\DashboardMenu::forUser($user) : [];
+        @endphp
+
         <header class="app-topbar sticky top-0 z-40 border-b border-slate-200 bg-mist-50/95 backdrop-blur">
             <div class="color-strip hidden rounded-none lg:flex">
                 <span class="bg-red-500"></span>
@@ -88,10 +94,12 @@
 
                     <div class="flex shrink-0 items-center gap-2">
                         @auth
-                            <a href="{{ route('dashboard') }}" class="btn-secondary px-3" title="Dashboard">
-                                <x-ui.icon name="layout-dashboard" class="h-4 w-4" />
-                                <span class="hidden sm:inline">Dashboard</span>
-                            </a>
+                            @unless ($usesAccountSidebar)
+                                <a href="{{ route('dashboard') }}" class="btn-secondary px-3" title="Dashboard">
+                                    <x-ui.icon name="layout-dashboard" class="h-4 w-4" />
+                                    <span class="hidden sm:inline">Dashboard</span>
+                                </a>
+                            @endunless
                             @if (auth()->user()->hasAdminAccess())
                                 <a href="{{ route('admin.dashboard') }}" class="btn-secondary px-3" title="Admin">
                                     <x-ui.icon name="shield" class="h-4 w-4" />
@@ -119,8 +127,6 @@
                 </div>
 
                 @php
-                    $user = auth()->user();
-
                     $mainLinks = [
                         ['label' => 'Daily', 'route' => 'daily.index', 'icon' => 'star', 'active' => ['daily.*']],
                         ['label' => 'Devotionals', 'route' => 'devotionals.index', 'icon' => 'sparkles', 'active' => ['devotionals.*']],
@@ -210,75 +216,139 @@
                         ->all();
                 @endphp
 
-                <nav class="hidden flex-col gap-2 text-sm lg:flex">
-                    @foreach ($desktopNavGroups as $group)
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="min-w-16 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{{ $group['label'] }}</span>
+                @unless ($usesAccountSidebar)
+                    <nav class="hidden flex-col gap-2 text-sm lg:flex">
+                        @foreach ($desktopNavGroups as $group)
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="min-w-16 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{{ $group['label'] }}</span>
 
-                            @foreach ($group['links'] as $link)
-                                <a href="{{ route($link['route']) }}" class="nav-pill {{ request()->routeIs(...$link['active']) ? 'nav-pill-active' : '' }}">
-                                    <x-ui.icon :name="$link['icon']" class="h-4 w-4" /> {{ $link['label'] }}
-                                </a>
-                            @endforeach
-                        </div>
-                    @endforeach
-                </nav>
+                                @foreach ($group['links'] as $link)
+                                    <a href="{{ route($link['route']) }}" class="nav-pill {{ request()->routeIs(...$link['active']) ? 'nav-pill-active' : '' }}">
+                                        <x-ui.icon :name="$link['icon']" class="h-4 w-4" /> {{ $link['label'] }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endforeach
+                    </nav>
+                @endunless
             </div>
         </header>
 
-        <main class="app-main mx-auto w-full max-w-7xl flex-1 px-3 pb-28 pt-5 sm:px-5 sm:pt-8 lg:px-8 lg:pb-8">
-            @if (session('status'))
-                <div class="mb-6 app-surface flex items-center gap-2 border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-900">
-                    <x-ui.icon name="sparkles" class="h-4 w-4" /> {{ session('status') }}
-                </div>
-            @endif
+        <div class="app-body mx-auto grid w-full max-w-7xl flex-1 gap-6 px-3 pt-5 sm:px-5 sm:pt-8 lg:px-8 {{ $usesAccountSidebar ? 'pb-8 lg:grid-cols-[17rem_minmax(0,1fr)] lg:items-start' : 'pb-28 lg:pb-8' }}">
+            @auth
+                <aside class="dashboard-sidebar" aria-label="Account menu">
+                    <div class="dashboard-sidebar-card">
+                        <div class="color-strip rounded-none">
+                            <span class="bg-emerald-500"></span>
+                            <span class="bg-teal-500"></span>
+                            <span class="bg-cyan-500"></span>
+                            <span class="bg-sky-500"></span>
+                            <span class="bg-violet-500"></span>
+                        </div>
 
-            {{ $slot }}
-        </main>
+                        <div class="p-4">
+                            <input type="checkbox" id="account-sidebar-toggle" class="dashboard-sidebar-control sr-only">
+                            <label for="account-sidebar-toggle" class="dashboard-sidebar-toggle">
+                                <span class="inline-flex min-w-0 items-center gap-3">
+                                    <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-700 text-white shadow-sm">
+                                        <x-ui.icon name="layout-dashboard" class="h-5 w-5" />
+                                    </span>
+                                    <span class="min-w-0 text-left">
+                                        <span class="block truncate text-sm font-black tracking-normal text-slate-950">Menu</span>
+                                        <span class="block truncate text-xs font-bold text-emerald-800">{{ $user->name }}</span>
+                                    </span>
+                                </span>
+                                <x-ui.icon name="chevron-right" class="dashboard-sidebar-toggle-icon h-4 w-4 text-emerald-900" />
+                            </label>
 
-        <nav class="mobile-bottom-nav">
-            <div class="mx-auto grid max-w-lg grid-cols-5 gap-2">
-                <a href="{{ route('devotionals.index') }}" class="mobile-tab {{ request()->routeIs('devotionals.*') ? 'mobile-tab-active' : '' }}">
-                    <x-ui.icon name="sparkles" />
-                    <span>Devotionals</span>
-                </a>
-                <a href="{{ route('bible') }}" class="mobile-tab {{ request()->routeIs('bible') ? 'mobile-tab-active' : '' }}">
-                    <x-ui.icon name="book-open" />
-                    <span>Bible</span>
-                </a>
-                <a href="{{ route('daily.index') }}" class="mobile-tab {{ request()->routeIs('daily.*') ? 'mobile-tab-active' : '' }}">
-                    <x-ui.icon name="star" />
-                    <span>Daily</span>
-                </a>
-                <a href="{{ route('library.index') }}" class="mobile-tab {{ request()->routeIs('library.*') ? 'mobile-tab-active' : '' }}">
-                    <x-ui.icon name="library" />
-                    <span>Library</span>
-                </a>
-                <details class="relative">
-                    <summary class="mobile-tab list-none cursor-pointer [&::-webkit-details-marker]:hidden {{ request()->routeIs(...$mobileMoreActiveRoutes) ? 'mobile-tab-active' : '' }}">
-                        <x-ui.icon name="more-horizontal" />
-                        <span>More</span>
-                    </summary>
+                            <div class="dashboard-sidebar-menu">
+                                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 p-3">
+                                    <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-700 text-white shadow-sm">
+                                        <x-ui.icon name="layout-dashboard" class="h-5 w-5" />
+                                    </span>
+                                    <span class="min-w-0">
+                                        <span class="block truncate text-sm font-black tracking-normal text-slate-950">My dashboard</span>
+                                        <span class="block truncate text-xs font-bold text-emerald-800">{{ $user->name }}</span>
+                                    </span>
+                                </a>
 
-                    <div class="mobile-more-panel">
-                        @foreach ($mobileMoreGroups as $group)
-                            <div class="mb-3 last:mb-0">
-                                <p class="mb-2 px-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-slate-400">{{ $group['label'] }}</p>
-
-                                <div class="space-y-1">
-                                    @foreach ($group['links'] as $link)
-                                        <a href="{{ route($link['route']) }}" class="mobile-more-link {{ request()->routeIs(...$link['active']) ? 'mobile-more-link-active' : '' }}">
-                                            <x-ui.icon :name="$link['icon']" class="h-4 w-4" />
-                                            <span>{{ $link['label'] }}</span>
-                                        </a>
+                                <nav class="mt-5 space-y-5">
+                                    @foreach ($accountSidebarMenu as $group)
+                                        <section>
+                                            <p class="px-2 text-[0.68rem] font-black uppercase tracking-[0.18em] text-slate-400">{{ $group['label'] }}</p>
+                                            <div class="mt-2 space-y-1">
+                                                @foreach ($group['items'] as $item)
+                                                    <a href="{{ $item['url'] }}" class="dashboard-menu-link {{ $item['is_active'] ? 'dashboard-menu-link-active' : '' }}">
+                                                        <x-ui.icon :name="$item['icon']" class="h-4 w-4" />
+                                                        <span>{{ $item['label'] }}</span>
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        </section>
                                     @endforeach
-                                </div>
+                                </nav>
                             </div>
-                        @endforeach
+                        </div>
                     </div>
-                </details>
-            </div>
-        </nav>
+                </aside>
+            @endauth
+
+            <main class="app-main w-full min-w-0">
+                @if (session('status'))
+                    <div class="mb-6 app-surface flex items-center gap-2 border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-900">
+                        <x-ui.icon name="sparkles" class="h-4 w-4" /> {{ session('status') }}
+                    </div>
+                @endif
+
+                {{ $slot }}
+            </main>
+        </div>
+
+        @unless ($usesAccountSidebar)
+            <nav class="mobile-bottom-nav">
+                <div class="mx-auto grid max-w-lg grid-cols-5 gap-2">
+                    <a href="{{ route('devotionals.index') }}" class="mobile-tab {{ request()->routeIs('devotionals.*') ? 'mobile-tab-active' : '' }}">
+                        <x-ui.icon name="sparkles" />
+                        <span>Devotionals</span>
+                    </a>
+                    <a href="{{ route('bible') }}" class="mobile-tab {{ request()->routeIs('bible') ? 'mobile-tab-active' : '' }}">
+                        <x-ui.icon name="book-open" />
+                        <span>Bible</span>
+                    </a>
+                    <a href="{{ route('daily.index') }}" class="mobile-tab {{ request()->routeIs('daily.*') ? 'mobile-tab-active' : '' }}">
+                        <x-ui.icon name="star" />
+                        <span>Daily</span>
+                    </a>
+                    <a href="{{ route('library.index') }}" class="mobile-tab {{ request()->routeIs('library.*') ? 'mobile-tab-active' : '' }}">
+                        <x-ui.icon name="library" />
+                        <span>Library</span>
+                    </a>
+                    <details class="relative">
+                        <summary class="mobile-tab list-none cursor-pointer [&::-webkit-details-marker]:hidden {{ request()->routeIs(...$mobileMoreActiveRoutes) ? 'mobile-tab-active' : '' }}">
+                            <x-ui.icon name="more-horizontal" />
+                            <span>More</span>
+                        </summary>
+
+                        <div class="mobile-more-panel">
+                            @foreach ($mobileMoreGroups as $group)
+                                <div class="mb-3 last:mb-0">
+                                    <p class="mb-2 px-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-slate-400">{{ $group['label'] }}</p>
+
+                                    <div class="space-y-1">
+                                        @foreach ($group['links'] as $link)
+                                            <a href="{{ route($link['route']) }}" class="mobile-more-link {{ request()->routeIs(...$link['active']) ? 'mobile-more-link-active' : '' }}">
+                                                <x-ui.icon :name="$link['icon']" class="h-4 w-4" />
+                                                <span>{{ $link['label'] }}</span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </details>
+                </div>
+            </nav>
+        @endunless
 
         <footer class="app-footer border-t border-slate-200 bg-white">
             <div class="mx-auto flex max-w-7xl flex-col gap-4 px-3 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-5 lg:px-8">

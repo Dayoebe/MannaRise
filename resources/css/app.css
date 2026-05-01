@@ -240,6 +240,62 @@
         @apply flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md;
     }
 
+    .dashboard-layout {
+        @apply grid gap-6 lg:grid-cols-[17rem_minmax(0,1fr)] lg:items-start;
+    }
+
+    .dashboard-sidebar {
+        @apply sticky top-20 z-30 block lg:top-28;
+    }
+
+    .dashboard-sidebar-card {
+        @apply max-h-[calc(100svh-6rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-sm;
+    }
+
+    .dashboard-sidebar-toggle {
+        @apply flex min-h-14 cursor-pointer items-center justify-between gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 p-3 lg:hidden;
+    }
+
+    .dashboard-sidebar-toggle-icon {
+        @apply shrink-0 transition-transform duration-200;
+    }
+
+    .dashboard-sidebar-menu {
+        @apply hidden lg:block;
+    }
+
+    .dashboard-sidebar-control:checked + .dashboard-sidebar-toggle {
+        @apply mb-4;
+    }
+
+    .dashboard-sidebar-control:checked + .dashboard-sidebar-toggle .dashboard-sidebar-toggle-icon {
+        @apply rotate-90;
+    }
+
+    .dashboard-sidebar-control:checked ~ .dashboard-sidebar-menu {
+        @apply block;
+    }
+
+    .dashboard-menu-link {
+        @apply flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-50 hover:text-slate-950;
+    }
+
+    .dashboard-menu-link svg {
+        @apply shrink-0 text-slate-400;
+    }
+
+    .dashboard-menu-link-active {
+        @apply bg-emerald-700 text-white shadow-sm hover:bg-emerald-800 hover:text-white;
+    }
+
+    .dashboard-menu-link-active svg {
+        @apply text-white;
+    }
+
+    .dashboard-content {
+        @apply min-w-0;
+    }
+
     .table-shell {
         @apply overflow-x-auto rounded-2xl border bg-white shadow-sm;
     }

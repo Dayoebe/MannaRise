@@ -11,7 +11,7 @@ class DailyDevotion extends Component
 {
     public DailyDevotionModel $devotion;
 
-    public function mount(?string $slug = null, ResourceHubService $service): void
+    public function mount(ResourceHubService $service, ?string $slug = null): void
     {
         $this->devotion = $slug
             ? DailyDevotionModel::published()->where('slug', $slug)->firstOrFail()
