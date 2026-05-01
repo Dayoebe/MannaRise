@@ -192,6 +192,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             BibleSeeder::class,
             SpiritualLibrarySeeder::class,
+            ResourceHubSeeder::class,
         ]);
 
         $this->call(MannaRiseContentSeeder::class);

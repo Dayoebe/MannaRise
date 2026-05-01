@@ -42,7 +42,7 @@ class MannaRisePagesTest extends TestCase
             'is_approved' => true,
         ]);
 
-        foreach (['/', '/daily', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/audio-devotionals', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
+        foreach (['/', '/daily', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/audio-devotionals', '/resources', '/resources/devotion', '/resources/books', '/resources/videos', '/resources/audio', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
             $this->get($path)->assertOk();
         }
     }
@@ -64,7 +64,7 @@ class MannaRisePagesTest extends TestCase
 
         $this->actingAs($admin);
 
-        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/featured-content', '/admin/moderation', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/settings'] as $path) {
+        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/resource-categories', '/admin/resource-items', '/admin/daily-devotions', '/admin/featured-content', '/admin/moderation', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/settings'] as $path) {
             $this->get($path)->assertOk();
         }
     }

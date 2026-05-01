@@ -28,6 +28,11 @@
             <path d="m22 2-7 20-4-9-9-4z" />
             <path d="M22 2 11 13" />
             @break
+        @case('download')
+            <path d="M12 3v12" />
+            <path d="m7 10 5 5 5-5" />
+            <path d="M5 21h14" />
+            @break
         @case('search')
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
@@ -94,10 +99,33 @@
             <path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5" />
             <path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
             @break
+        @case('globe')
+            <circle cx="12" cy="12" r="10" />
+            <path d="M2 12h20" />
+            <path d="M12 2a15.3 15.3 0 0 1 0 20" />
+            <path d="M12 2a15.3 15.3 0 0 0 0 20" />
+            @break
+        @case('layers')
+            <path d="m12 2 9 5-9 5-9-5z" />
+            <path d="m3 12 9 5 9-5" />
+            <path d="m3 17 9 5 9-5" />
+            @break
         @case('headphones')
             <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
             <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z" />
             <path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+            @break
+        @case('video')
+            <path d="M15 10 20 7v10l-5-3" />
+            <rect x="3" y="6" width="12" height="12" rx="2" />
+            @break
+        @case('volume-2')
+            <path d="M11 5 6 9H3v6h3l5 4z" />
+            <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+            <path d="M19 5a9 9 0 0 1 0 14" />
+            @break
+        @case('square')
+            <rect x="6" y="6" width="12" height="12" rx="1" />
             @break
         @case('route')
             <circle cx="6" cy="19" r="3" />

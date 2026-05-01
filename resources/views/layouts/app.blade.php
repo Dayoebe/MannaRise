@@ -125,6 +125,7 @@
                         ['label' => 'Daily', 'route' => 'daily.index', 'icon' => 'star', 'active' => ['daily.*']],
                         ['label' => 'Devotionals', 'route' => 'devotionals.index', 'icon' => 'sparkles', 'active' => ['devotionals.*']],
                         ['label' => 'Bible', 'route' => 'bible', 'icon' => 'book-open', 'active' => ['bible']],
+                        ['label' => 'Resources', 'route' => 'resources.index', 'icon' => 'library', 'active' => ['resources.*']],
                         ['label' => 'Prayer', 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*', 'prayer-rooms.*', 'prayer-requests.*']],
                     ];
 
@@ -135,6 +136,8 @@
                     $exploreLinks = [
                         ['label' => 'Plans', 'route' => 'devotional-plans.index', 'icon' => 'route', 'active' => ['devotional-plans.*']],
                         ['label' => 'Library', 'route' => 'library.index', 'icon' => 'library', 'active' => ['library.*']],
+                        ['label' => 'Hub Books', 'route' => 'resources.books', 'icon' => 'library', 'active' => ['resources.books']],
+                        ['label' => 'Hub Audio', 'route' => 'resources.audio', 'icon' => 'headphones', 'active' => ['resources.audio']],
                         ['label' => 'Memory', 'route' => 'memory-verses.index', 'icon' => 'bookmark', 'active' => ['memory-verses.*']],
                         ['label' => 'Cards', 'route' => 'scripture-cards.index', 'icon' => 'book-open', 'active' => ['scripture-cards.*']],
                         ['label' => 'Audio', 'route' => 'audio-devotionals.index', 'icon' => 'headphones', 'active' => ['audio-devotionals.*']],
@@ -162,6 +165,7 @@
                         $adminLinks = [
                             ['label' => 'Admin Home', 'route' => 'admin.dashboard', 'icon' => 'shield', 'active' => ['admin.dashboard']],
                             ['label' => 'Content', 'route' => 'admin.devotionals', 'icon' => 'sparkles', 'active' => ['admin.categories', 'admin.devotionals', 'admin.featured-content']],
+                            ['label' => 'Resource Admin', 'route' => 'admin.resource-items', 'icon' => 'library', 'active' => ['admin.resource-categories', 'admin.resource-items', 'admin.daily-devotions']],
                             ['label' => 'Moderation', 'route' => 'admin.moderation', 'icon' => 'message-circle', 'active' => ['admin.moderation', 'admin.prayer-requests', 'admin.testimonies']],
                             ['label' => 'Engagement', 'route' => 'admin.engagement', 'icon' => 'bar-chart', 'active' => ['admin.engagement']],
                             ['label' => 'Settings', 'route' => 'admin.settings', 'icon' => 'settings', 'active' => ['admin.settings']],

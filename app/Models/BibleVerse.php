@@ -12,6 +12,7 @@ class BibleVerse extends Model
 
     protected $fillable = [
         'bible_book_id',
+        'language',
         'version',
         'chapter',
         'verse',

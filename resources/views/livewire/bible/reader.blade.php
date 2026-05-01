@@ -10,9 +10,9 @@
         </div>
         <div class="flex flex-col gap-4 p-5 sm:p-6 md:flex-row md:items-end md:justify-between">
             <div>
-                <p class="app-eyebrow border-blue-200 bg-blue-50 text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> King James Version</p>
+                <p class="app-eyebrow border-blue-200 bg-blue-50 text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $languageLabel }} · {{ $version }}</p>
                 <h1 class="mt-3 app-section-title">Bible reader</h1>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Read the full public-domain KJV Bible by book and chapter, or search across all verses.</p>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Read available Bible translations by book, chapter, language, and version, or search within the selected translation.</p>
             </div>
             <a href="{{ route('library.index') }}" class="btn-secondary w-full border-cyan-200 text-cyan-900 hover:bg-cyan-50 sm:w-auto"><x-ui.icon name="library" class="h-4 w-4" /> Open library</a>
         </div>
@@ -24,7 +24,7 @@
         </div>
     @else
         <section class="app-panel border-sky-200 bg-sky-50">
-            <div class="grid gap-4 md:grid-cols-[minmax(0,1fr)_8rem_minmax(0,1fr)]">
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_8rem_12rem_12rem_minmax(0,1fr)]">
                 <div>
                     <label class="flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="book-open" class="h-4 w-4 text-blue-700" /> Book</label>
                     <select wire:model.live="bookSlug" data-bible-change class="field-input mt-1 border-sky-300 focus:border-blue-600 focus:ring-blue-100">
@@ -38,10 +38,28 @@
                     <label class="flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="bookmark" class="h-4 w-4 text-blue-700" /> Chapter</label>
                     <select wire:model.live="chapter" data-bible-change class="field-input mt-1 border-sky-300 focus:border-blue-600 focus:ring-blue-100">
                         @if ($book)
-                            @for ($i = 1; $i <= $book->chapters; $i++)
+                            @for ($i = 1; $i <= $chapterCount; $i++)
                                 <option value="{{ $i }}">{{ $i }}</option>
                             @endfor
                         @endif
+                    </select>
+                </div>
+
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="globe" class="h-4 w-4 text-blue-700" /> Language</label>
+                    <select wire:model.live="language" data-bible-change class="field-input mt-1 border-sky-300 focus:border-blue-600 focus:ring-blue-100">
+                        @foreach ($languages as $translation)
+                            <option value="{{ $translation['language'] }}">{{ $translation['language_label'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="layers" class="h-4 w-4 text-blue-700" /> Version</label>
+                    <select wire:model.live="version" data-bible-change class="field-input mt-1 border-sky-300 focus:border-blue-600 focus:ring-blue-100">
+                        @foreach ($versions as $translation)
+                            <option value="{{ $translation['version'] }}">{{ $translation['version'] }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -62,7 +80,7 @@
                 <div class="space-y-3">
                     @forelse ($searchResults as $result)
                         <article class="rounded-xl border border-mauve-200 bg-white p-4 shadow-sm">
-                            <p class="text-sm font-black tracking-normal text-mauve-800">{{ $result->book->name }} {{ $result->chapter }}:{{ $result->verse }}</p>
+                            <p class="text-sm font-black tracking-normal text-mauve-800">{{ $result->book->name }} {{ $result->chapter }}:{{ $result->verse }} · {{ strtoupper($result->language) }} {{ $result->version }}</p>
                             <p class="mt-2 text-base leading-7 text-slate-800">{{ $result->text }}</p>
                         </article>
                     @empty
@@ -74,15 +92,15 @@
             </section>
         @endif
 
-        <article class="app-panel border-olive-200 bg-white p-5 sm:p-8" data-bible-reader>
+        <article class="app-panel border-olive-200 bg-white p-5 sm:p-8" data-bible-reader data-bible-language="{{ $language }}">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <p class="inline-flex items-center gap-2 rounded-full border border-olive-200 bg-olive-50 px-3 py-1 text-sm font-black uppercase tracking-normal text-olive-800"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $book?->testament }}</p>
+                    <p class="inline-flex items-center gap-2 rounded-full border border-olive-200 bg-olive-50 px-3 py-1 text-sm font-black uppercase tracking-normal text-olive-800"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $book?->testament }} · {{ strtoupper($language) }} {{ $version }}</p>
                     <h2 class="mt-3 break-words text-3xl font-black tracking-normal text-slate-950 sm:text-4xl">{{ $book?->name }} {{ $chapter }}</h2>
                     <p data-bible-audio-status class="mt-2 min-h-5 text-sm font-bold text-olive-800"></p>
                 </div>
                 <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
-                    <button type="button" data-bible-read-chapter data-bible-reference="{{ $book?->name }} {{ $chapter }}" class="btn-secondary col-span-2 border-olive-300 bg-olive-50 px-3 text-olive-900 hover:bg-olive-100 sm:col-span-1">
+                    <button type="button" data-bible-read-chapter data-bible-reference="{{ $book?->name }} {{ $chapter }} {{ $version }}" class="btn-secondary col-span-2 border-olive-300 bg-olive-50 px-3 text-olive-900 hover:bg-olive-100 sm:col-span-1">
                         <x-ui.icon name="volume-2" class="h-4 w-4" /> Listen
                     </button>
                     <button type="button" data-bible-stop class="btn-secondary border-rose-200 px-3 text-rose-900 hover:bg-rose-50">
@@ -103,7 +121,7 @@
                         <button
                             type="button"
                             data-bible-read-verse
-                            data-bible-reference="{{ $book?->name }} {{ $verse->chapter }}:{{ $verse->verse }}"
+                            data-bible-reference="{{ $book?->name }} {{ $verse->chapter }}:{{ $verse->verse }} {{ $version }}"
                             data-bible-text="{{ $verse->text }}"
                             class="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-900 shadow-sm transition hover:border-amber-400 hover:bg-amber-100"
                             aria-label="Listen to {{ $book?->name }} {{ $verse->chapter }}:{{ $verse->verse }}"
@@ -178,10 +196,26 @@
                 return `${reference}. ${verses.join(' ')}`.trim();
             }
 
-            function speechVoice() {
-                const voices = window.speechSynthesis?.getVoices?.() || [];
+            function speechLanguage(reader) {
+                return {
+                    en: 'en-US',
+                    es: 'es-ES',
+                    fr: 'fr-FR',
+                    de: 'de-DE',
+                    pt: 'pt-BR',
+                    yo: 'yo-NG',
+                    ig: 'ig-NG',
+                    ha: 'ha-NG',
+                    sw: 'sw-KE',
+                }[reader?.dataset?.bibleLanguage || 'en'] || 'en-US';
+            }
 
-                return voices.find((voice) => voice.lang?.toLowerCase().startsWith('en'))
+            function speechVoice(language) {
+                const voices = window.speechSynthesis?.getVoices?.() || [];
+                const baseLanguage = language.split('-')[0].toLowerCase();
+
+                return voices.find((voice) => voice.lang?.toLowerCase() === language.toLowerCase())
+                    || voices.find((voice) => voice.lang?.toLowerCase().startsWith(baseLanguage))
                     || voices[0]
                     || null;
             }
@@ -279,13 +313,14 @@
                 }
 
                 const utterance = new SpeechSynthesisUtterance(activeQueue[activeQueueIndex]);
-                const voice = speechVoice();
+                const language = speechLanguage(activeReader);
+                const voice = speechVoice(language);
 
                 if (voice) {
                     utterance.voice = voice;
                     utterance.lang = voice.lang;
                 } else {
-                    utterance.lang = 'en-US';
+                    utterance.lang = language;
                 }
 
                 utterance.rate = 0.88;

@@ -153,6 +153,16 @@ class User extends Authenticatable
         return $this->hasMany(BibleChapterCompletion::class);
     }
 
+    public function resourceBookmarks(): HasMany
+    {
+        return $this->hasMany(UserResourceBookmark::class);
+    }
+
+    public function resourceProgress(): HasMany
+    {
+        return $this->hasMany(UserResourceProgress::class);
+    }
+
     public function spiritualProfile()
     {
         return $this->hasOne(UserSpiritualProfile::class);

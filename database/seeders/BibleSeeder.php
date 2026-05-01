@@ -66,8 +66,8 @@ class BibleSeeder extends Seeder
 
     private function hasCompleteCleanKjvImport(): bool
     {
-        return BibleVerse::where('version', 'KJV')->count() >= 31102
-            && ! BibleVerse::where('version', 'KJV')->where('text', 'like', '#%')->exists();
+        return BibleVerse::where('language', 'en')->where('version', 'KJV')->count() >= 31102
+            && ! BibleVerse::where('language', 'en')->where('version', 'KJV')->where('text', 'like', '#%')->exists();
     }
 
     private function loadVersesFromLocalFile(): ?array
@@ -177,6 +177,7 @@ class BibleSeeder extends Seeder
 
             $rows[] = [
                 'bible_book_id' => $book->id,
+                'language' => 'en',
                 'version' => 'KJV',
                 'chapter' => $chapter,
                 'verse' => $verse,
@@ -186,13 +187,13 @@ class BibleSeeder extends Seeder
             ];
 
             if (count($rows) >= 1000) {
-                BibleVerse::upsert($rows, ['version', 'bible_book_id', 'chapter', 'verse'], ['text', 'updated_at']);
+                BibleVerse::upsert($rows, ['language', 'version', 'bible_book_id', 'chapter', 'verse'], ['text', 'updated_at']);
                 $rows = [];
             }
         }
 
         if ($rows !== []) {
-            BibleVerse::upsert($rows, ['version', 'bible_book_id', 'chapter', 'verse'], ['text', 'updated_at']);
+            BibleVerse::upsert($rows, ['language', 'version', 'bible_book_id', 'chapter', 'verse'], ['text', 'updated_at']);
         }
 
         foreach ($chapterCounts as $bookName => $chapters) {
