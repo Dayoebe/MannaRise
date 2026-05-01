@@ -5,8 +5,10 @@ namespace App\Livewire\Journal;
 use App\Models\Devotional;
 use App\Models\JournalEntry;
 use App\Models\PersonalizedDailyPathCheckIn;
+use App\Models\PrayerRequest;
 use App\Support\PersonalizedDailyPath;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -136,6 +138,62 @@ class Index extends Component
                 ->latest('entry_date')
                 ->paginate(8),
             'devotionals' => Devotional::published()->latest('published_at')->get(['id', 'title']),
+            'insights' => $this->insights(),
         ]);
+    }
+
+    private function insights(): array
+    {
+        $monthStart = today()->startOfMonth();
+        $entries = JournalEntry::query()
+            ->where('user_id', auth()->id())
+            ->whereDate('entry_date', '>=', $monthStart)
+            ->get();
+
+        $topicCounts = $entries
+            ->flatMap(fn (JournalEntry $entry) => collect($entry->topics ?? []))
+            ->map(fn ($topic) => Str::lower(trim((string) $topic)))
+            ->filter()
+            ->countBy()
+            ->sortDesc();
+
+        $moodCounts = $entries
+            ->pluck('mood')
+            ->map(fn ($mood) => Str::lower(trim((string) $mood)))
+            ->filter()
+            ->countBy()
+            ->sortDesc();
+
+        $prayerText = PrayerRequest::query()
+            ->where('user_id', auth()->id())
+            ->where('created_at', '>=', $monthStart)
+            ->get(['title', 'body'])
+            ->map(fn (PrayerRequest $request) => Str::lower($request->title.' '.$request->body))
+            ->join(' ');
+
+        $prayerTopics = collect(['family', 'healing', 'peace', 'business', 'marriage', 'exams', 'salvation', 'grief', 'purpose', 'faith'])
+            ->mapWithKeys(fn (string $topic) => [$topic => substr_count($prayerText, $topic)])
+            ->filter()
+            ->sortDesc();
+
+        $topTopic = $topicCounts->keys()->first();
+        $topMood = $moodCounts->keys()->first();
+        $topPrayerTopic = $prayerTopics->keys()->first();
+        $topPrayerCount = $topPrayerTopic ? $prayerTopics[$topPrayerTopic] : 0;
+
+        return [
+            'entry_count' => $entries->count(),
+            'topic_summary' => $topTopic
+                ? 'You wrote most about '.str($topTopic)->headline()->lower().' this month.'
+                : 'Add topics to your journal entries and patterns will appear here.',
+            'mood_summary' => $topMood
+                ? 'Your most common journal mood this month is '.str($topMood)->headline()->lower().'.'
+                : 'Add a mood to each reflection to see emotional patterns over time.',
+            'prayer_summary' => $topPrayerTopic
+                ? 'You prayed about '.str($topPrayerTopic)->headline()->lower().' '.$topPrayerCount.' '.Str::plural('time', $topPrayerCount).' this month.'
+                : 'Prayer themes will appear when your requests mention topics like family, peace, faith, or healing.',
+            'top_topics' => $topicCounts->take(5),
+            'top_moods' => $moodCounts->take(5),
+        ];
     }
 }

@@ -72,6 +72,24 @@
             </div>
         </div>
 
+        <section class="mb-4 app-panel border-indigo-200 bg-indigo-50">
+            <p class="app-eyebrow border-indigo-200 bg-white text-indigo-900"><x-ui.icon name="bar-chart" class="h-4 w-4" /> Journal insights</p>
+            <h2 class="mt-3 text-xl font-black tracking-normal text-slate-950">This month&apos;s patterns</h2>
+            <div class="mt-4 grid gap-3 md:grid-cols-3">
+                <div class="rounded-xl border border-white bg-white p-4">
+                    <p class="text-2xl font-black text-slate-950">{{ $insights['entry_count'] }}</p>
+                    <p class="mt-1 text-sm font-bold text-indigo-900">Journal entries</p>
+                </div>
+                <div class="rounded-xl border border-white bg-white p-4">
+                    <p class="text-sm font-semibold leading-6 text-slate-700">{{ $insights['topic_summary'] }}</p>
+                </div>
+                <div class="rounded-xl border border-white bg-white p-4">
+                    <p class="text-sm font-semibold leading-6 text-slate-700">{{ $insights['prayer_summary'] }}</p>
+                </div>
+            </div>
+            <p class="mt-3 rounded-xl border border-white bg-white p-4 text-sm font-semibold leading-6 text-slate-700">{{ $insights['mood_summary'] }}</p>
+        </section>
+
         <div class="space-y-3">
             @forelse ($entries as $entry)
                 <article class="app-panel border-sky-200">

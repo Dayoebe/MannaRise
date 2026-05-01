@@ -28,7 +28,7 @@
             The Bible has not been imported yet. Run `php artisan db:seed --class=BibleSeeder`.
         </div>
     @else
-        <section class="app-panel border-sky-200 bg-sky-50">
+        <section class="app-panel bible-filter-panel border-sky-200 bg-sky-50">
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_8rem_12rem_12rem_minmax(0,1fr)]">
                 <div>
                     <label class="flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="book-open" class="h-4 w-4 text-blue-700" /> Book</label>
@@ -103,20 +103,23 @@
             </div>
         @endif
 
-        <article class="app-panel border-olive-200 bg-white p-5 sm:p-8" data-bible-reader data-bible-language="{{ $language }}">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <article class="app-panel bible-reader-card border-olive-200 bg-white p-5 sm:p-8" data-bible-reader data-bible-language="{{ $language }}">
+            <div class="bible-reader-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p class="inline-flex items-center gap-2 rounded-full border border-olive-200 bg-olive-50 px-3 py-1 text-sm font-black uppercase tracking-normal text-olive-800"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $book?->testament }} · {{ strtoupper($language) }} {{ $version }}</p>
                     <h2 class="mt-3 break-words text-3xl font-black tracking-normal text-slate-950 sm:text-4xl">{{ $book?->name }} {{ $chapter }}</h2>
                     <p data-bible-audio-status class="mt-2 min-h-5 text-sm font-bold text-olive-800"></p>
                     <p data-bible-share-status class="min-h-5 text-sm font-bold text-sky-800"></p>
                 </div>
-                <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+                <div class="bible-reader-actions grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
                     @auth
                         <button type="button" wire:click="markChapterRead" class="btn-warm col-span-2 px-3 sm:col-span-1">
                             <x-ui.icon name="check-circle" class="h-4 w-4" /> Mark read
                         </button>
                     @endauth
+                    <button type="button" data-offline-save data-offline-save-url="{{ request()->fullUrl() }}" class="btn-secondary col-span-2 border-sky-200 px-3 text-sky-900 hover:bg-sky-50 sm:col-span-1">
+                        <x-ui.icon name="download" class="h-4 w-4" /> Save offline
+                    </button>
                     <button type="button" data-bible-read-chapter data-bible-reference="{{ $book?->name }} {{ $chapter }} {{ $version }}" class="btn-secondary col-span-2 border-olive-300 bg-olive-50 px-3 text-olive-900 hover:bg-olive-100 sm:col-span-1">
                         <x-ui.icon name="volume-2" class="h-4 w-4" /> Listen
                     </button>
@@ -131,6 +134,70 @@
                     </button>
                 </div>
             </div>
+
+            <details class="bible-study-panel mt-6 rounded-xl border border-indigo-100 bg-indigo-50/70 p-4">
+                <summary class="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+                    <span>
+                        <span class="app-eyebrow border-indigo-200 bg-white text-indigo-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> Study mode</span>
+                        <span class="mt-2 block text-lg font-black tracking-normal text-slate-950">Understand {{ $book?->name }} {{ $chapter }}</span>
+                    </span>
+                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-indigo-200 bg-white text-indigo-900">
+                        <x-ui.icon name="chevron-right" class="h-4 w-4" />
+                    </span>
+                </summary>
+
+                <div class="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.75fr)]">
+                    <div class="space-y-4">
+                        <article class="rounded-xl border border-white bg-white p-4">
+                            <h3 class="font-black tracking-normal text-slate-950">Chapter summary</h3>
+                            <p class="mt-2 text-sm leading-6 text-slate-700">{{ $studyGuide['summary'] }}</p>
+                        </article>
+
+                        <article class="rounded-xl border border-white bg-white p-4">
+                            <h3 class="font-black tracking-normal text-slate-950">Reflection questions</h3>
+                            <div class="mt-3 space-y-2">
+                                @foreach ($studyGuide['reflection_questions'] as $question)
+                                    <p class="rounded-lg bg-slate-50 p-3 text-sm leading-6 text-slate-700">{{ $question }}</p>
+                                @endforeach
+                            </div>
+                        </article>
+                    </div>
+
+                    <aside class="space-y-4">
+                        <article class="rounded-xl border border-white bg-white p-4">
+                            <h3 class="font-black tracking-normal text-slate-950">Key themes</h3>
+                            <div class="mt-3 flex flex-wrap gap-2">
+                                @foreach ($studyGuide['themes'] as $theme)
+                                    <span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-indigo-900">{{ $theme }}</span>
+                                @endforeach
+                            </div>
+                        </article>
+
+                        <article class="rounded-xl border border-white bg-white p-4">
+                            <h3 class="font-black tracking-normal text-slate-950">Prayer points</h3>
+                            <div class="mt-3 space-y-2">
+                                @foreach ($studyGuide['prayer_points'] as $point)
+                                    <p class="text-sm leading-6 text-slate-700">{{ $point }}</p>
+                                @endforeach
+                            </div>
+                        </article>
+
+                        <article class="rounded-xl border border-white bg-white p-4">
+                            <h3 class="font-black tracking-normal text-slate-950">Related devotionals</h3>
+                            <div class="mt-3 space-y-2">
+                                @forelse ($studyGuide['related_devotionals'] as $devotional)
+                                    <a href="{{ route('devotionals.show', $devotional->slug) }}" class="block rounded-lg border border-emerald-100 bg-emerald-50 p-3 text-sm font-bold text-emerald-950 hover:border-emerald-300">
+                                        {{ $devotional->title }}
+                                        <span class="mt-1 block text-xs text-emerald-800">{{ $devotional->category?->name }}</span>
+                                    </a>
+                                @empty
+                                    <p class="text-sm leading-6 text-slate-600">No related devotional found yet. Published devotionals will appear here as your library grows.</p>
+                                @endforelse
+                            </div>
+                        </article>
+                    </aside>
+                </div>
+            </details>
 
             <div class="reading-copy mt-6 space-y-2">
                 @foreach ($verses as $verse)
@@ -159,7 +226,7 @@
                                     <x-ui.icon name="{{ $hasPersonalMark ? 'bookmark' : 'more-horizontal' }}" class="h-4 w-4" />
                                 </summary>
 
-                                <div class="mt-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:absolute sm:right-0 sm:z-10 sm:w-96">
+                                <div class="bible-verse-tool-panel mt-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:absolute sm:right-0 sm:z-10 sm:w-96">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <button
                                             type="button"
@@ -509,13 +576,35 @@
                 const verseButton = event.target.closest('[data-bible-read-verse]');
                 const stopButton = event.target.closest('[data-bible-stop]');
                 const shareButton = event.target.closest('[data-bible-share]');
+                const offlineButton = event.target.closest('[data-offline-save]');
 
-                if (! changeControl && ! chapterButton && ! verseButton && ! stopButton && ! shareButton) {
+                if (! changeControl && ! chapterButton && ! verseButton && ! stopButton && ! shareButton && ! offlineButton) {
                     return;
                 }
 
                 if (changeControl) {
                     stopReading();
+                    return;
+                }
+
+                if (offlineButton) {
+                    const reader = readerFor(offlineButton);
+                    const url = offlineButton.dataset.offlineSaveUrl || window.location.href;
+
+                    if (! ('serviceWorker' in navigator) || ! window.caches) {
+                        setShareStatus(reader, 'Offline saving is not available in this browser.');
+                        return;
+                    }
+
+                    caches.open('mannarise-offline-reading-v1')
+                        .then((cache) => cache.add(url))
+                        .then(() => navigator.serviceWorker.controller?.postMessage?.({
+                            type: 'CACHE_OFFLINE_URLS',
+                            urls: [url, '/bible', '/daily', '/guided-prayer', '/devotionals', '/prayer-wall'],
+                        }))
+                        .then(() => setShareStatus(reader, 'Chapter saved for offline reading.'))
+                        .catch(() => setShareStatus(reader, 'Unable to save this chapter offline.'));
+
                     return;
                 }
 

@@ -20,6 +20,35 @@
         </div>
     </div>
 
+    <section class="app-panel border-amber-200 bg-amber-50">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <p class="app-eyebrow border-amber-200 bg-white text-amber-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> Content planning intelligence</p>
+                <h2 class="mt-3 app-section-title">What to plan next</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-700">Suggestions are based on recent devotionals, prayer rooms, journal topics, prayer requests, and marked Bible verses.</p>
+            </div>
+            <a href="{{ route('admin.featured-content') }}" class="btn-secondary border-amber-200 bg-white text-amber-900 hover:bg-amber-50">Featured controls</a>
+        </div>
+
+        <div class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            @forelse ($contentSuggestions as $suggestion)
+                <article class="rounded-xl border border-white bg-white p-4 shadow-sm">
+                    <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-amber-900">{{ $suggestion['type'] }}</span>
+                    <h3 class="mt-3 font-black tracking-normal text-slate-950">{{ $suggestion['title'] }}</h3>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">{{ $suggestion['detail'] }}</p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <button type="button" wire:click="createDraftFromSuggestion(@js($suggestion['title']), @js($suggestion['detail']))" class="btn-primary bg-amber-600 px-3 text-slate-950 hover:bg-amber-500">
+                            <x-ui.icon name="journal" class="h-4 w-4" /> Create draft
+                        </button>
+                        <a href="{{ route('admin.featured-content') }}" class="btn-secondary border-amber-200 px-3">{{ $suggestion['action'] }}</a>
+                    </div>
+                </article>
+            @empty
+                <p class="rounded-xl border border-dashed border-amber-200 bg-white p-4 text-sm text-slate-600">Planning suggestions will appear as users create prayer, journal, and Bible-reading signals.</p>
+            @endforelse
+        </div>
+    </section>
+
     <section class="app-panel border-emerald-200">
         <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="sparkles" class="h-5 w-5 text-emerald-800" /> Top devotionals</h2>
         <div class="mt-4 grid gap-3 md:grid-cols-2">

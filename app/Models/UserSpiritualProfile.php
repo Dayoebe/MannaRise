@@ -14,12 +14,14 @@ class UserSpiritualProfile extends Model
         'path_goal',
         'support_note',
         'preferred_time',
+        'onboarding_completed_at',
     ];
 
     protected function casts(): array
     {
         return [
             'seasons' => 'array',
+            'onboarding_completed_at' => 'datetime',
         ];
     }
 

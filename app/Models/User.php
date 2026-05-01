@@ -70,6 +70,19 @@ class User extends Authenticatable
             return true;
         }
 
+        if ($this->is_admin && in_array($permission, [
+            'manage-dashboard',
+            'manage-devotionals',
+            'manage-categories',
+            'manage-prayer-requests',
+            'manage-testimonies',
+            'view-engagement',
+            'manage-audio-devotionals',
+            'manage-notifications',
+        ], true)) {
+            return true;
+        }
+
         if (array_key_exists($permission, $this->permissionCache)) {
             return $this->permissionCache[$permission];
         }

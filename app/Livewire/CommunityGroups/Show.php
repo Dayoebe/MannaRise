@@ -4,6 +4,7 @@ namespace App\Livewire\CommunityGroups;
 
 use App\Models\BibleBook;
 use App\Models\CommunityGroup;
+use App\Models\CommunityGroupDiscussionPrompt;
 use App\Models\CommunityGroupInvite;
 use App\Models\CommunityGroupMembership;
 use App\Models\CommunityGroupPrayer;
@@ -47,6 +48,16 @@ class Show extends Component
 
     public string $inviteMaxUses = '';
 
+    public int $weeklyPrayerGoal = 7;
+
+    public string $reminderDay = '';
+
+    public string $reminderTime = '';
+
+    public string $promptTitle = '';
+
+    public string $promptText = '';
+
     public function mount(string $group): void
     {
         $this->communityGroup = CommunityGroup::query()
@@ -58,6 +69,9 @@ class Show extends Component
         abort_unless($this->communityGroup->visibility === 'public' || $this->communityGroup->isMember(auth()->user()), 403);
 
         $this->challengeStartsOn = today()->toDateString();
+        $this->weeklyPrayerGoal = (int) ($this->communityGroup->weekly_prayer_goal ?: 7);
+        $this->reminderDay = (string) ($this->communityGroup->reminder_day ?? '');
+        $this->reminderTime = (string) ($this->communityGroup->reminder_time ?? '');
     }
 
     public function join()
@@ -223,6 +237,49 @@ class Show extends Component
         $invite->update(['is_active' => ! $invite->is_active]);
     }
 
+    public function saveGroupRhythm(): void
+    {
+        $this->authorizeLeader();
+
+        $validated = $this->validate([
+            'weeklyPrayerGoal' => ['required', 'integer', 'min:1', 'max:200'],
+            'reminderDay' => ['nullable', 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday'],
+            'reminderTime' => ['nullable', 'date_format:H:i'],
+        ]);
+
+        $this->communityGroup->update([
+            'weekly_prayer_goal' => $validated['weeklyPrayerGoal'],
+            'reminder_day' => $validated['reminderDay'] ?: null,
+            'reminder_time' => $validated['reminderTime'] ?: null,
+        ]);
+
+        session()->flash('status', 'Group rhythm updated.');
+    }
+
+    public function createPrompt(): void
+    {
+        $this->authorizeLeader();
+
+        $validated = $this->validate([
+            'promptTitle' => ['nullable', 'string', 'max:140'],
+            'promptText' => ['required', 'string', 'min:10', 'max:1200'],
+        ]);
+
+        CommunityGroupDiscussionPrompt::create([
+            'community_group_id' => $this->communityGroup->id,
+            'created_by' => auth()->id(),
+            'week_start' => now()->startOfWeek()->toDateString(),
+            'title' => $validated['promptTitle'] ?: null,
+            'prompt' => $validated['promptText'],
+            'is_active' => true,
+        ]);
+
+        $this->promptTitle = '';
+        $this->promptText = '';
+
+        session()->flash('status', 'Weekly discussion prompt added.');
+    }
+
     public function render()
     {
         $this->communityGroup->load('memberships.user');
@@ -261,9 +318,57 @@ class Show extends Component
                 ->take(10)
                 ->get(),
             'invites' => $canManage ? $this->communityGroup->invites()->latest()->take(6)->get() : collect(),
+            'discussionPrompts' => $this->communityGroup->discussionPrompts()
+                ->where('is_active', true)
+                ->latest('week_start')
+                ->take(4)
+                ->get(),
             'books' => BibleBook::orderBy('book_order')->get(),
             'todayReadingCount' => $this->communityGroup->readingLogs()->whereDate('read_on', today())->count(),
+            'weeklySummary' => $this->weeklySummary(),
         ]);
+    }
+
+    private function weeklySummary(): array
+    {
+        $weekStart = now()->startOfWeek()->toDateString();
+        $weekEnd = now()->endOfWeek()->toDateString();
+        $readingLogs = $this->communityGroup->readingLogs()
+            ->with('book')
+            ->whereBetween('read_on', [$weekStart, $weekEnd])
+            ->get();
+        $prayers = $this->communityGroup->prayers()
+            ->withCount(['prayerLogs as weekly_prayers_count' => fn ($query) => $query->whereBetween('prayed_on', [$weekStart, $weekEnd])])
+            ->where('created_at', '>=', now()->startOfWeek())
+            ->get();
+        $prayerLogCount = CommunityGroupPrayerLog::query()
+            ->whereHas('prayer', fn ($query) => $query->where('community_group_id', $this->communityGroup->id))
+            ->whereBetween('prayed_on', [$weekStart, $weekEnd])
+            ->count();
+        $topBook = $readingLogs->groupBy('book.name')->sortByDesc(fn ($items) => $items->count())->keys()->first();
+        $goal = max(1, (int) ($this->communityGroup->weekly_prayer_goal ?: 7));
+
+        return [
+            'reading_count' => $readingLogs->count(),
+            'prayer_count' => $prayerLogCount,
+            'prayer_goal' => $goal,
+            'prayer_percent' => min(100, (int) round(($prayerLogCount / $goal) * 100)),
+            'new_prayers' => $prayers->count(),
+            'answered_prayers' => $this->communityGroup->prayers()->where('is_answered', true)->where('updated_at', '>=', now()->startOfWeek())->count(),
+            'top_book' => $topBook,
+            'summary' => $this->weeklySummaryText($readingLogs->count(), $prayerLogCount, $goal, $topBook),
+        ];
+    }
+
+    private function weeklySummaryText(int $readings, int $prayers, int $goal, ?string $topBook): string
+    {
+        if ($readings === 0 && $prayers === 0) {
+            return 'This week is open. Start with one shared chapter, one prayer, and one honest reflection.';
+        }
+
+        $bookText = $topBook ? " Most readings came from {$topBook}." : '';
+
+        return "This group logged {$readings} Bible ".Str::plural('chapter', $readings)." and {$prayers} prayer ".Str::plural('response', $prayers)." toward a weekly goal of {$goal}.{$bookText}";
     }
 
     private function selectedChallenge(): ?CommunityGroupReadingChallenge

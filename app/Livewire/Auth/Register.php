@@ -31,7 +31,7 @@ class Register extends Component
 
         request()->session()->regenerate();
 
-        return redirect()->route('dashboard');
+        return redirect()->route('onboarding');
     }
 
     public function render()

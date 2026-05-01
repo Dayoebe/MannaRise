@@ -15,10 +15,12 @@ use App\Livewire\Admin\ResourceItems as AdminResourceItems;
 use App\Livewire\Admin\Roles as AdminRoles;
 use App\Livewire\Admin\Settings as AdminSettings;
 use App\Livewire\Admin\Testimonies as AdminTestimonies;
+use App\Livewire\Admin\Users as AdminUsers;
 use App\Livewire\AudioDevotionals\Index as AudioDevotionalIndex;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Bible\Reader as BibleReader;
+use App\Livewire\Bible\Notes as BibleNotes;
 use App\Livewire\CommunityGroups\Index as CommunityGroupIndex;
 use App\Livewire\CommunityGroups\Show as CommunityGroupShow;
 use App\Livewire\Daily\Index as DailyIndex;
@@ -31,6 +33,8 @@ use App\Livewire\Favorites\Index as FavoritesIndex;
 use App\Livewire\GrowthPath\Index as GrowthPathIndex;
 use App\Livewire\Journal\Index as JournalIndex;
 use App\Livewire\MemoryVerses\Index as MemoryVerseIndex;
+use App\Livewire\OfflineLibrary;
+use App\Livewire\Onboarding\Index as OnboardingIndex;
 use App\Livewire\Pages\Home;
 use App\Livewire\PrayerSessions\Index as PrayerSessionIndex;
 use App\Livewire\PrayerRooms\Index as PrayerRoomIndex;
@@ -101,10 +105,13 @@ Route::post('/logout', function (Request $request) {
 
 Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
+    Route::get('/onboarding', OnboardingIndex::class)->name('onboarding');
     Route::get('/growth-path', GrowthPathIndex::class)->name('growth-path.index');
     Route::get('/journal', JournalIndex::class)->name('journal.index');
+    Route::get('/bible-notes', BibleNotes::class)->name('bible.notes');
     Route::get('/favorites', FavoritesIndex::class)->name('favorites.index');
     Route::get('/reminders', ReminderSettings::class)->name('reminders.settings');
+    Route::get('/offline-library', OfflineLibrary::class)->name('offline.library');
     Route::get('/groups', CommunityGroupIndex::class)->name('community-groups.index');
     Route::get('/groups/invite/{token}', function (string $token) {
         $invite = CommunityGroupInvite::with('group')
@@ -137,17 +144,18 @@ Route::middleware('auth')->group(function (): void {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', AdminDashboard::class)->name('dashboard');
-    Route::get('/categories', AdminCategories::class)->name('categories');
-    Route::get('/devotionals', AdminDevotionals::class)->name('devotionals');
-    Route::get('/resource-categories', AdminResourceCategories::class)->name('resource-categories');
-    Route::get('/resource-items', AdminResourceItems::class)->name('resource-items');
-    Route::get('/daily-devotions', AdminDailyDevotions::class)->name('daily-devotions');
-    Route::get('/featured-content', AdminFeaturedContent::class)->name('featured-content');
-    Route::get('/moderation', AdminModerationQueue::class)->name('moderation');
-    Route::get('/prayer-requests', AdminPrayerRequests::class)->name('prayer-requests');
-    Route::get('/testimonies', AdminTestimonies::class)->name('testimonies');
-    Route::get('/engagement', AdminEngagement::class)->name('engagement');
+    Route::get('/categories', AdminCategories::class)->middleware('permission:manage-categories')->name('categories');
+    Route::get('/devotionals', AdminDevotionals::class)->middleware('permission:manage-devotionals')->name('devotionals');
+    Route::get('/resource-categories', AdminResourceCategories::class)->middleware('permission:manage-devotionals')->name('resource-categories');
+    Route::get('/resource-items', AdminResourceItems::class)->middleware('permission:manage-devotionals')->name('resource-items');
+    Route::get('/daily-devotions', AdminDailyDevotions::class)->middleware('permission:manage-devotionals')->name('daily-devotions');
+    Route::get('/featured-content', AdminFeaturedContent::class)->middleware('permission:manage-devotionals')->name('featured-content');
+    Route::get('/moderation', AdminModerationQueue::class)->middleware('permission:manage-testimonies')->name('moderation');
+    Route::get('/prayer-requests', AdminPrayerRequests::class)->middleware('permission:manage-prayer-requests')->name('prayer-requests');
+    Route::get('/testimonies', AdminTestimonies::class)->middleware('permission:manage-testimonies')->name('testimonies');
+    Route::get('/engagement', AdminEngagement::class)->middleware('permission:view-engagement')->name('engagement');
     Route::get('/audio-devotionals', AdminAudioDevotionals::class)->middleware('permission:manage-audio-devotionals')->name('audio-devotionals');
+    Route::get('/users', AdminUsers::class)->middleware('permission:manage-users')->name('users');
     Route::get('/roles', AdminRoles::class)->middleware('permission:manage-roles')->name('roles');
-    Route::get('/settings', AdminSettings::class)->name('settings');
+    Route::get('/settings', AdminSettings::class)->middleware('permission:manage-dashboard')->name('settings');
 });

@@ -24,6 +24,12 @@ return [
                     'active' => ['bible'],
                 ],
                 [
+                    'label' => 'Bible notes',
+                    'route' => 'bible.notes',
+                    'icon' => 'bookmark',
+                    'active' => ['bible.notes'],
+                ],
+                [
                     'label' => 'Guided prayer',
                     'route' => 'prayer-sessions.index',
                     'icon' => 'heart',
@@ -57,6 +63,12 @@ return [
                     'route' => 'reminders.settings',
                     'icon' => 'bell',
                     'active' => ['reminders.*'],
+                ],
+                [
+                    'label' => 'Offline library',
+                    'route' => 'offline.library',
+                    'icon' => 'download',
+                    'active' => ['offline.*'],
                 ],
                 [
                     'label' => 'Memory verses',
@@ -163,6 +175,13 @@ return [
                     'route' => 'admin.engagement',
                     'icon' => 'bar-chart',
                     'active' => ['admin.engagement'],
+                ],
+                [
+                    'label' => 'Users',
+                    'route' => 'admin.users',
+                    'icon' => 'users',
+                    'active' => ['admin.users'],
+                    'ability' => 'manage-users',
                 ],
                 [
                     'label' => 'Roles',

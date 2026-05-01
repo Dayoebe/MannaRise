@@ -159,9 +159,11 @@
                     if ($user) {
                         $accountLinks = [
                             ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'layout-dashboard', 'active' => ['dashboard']],
+                            ['label' => 'Bible Notes', 'route' => 'bible.notes', 'icon' => 'bookmark', 'active' => ['bible.notes']],
                             ['label' => 'Favorites', 'route' => 'favorites.index', 'icon' => 'bookmark', 'active' => ['favorites.*']],
                             ['label' => 'Path', 'route' => 'growth-path.index', 'icon' => 'route', 'active' => ['growth-path.*']],
                             ['label' => 'Reminders', 'route' => 'reminders.settings', 'icon' => 'star', 'active' => ['reminders.*']],
+                            ['label' => 'Offline', 'route' => 'offline.library', 'icon' => 'download', 'active' => ['offline.*']],
                         ];
                     }
 
@@ -176,6 +178,10 @@
                             ['label' => 'Engagement', 'route' => 'admin.engagement', 'icon' => 'bar-chart', 'active' => ['admin.engagement']],
                             ['label' => 'Settings', 'route' => 'admin.settings', 'icon' => 'settings', 'active' => ['admin.settings']],
                         ];
+
+                        if ($user->canDo('manage-users')) {
+                            $adminLinks[] = ['label' => 'Users', 'route' => 'admin.users', 'icon' => 'users', 'active' => ['admin.users']];
+                        }
 
                         if ($user->canDo('manage-audio-devotionals')) {
                             $adminLinks[] = ['label' => 'Audio Admin', 'route' => 'admin.audio-devotionals', 'icon' => 'headphones', 'active' => ['admin.audio-devotionals']];
@@ -234,7 +240,7 @@
             </div>
         </header>
 
-        <div class="app-body mx-auto grid w-full max-w-7xl flex-1 gap-6 px-3 pt-5 sm:px-5 sm:pt-8 lg:px-8 {{ $usesAccountSidebar ? 'pb-8 lg:grid-cols-[17rem_minmax(0,1fr)] lg:items-start' : 'pb-28 lg:pb-8' }}">
+        <div class="app-body mx-auto grid w-full max-w-7xl flex-1 gap-6 px-3 pt-5 pb-28 sm:px-5 sm:pt-8 lg:px-8 lg:pb-8 {{ $usesAccountSidebar ? 'lg:grid-cols-[17rem_minmax(0,1fr)] lg:items-start' : '' }}">
             @auth
                 <aside class="dashboard-sidebar" aria-label="Account menu">
                     <div class="dashboard-sidebar-card">
@@ -304,12 +310,29 @@
             </main>
         </div>
 
-        @unless ($usesAccountSidebar)
-            <nav class="mobile-bottom-nav">
-                <div class="mx-auto grid max-w-lg grid-cols-5 gap-2">
+        <nav class="mobile-bottom-nav">
+            <div class="mx-auto grid max-w-lg grid-cols-5 gap-1.5">
+                @auth
+                    <a href="{{ route('dashboard') }}" class="mobile-tab {{ request()->routeIs('dashboard') ? 'mobile-tab-active' : '' }}">
+                        <x-ui.icon name="layout-dashboard" />
+                        <span>Home</span>
+                    </a>
+                    <a href="{{ route('bible') }}" class="mobile-tab {{ request()->routeIs('bible') ? 'mobile-tab-active' : '' }}">
+                        <x-ui.icon name="book-open" />
+                        <span>Bible</span>
+                    </a>
+                    <a href="{{ route('daily.index') }}" class="mobile-tab {{ request()->routeIs('daily.*') ? 'mobile-tab-active' : '' }}">
+                        <x-ui.icon name="star" />
+                        <span>Daily</span>
+                    </a>
+                    <a href="{{ route('journal.index') }}" class="mobile-tab {{ request()->routeIs('journal.*') ? 'mobile-tab-active' : '' }}">
+                        <x-ui.icon name="journal" />
+                        <span>Journal</span>
+                    </a>
+                @else
                     <a href="{{ route('devotionals.index') }}" class="mobile-tab {{ request()->routeIs('devotionals.*') ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="sparkles" />
-                        <span>Devotionals</span>
+                        <span>Devotion</span>
                     </a>
                     <a href="{{ route('bible') }}" class="mobile-tab {{ request()->routeIs('bible') ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="book-open" />
@@ -323,32 +346,46 @@
                         <x-ui.icon name="library" />
                         <span>Library</span>
                     </a>
-                    <details class="relative">
-                        <summary class="mobile-tab list-none cursor-pointer [&::-webkit-details-marker]:hidden {{ request()->routeIs(...$mobileMoreActiveRoutes) ? 'mobile-tab-active' : '' }}">
-                            <x-ui.icon name="more-horizontal" />
-                            <span>More</span>
-                        </summary>
+                @endauth
+                <details class="relative">
+                    <summary class="mobile-tab list-none cursor-pointer [&::-webkit-details-marker]:hidden {{ request()->routeIs(...$mobileMoreActiveRoutes) ? 'mobile-tab-active' : '' }}">
+                        <x-ui.icon name="more-horizontal" />
+                        <span>More</span>
+                    </summary>
 
-                        <div class="mobile-more-panel">
-                            @foreach ($mobileMoreGroups as $group)
-                                <div class="mb-3 last:mb-0">
-                                    <p class="mb-2 px-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-slate-400">{{ $group['label'] }}</p>
+                    <div class="mobile-more-panel">
+                        @foreach ($mobileMoreGroups as $group)
+                            <div class="mb-3 last:mb-0">
+                                <p class="mb-2 px-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-slate-400">{{ $group['label'] }}</p>
 
-                                    <div class="space-y-1">
-                                        @foreach ($group['links'] as $link)
-                                            <a href="{{ route($link['route']) }}" class="mobile-more-link {{ request()->routeIs(...$link['active']) ? 'mobile-more-link-active' : '' }}">
-                                                <x-ui.icon :name="$link['icon']" class="h-4 w-4" />
-                                                <span>{{ $link['label'] }}</span>
-                                            </a>
-                                        @endforeach
-                                    </div>
+                                <div class="space-y-1">
+                                    @foreach ($group['links'] as $link)
+                                        <a href="{{ route($link['route']) }}" class="mobile-more-link {{ request()->routeIs(...$link['active']) ? 'mobile-more-link-active' : '' }}">
+                                            <x-ui.icon :name="$link['icon']" class="h-4 w-4" />
+                                            <span>{{ $link['label'] }}</span>
+                                        </a>
+                                    @endforeach
                                 </div>
-                            @endforeach
-                        </div>
-                    </details>
+                            </div>
+                        @endforeach
+                    </div>
+                </details>
+            </div>
+        </nav>
+
+        <div data-install-banner class="fixed inset-x-3 bottom-[calc(6.2rem+env(safe-area-inset-bottom))] z-40 mx-auto hidden max-w-lg rounded-2xl border border-emerald-200 bg-white p-3 shadow-2xl lg:hidden">
+            <div class="flex items-center gap-3">
+                <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-700 text-white">
+                    <x-ui.icon name="download" class="h-5 w-5" />
+                </span>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-black tracking-normal text-slate-950">Install MannaRise</p>
+                    <p class="text-xs font-bold text-slate-500">Open faster and keep spiritual tools close.</p>
                 </div>
-            </nav>
-        @endunless
+                <button type="button" data-install-now class="rounded-full bg-emerald-700 px-3 py-2 text-xs font-black text-white">Install</button>
+                <button type="button" data-install-dismiss class="rounded-full border border-slate-200 px-3 py-2 text-xs font-black text-slate-600">Later</button>
+            </div>
+        </div>
 
         <footer class="app-footer border-t border-slate-200 bg-white">
             <div class="mx-auto flex max-w-7xl flex-col gap-4 px-3 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-5 lg:px-8">

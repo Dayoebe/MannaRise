@@ -54,7 +54,61 @@
         </div>
     </section>
 
+    @if (session('status'))
+        <div class="app-panel border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-900">
+            {{ session('status') }}
+        </div>
+    @endif
+
     @if ($membership)
+        <section class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
+            <article class="app-panel border-cyan-200 bg-cyan-50">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <p class="app-eyebrow border-cyan-200 bg-white text-cyan-900"><x-ui.icon name="bar-chart" class="h-4 w-4" /> Weekly reflection</p>
+                        <h2 class="mt-3 app-section-title">This group&apos;s rhythm</h2>
+                        <p class="mt-2 text-sm leading-6 text-slate-700">{{ $weeklySummary['summary'] }}</p>
+                    </div>
+                    <div class="rounded-xl border border-white bg-white p-4 text-center">
+                        <p class="text-3xl font-black tracking-normal text-slate-950">{{ $weeklySummary['prayer_count'] }}/{{ $weeklySummary['prayer_goal'] }}</p>
+                        <p class="text-xs font-bold uppercase tracking-normal text-cyan-900">Prayer goal</p>
+                    </div>
+                </div>
+                <div class="mt-4 h-3 overflow-hidden rounded-full bg-white">
+                    <div class="h-full rounded-full bg-cyan-700" style="width: {{ $weeklySummary['prayer_percent'] }}%"></div>
+                </div>
+                <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div class="rounded-xl bg-white p-3">
+                        <p class="text-2xl font-black text-slate-950">{{ $weeklySummary['reading_count'] }}</p>
+                        <p class="text-xs font-bold uppercase tracking-normal text-cyan-900">Chapters</p>
+                    </div>
+                    <div class="rounded-xl bg-white p-3">
+                        <p class="text-2xl font-black text-slate-950">{{ $weeklySummary['new_prayers'] }}</p>
+                        <p class="text-xs font-bold uppercase tracking-normal text-cyan-900">New prayers</p>
+                    </div>
+                    <div class="rounded-xl bg-white p-3">
+                        <p class="text-2xl font-black text-slate-950">{{ $weeklySummary['answered_prayers'] }}</p>
+                        <p class="text-xs font-bold uppercase tracking-normal text-cyan-900">Answered</p>
+                    </div>
+                </div>
+            </article>
+
+            <aside class="app-panel border-indigo-200">
+                <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="message-circle" class="h-5 w-5 text-indigo-800" /> Discussion prompts</h2>
+                <div class="mt-4 space-y-3">
+                    @forelse ($discussionPrompts as $prompt)
+                        <article class="rounded-xl border border-indigo-100 bg-indigo-50 p-4">
+                            <p class="text-xs font-black uppercase tracking-normal text-indigo-900">Week of {{ $prompt->week_start->format('M j') }}</p>
+                            <h3 class="mt-2 font-black tracking-normal text-slate-950">{{ $prompt->title ?: 'Group reflection' }}</h3>
+                            <p class="mt-2 text-sm leading-6 text-slate-700">{{ $prompt->prompt }}</p>
+                        </article>
+                    @empty
+                        <p class="rounded-xl border border-dashed border-indigo-200 bg-indigo-50 p-4 text-sm text-slate-600">Leaders can add weekly prompts for group reflection.</p>
+                    @endforelse
+                </div>
+            </aside>
+        </section>
+
         <section class="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.95fr)]">
             <div class="app-panel border-emerald-200 bg-emerald-50">
                 <p class="app-eyebrow border-emerald-200 bg-white text-emerald-900"><x-ui.icon name="book-open" class="h-4 w-4" /> Group challenge</p>
@@ -214,6 +268,47 @@
                             <textarea wire:model="challengeDescription" rows="3" class="field-input mt-1 border-violet-300 focus:border-violet-600 focus:ring-violet-100"></textarea>
                         </div>
                         <button type="submit" class="btn-primary bg-violet-700 hover:bg-violet-800">Create challenge</button>
+                    </form>
+
+                    <form wire:submit="saveGroupRhythm" class="mt-5 space-y-4 rounded-xl border border-cyan-100 bg-cyan-50 p-4">
+                        <h3 class="font-black tracking-normal text-slate-950">Prayer goal and reminder</h3>
+                        <div class="grid gap-3 sm:grid-cols-3">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700">Weekly prayer goal</label>
+                                <input type="number" min="1" max="200" wire:model="weeklyPrayerGoal" class="field-input mt-1 border-cyan-300 focus:border-cyan-600 focus:ring-cyan-100">
+                                @error('weeklyPrayerGoal') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700">Reminder day</label>
+                                <select wire:model="reminderDay" class="field-input mt-1 border-cyan-300 focus:border-cyan-600 focus:ring-cyan-100">
+                                    <option value="">No day set</option>
+                                    @foreach (['monday','tuesday','wednesday','thursday','friday','saturday','sunday'] as $day)
+                                        <option value="{{ $day }}">{{ str($day)->headline() }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700">Reminder time</label>
+                                <input type="time" wire:model="reminderTime" class="field-input mt-1 border-cyan-300 focus:border-cyan-600 focus:ring-cyan-100">
+                                @error('reminderTime') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-secondary border-cyan-200 text-cyan-900 hover:bg-white"><x-ui.icon name="bell" class="h-4 w-4" /> Save rhythm</button>
+                    </form>
+
+                    <form wire:submit="createPrompt" class="mt-5 space-y-4 rounded-xl border border-amber-100 bg-amber-50 p-4">
+                        <h3 class="font-black tracking-normal text-slate-950">Weekly discussion prompt</h3>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700">Title</label>
+                            <input type="text" wire:model="promptTitle" class="field-input mt-1 border-amber-300 focus:border-amber-600 focus:ring-amber-100">
+                            @error('promptTitle') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700">Prompt</label>
+                            <textarea wire:model="promptText" rows="3" class="field-input mt-1 border-amber-300 focus:border-amber-600 focus:ring-amber-100"></textarea>
+                            @error('promptText') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+                        </div>
+                        <button type="submit" class="btn-secondary border-amber-200 text-amber-900 hover:bg-white"><x-ui.icon name="message-circle" class="h-4 w-4" /> Add prompt</button>
                     </form>
 
                     <form wire:submit="createInvite" class="mt-5 space-y-4 rounded-xl border border-indigo-100 bg-indigo-50 p-4">

@@ -20,6 +20,16 @@ window.addEventListener('beforeinstallprompt', (event) => {
     window.dispatchEvent(new CustomEvent('mannarise-install-ready'));
 });
 
+window.addEventListener('mannarise-install-ready', () => {
+    const banner = document.querySelector('[data-install-banner]');
+
+    if (! banner || window.localStorage.getItem('mannarise-install-dismissed') === 'yes') {
+        return;
+    }
+
+    banner.classList.remove('hidden');
+});
+
 window.mannaRiseInstall = async () => {
     if (! installPromptEvent) {
         return false;
@@ -35,4 +45,21 @@ window.mannaRiseInstall = async () => {
 window.addEventListener('appinstalled', () => {
     installPromptEvent = null;
     document.documentElement.classList.add('is-installed');
+    document.querySelector('[data-install-banner]')?.classList.add('hidden');
+});
+
+window.addEventListener('click', async (event) => {
+    if (event.target.closest('[data-install-dismiss]')) {
+        window.localStorage.setItem('mannarise-install-dismissed', 'yes');
+        document.querySelector('[data-install-banner]')?.classList.add('hidden');
+        return;
+    }
+
+    if (event.target.closest('[data-install-now]')) {
+        const installed = await window.mannaRiseInstall();
+
+        if (! installed) {
+            document.querySelector('[data-install-banner]')?.classList.add('hidden');
+        }
+    }
 });

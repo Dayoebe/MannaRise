@@ -127,13 +127,14 @@ class Dashboard extends Component
     private function contentAreas(int $publishedDevotionals, int $draftDevotionals, int $openPrayers, int $answeredPrayers, int $pendingTestimonies, int $prayerRooms): array
     {
         return collect([
-            $this->area('Devotional input', 'Create, publish, feature, and edit devotionals.', 'sparkles', 'admin.devotionals', "{$publishedDevotionals} published, {$draftDevotionals} drafts"),
-            $this->area('Categories', 'Manage devotional topics and public browsing structure.', 'bookmark', 'admin.categories', DevotionalCategory::count().' topics'),
-            $this->area('Prayer moderation', 'Review prayer wall visibility and answered requests.', 'heart', 'admin.prayer-requests', "{$openPrayers} open, {$answeredPrayers} answered"),
+            $this->area('Devotional input', 'Create, publish, feature, and edit devotionals.', 'sparkles', 'admin.devotionals', "{$publishedDevotionals} published, {$draftDevotionals} drafts", 'manage-devotionals'),
+            $this->area('Categories', 'Manage devotional topics and public browsing structure.', 'bookmark', 'admin.categories', DevotionalCategory::count().' topics', 'manage-categories'),
+            $this->area('Prayer moderation', 'Review prayer wall visibility and answered requests.', 'heart', 'admin.prayer-requests', "{$openPrayers} open, {$answeredPrayers} answered", 'manage-prayer-requests'),
             $this->area('Prayer rooms', 'Review focused rooms, streak activity, and room-based requests.', 'users', 'prayer-rooms.index', "{$prayerRooms} rooms"),
-            $this->area('Testimony moderation', 'Approve reader testimonies before public display.', 'message-circle', 'admin.testimonies', "{$pendingTestimonies} pending"),
-            $this->area('Engagement', 'Review completions, favorites, journals, and prayer activity.', 'bar-chart', 'admin.engagement', DevotionalCompletion::count().' completions'),
-            $this->area('Settings', 'Configure site copy, daily modules, and moderation defaults.', 'settings', 'admin.settings', PlatformSetting::allWithDefaults()->count().' settings'),
+            $this->area('Testimony moderation', 'Approve reader testimonies before public display.', 'message-circle', 'admin.testimonies', "{$pendingTestimonies} pending", 'manage-testimonies'),
+            $this->area('Engagement', 'Review completions, favorites, journals, and prayer activity.', 'bar-chart', 'admin.engagement', DevotionalCompletion::count().' completions', 'view-engagement'),
+            $this->area('Users', 'Assign roles and relevant admin work.', 'users', 'admin.users', User::count().' users', 'manage-users'),
+            $this->area('Settings', 'Configure site copy, daily modules, and moderation defaults.', 'settings', 'admin.settings', PlatformSetting::allWithDefaults()->count().' settings', 'manage-dashboard'),
             $this->area('Daily rhythm', 'Preview verse of the day, affirmation, and Bible challenge.', 'star', 'daily.index', 'Public daily page'),
             $this->area('Bible reader', 'Review the Bible reader and scripture search experience.', 'book-open', 'bible', BibleBook::count().' books'),
             $this->area('Spiritual library', 'Review public-domain books and chapters.', 'library', 'library.index', SpiritualBook::count().' books'),
@@ -162,9 +163,13 @@ class Dashboard extends Component
         ];
     }
 
-    private function area(string $title, string $description, string $icon, string $route, string $meta): ?array
+    private function area(string $title, string $description, string $icon, string $route, string $meta, ?string $permission = null): ?array
     {
         if (! Route::has($route)) {
+            return null;
+        }
+
+        if ($permission && ! auth()->user()?->canDo($permission)) {
             return null;
         }
 
@@ -178,6 +183,10 @@ class Dashboard extends Component
         }
 
         if ($route === 'admin.roles' && (! method_exists(auth()->user(), 'canDo') || ! auth()->user()->canDo('manage-roles'))) {
+            return null;
+        }
+
+        if ($route === 'admin.audio-devotionals' && (! method_exists(auth()->user(), 'canDo') || ! auth()->user()->canDo('manage-audio-devotionals'))) {
             return null;
         }
 

@@ -10,6 +10,8 @@ class Settings extends Component
     public string $title = 'Daily devotional reminder';
     public string $remind_at = '06:00';
     public string $timezone = 'Africa/Lagos';
+    public array $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    public array $reminderTypes = ['devotional', 'bible', 'prayer'];
     public bool $email_enabled = true;
     public bool $push_enabled = false;
     public bool $is_active = true;
@@ -25,6 +27,8 @@ class Settings extends Component
         $this->title = $reminder->title;
         $this->remind_at = substr($reminder->remind_at, 0, 5);
         $this->timezone = $reminder->timezone;
+        $this->days = $reminder->days['weekdays'] ?? ($reminder->days ?? $this->days);
+        $this->reminderTypes = $reminder->days['types'] ?? $this->reminderTypes;
         $this->email_enabled = $reminder->email_enabled;
         $this->push_enabled = $reminder->push_enabled;
         $this->is_active = $reminder->is_active;
@@ -36,6 +40,10 @@ class Settings extends Component
             'title' => ['required', 'string', 'max:255'],
             'remind_at' => ['required', 'date_format:H:i'],
             'timezone' => ['required', 'string', 'max:64'],
+            'days' => ['array'],
+            'days.*' => ['in:monday,tuesday,wednesday,thursday,friday,saturday,sunday'],
+            'reminderTypes' => ['array'],
+            'reminderTypes.*' => ['in:devotional,bible,journal,prayer,plan,memory,group'],
             'email_enabled' => ['boolean'],
             'push_enabled' => ['boolean'],
             'is_active' => ['boolean'],
@@ -44,8 +52,16 @@ class Settings extends Component
         DevotionalReminder::updateOrCreate(
             ['user_id' => auth()->id()],
             [
-                ...$validated,
+                'title' => $validated['title'],
+                'timezone' => $validated['timezone'],
+                'email_enabled' => $validated['email_enabled'],
+                'push_enabled' => $validated['push_enabled'],
+                'is_active' => $validated['is_active'],
                 'remind_at' => $validated['remind_at'].':00',
+                'days' => [
+                    'weekdays' => array_values($validated['days']),
+                    'types' => array_values($validated['reminderTypes']),
+                ],
             ]
         );
 
@@ -54,6 +70,25 @@ class Settings extends Component
 
     public function render()
     {
-        return view('livewire.reminders.settings');
+        return view('livewire.reminders.settings', [
+            'weekdayOptions' => [
+                'monday' => 'Mon',
+                'tuesday' => 'Tue',
+                'wednesday' => 'Wed',
+                'thursday' => 'Thu',
+                'friday' => 'Fri',
+                'saturday' => 'Sat',
+                'sunday' => 'Sun',
+            ],
+            'typeOptions' => [
+                'devotional' => ['Daily devotional', 'sparkles'],
+                'bible' => ['Bible reading', 'book-open'],
+                'journal' => ['Journal reflection', 'journal'],
+                'prayer' => ['Prayer rhythm', 'heart'],
+                'plan' => ['Plan continuation', 'route'],
+                'memory' => ['Memory verse', 'award'],
+                'group' => ['Group prayer', 'users'],
+            ],
+        ]);
     }
 }

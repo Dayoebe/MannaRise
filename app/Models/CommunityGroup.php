@@ -18,6 +18,9 @@ class CommunityGroup extends Model
         'description',
         'visibility',
         'invite_enabled',
+        'weekly_prayer_goal',
+        'reminder_day',
+        'reminder_time',
         'is_active',
     ];
 
@@ -25,6 +28,7 @@ class CommunityGroup extends Model
     {
         return [
             'invite_enabled' => 'boolean',
+            'weekly_prayer_goal' => 'integer',
             'is_active' => 'boolean',
         ];
     }
@@ -76,6 +80,11 @@ class CommunityGroup extends Model
     public function prayers(): HasMany
     {
         return $this->hasMany(CommunityGroupPrayer::class);
+    }
+
+    public function discussionPrompts(): HasMany
+    {
+        return $this->hasMany(CommunityGroupDiscussionPrompt::class);
     }
 
     public function scopeActive(Builder $query): Builder

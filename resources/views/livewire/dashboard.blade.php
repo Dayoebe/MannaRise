@@ -39,14 +39,74 @@
             </div>
         </div>
 
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        @foreach ([['bookmark', 'Favorites', $stats['favorites'], 'border-emerald-200 bg-emerald-50 text-emerald-900'], ['journal', 'Journal', $stats['journal_entries'], 'border-sky-200 bg-sky-50 text-sky-900'], ['heart', 'Prayers', $stats['prayer_requests'], 'border-rose-200 bg-rose-50 text-rose-900'], ['sparkles', 'Completed', $stats['completed'], 'border-lime-200 bg-lime-50 text-lime-900'], ['star', 'Streak', $stats['streak'].' days', 'border-orange-200 bg-orange-50 text-orange-900']] as [$icon, $label, $value, $classes])
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+        @foreach ([
+            ['book-open', 'Bible', $unifiedProgress['stats']['bible_chapters'].' chapters', 'border-blue-200 bg-blue-50 text-blue-900'],
+            ['heart', 'Prayer', $unifiedProgress['stats']['prayer_days'].' days', 'border-rose-200 bg-rose-50 text-rose-900'],
+            ['journal', 'Journal', $unifiedProgress['stats']['journal_entries'], 'border-sky-200 bg-sky-50 text-sky-900'],
+            ['route', 'Plans', $unifiedProgress['stats']['plan_days'].' days', 'border-emerald-200 bg-emerald-50 text-emerald-900'],
+            ['award', 'Memory', $unifiedProgress['stats']['memory_completed'], 'border-amber-200 bg-amber-50 text-amber-900'],
+            ['star', 'Testimonies', $unifiedProgress['stats']['testimonies'], 'border-violet-200 bg-violet-50 text-violet-900'],
+        ] as [$icon, $label, $value, $classes])
             <div class="metric-card {{ $classes }}">
                 <p class="flex items-center gap-2 text-sm font-bold"><x-ui.icon :name="$icon" class="h-4 w-4" /> {{ $label }}</p>
                 <p class="mt-2 text-3xl font-black tracking-normal text-slate-950">{{ $value }}</p>
             </div>
         @endforeach
     </div>
+
+    <section class="app-panel border-cyan-200 bg-cyan-50">
+        <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,28rem)] lg:items-start">
+            <div>
+                <p class="app-eyebrow border-cyan-200 bg-white text-cyan-900"><x-ui.icon name="bar-chart" class="h-4 w-4" /> Unified progress</p>
+                <h2 class="mt-3 app-section-title">Your spiritual rhythm</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-700">{{ $unifiedProgress['encouragement'] }}</p>
+                <p class="mt-3 rounded-xl border border-white bg-white p-3 text-sm font-semibold leading-6 text-slate-700">{{ $unifiedProgress['journal_pattern'] }}</p>
+                @if ($unifiedProgress['latest_reading'])
+                    <a href="{{ route('bible', ['book' => $unifiedProgress['latest_reading']->book?->slug, 'chapter' => $unifiedProgress['latest_reading']->chapter, 'language' => $unifiedProgress['latest_reading']->language, 'version' => $unifiedProgress['latest_reading']->version]) }}" class="mt-4 btn-primary bg-cyan-700 hover:bg-cyan-800">
+                        Continue {{ $unifiedProgress['latest_reading']->book?->name }} {{ $unifiedProgress['latest_reading']->chapter }}
+                        <x-ui.icon name="chevron-right" class="h-4 w-4" />
+                    </a>
+                @endif
+            </div>
+
+            <div class="app-surface border-cyan-200 bg-white p-4">
+                <h3 class="font-black tracking-normal text-slate-950">Gentle streaks</h3>
+                <div class="mt-4 grid gap-3">
+                    @foreach ([
+                        ['Bible reading', $unifiedProgress['stats']['bible_streak'], 'bg-blue-600'],
+                        ['Prayer', $unifiedProgress['stats']['prayer_streak'], 'bg-rose-600'],
+                        ['Journal', $unifiedProgress['stats']['journal_streak'], 'bg-sky-600'],
+                    ] as [$label, $days, $bar])
+                        <div>
+                            <div class="flex items-center justify-between gap-3 text-sm font-bold text-slate-700">
+                                <span>{{ $label }}</span>
+                                <span>{{ $days }} {{ \Illuminate\Support\Str::plural('day', $days) }}</span>
+                            </div>
+                            <div class="mt-1 h-2 overflow-hidden rounded-full bg-slate-100">
+                                <div class="h-full rounded-full {{ $bar }}" style="width: {{ min(100, $days * 14) }}%"></div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <h3 class="mt-5 font-black tracking-normal text-slate-950">Plan progress</h3>
+                <div class="mt-3 space-y-3">
+                    @foreach ($unifiedProgress['plans'] as $plan)
+                        <a href="{{ route('devotional-plans.show', $plan['slug']) }}" class="block rounded-xl border border-slate-100 bg-slate-50 p-3 hover:border-cyan-200 hover:bg-cyan-50">
+                            <div class="flex items-center justify-between gap-3 text-sm font-bold text-slate-700">
+                                <span>{{ $plan['title'] }}</span>
+                                <span>{{ $plan['completed'] }}/{{ $plan['duration'] }}</span>
+                            </div>
+                            <div class="mt-2 h-2 overflow-hidden rounded-full bg-white">
+                                <div class="h-full rounded-full bg-emerald-700" style="width: {{ $plan['percent'] }}%"></div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section class="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <article class="app-panel border-violet-200 bg-violet-50">
@@ -148,7 +208,14 @@
         </article>
     </section>
 
-    <section class="grid gap-4 md:grid-cols-3">
+    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <a href="{{ route('bible.notes') }}" class="dashboard-action-card">
+            <span class="icon-badge text-blue-800"><x-ui.icon name="bookmark" class="h-5 w-5" /></span>
+            <span>
+                <span class="block font-black tracking-normal text-slate-950">Bible notes</span>
+                <span class="mt-1 block text-sm leading-6 text-slate-600">Review verses you saved, highlighted, or wrote notes on.</span>
+            </span>
+        </a>
         <a href="{{ route('devotionals.index') }}" class="dashboard-action-card">
             <span class="icon-badge text-emerald-800"><x-ui.icon name="sparkles" class="h-5 w-5" /></span>
             <span>
@@ -163,11 +230,11 @@
                 <span class="mt-1 block text-sm leading-6 text-slate-600">Share a request privately or with the prayer wall.</span>
             </span>
         </a>
-        <a href="{{ route('favorites.index') }}" class="dashboard-action-card">
-            <span class="icon-badge text-amber-800"><x-ui.icon name="bookmark" class="h-5 w-5" /></span>
+        <a href="{{ route('offline.library') }}" class="dashboard-action-card">
+            <span class="icon-badge text-amber-800"><x-ui.icon name="download" class="h-5 w-5" /></span>
             <span>
-                <span class="block font-black tracking-normal text-slate-950">Saved readings</span>
-                <span class="mt-1 block text-sm leading-6 text-slate-600">Return to the devotionals that blessed you most.</span>
+                <span class="block font-black tracking-normal text-slate-950">Offline library</span>
+                <span class="mt-1 block text-sm leading-6 text-slate-600">Keep core Bible, prayer, and devotional pages close on mobile.</span>
             </span>
         </a>
     </section>

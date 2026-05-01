@@ -8,6 +8,7 @@ use App\Models\BibleVerse;
 use App\Models\PersonalizedDailyPathCheckIn;
 use App\Models\UserBibleReadingHistory;
 use App\Models\UserBibleVerseEngagement;
+use App\Support\BibleChapterStudyGuide;
 use App\Support\PersonalizedDailyPath;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
@@ -426,6 +427,7 @@ class Reader extends Component
             'verses' => $verses,
             'chapterCount' => $chapterCount,
             'searchResults' => $searchResults,
+            'studyGuide' => BibleChapterStudyGuide::build($book, $this->chapter, $verses),
             'engagements' => $engagements,
             'lastReading' => auth()->check()
                 ? UserBibleReadingHistory::with('book')
