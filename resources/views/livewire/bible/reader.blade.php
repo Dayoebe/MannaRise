@@ -14,7 +14,12 @@
                 <h1 class="mt-3 app-section-title">Bible reader</h1>
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Read available Bible translations by book, chapter, language, and version, or search within the selected translation.</p>
             </div>
-            <a href="{{ route('library.index') }}" class="btn-secondary w-full border-cyan-200 text-cyan-900 hover:bg-cyan-50 sm:w-auto"><x-ui.icon name="library" class="h-4 w-4" /> Open library</a>
+            <div class="grid gap-2 sm:grid-cols-2 md:flex">
+                @if ($lastReading)
+                    <a href="{{ route('bible', ['book' => $lastReading->book?->slug, 'chapter' => $lastReading->chapter, 'language' => $lastReading->language, 'version' => $lastReading->version]) }}" class="btn-primary w-full sm:w-auto"><x-ui.icon name="bookmark" class="h-4 w-4" /> Continue reading</a>
+                @endif
+                <a href="{{ route('library.index') }}" class="btn-secondary w-full border-cyan-200 text-cyan-900 hover:bg-cyan-50 sm:w-auto"><x-ui.icon name="library" class="h-4 w-4" /> Open library</a>
+            </div>
         </div>
     </div>
 
@@ -92,14 +97,26 @@
             </section>
         @endif
 
+        @if (session('status'))
+            <div class="app-panel border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-900">
+                {{ session('status') }}
+            </div>
+        @endif
+
         <article class="app-panel border-olive-200 bg-white p-5 sm:p-8" data-bible-reader data-bible-language="{{ $language }}">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p class="inline-flex items-center gap-2 rounded-full border border-olive-200 bg-olive-50 px-3 py-1 text-sm font-black uppercase tracking-normal text-olive-800"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $book?->testament }} · {{ strtoupper($language) }} {{ $version }}</p>
                     <h2 class="mt-3 break-words text-3xl font-black tracking-normal text-slate-950 sm:text-4xl">{{ $book?->name }} {{ $chapter }}</h2>
                     <p data-bible-audio-status class="mt-2 min-h-5 text-sm font-bold text-olive-800"></p>
+                    <p data-bible-share-status class="min-h-5 text-sm font-bold text-sky-800"></p>
                 </div>
                 <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+                    @auth
+                        <button type="button" wire:click="markChapterRead" class="btn-warm col-span-2 px-3 sm:col-span-1">
+                            <x-ui.icon name="check-circle" class="h-4 w-4" /> Mark read
+                        </button>
+                    @endauth
                     <button type="button" data-bible-read-chapter data-bible-reference="{{ $book?->name }} {{ $chapter }} {{ $version }}" class="btn-secondary col-span-2 border-olive-300 bg-olive-50 px-3 text-olive-900 hover:bg-olive-100 sm:col-span-1">
                         <x-ui.icon name="volume-2" class="h-4 w-4" /> Listen
                     </button>
@@ -115,22 +132,106 @@
                 </div>
             </div>
 
-            <div class="reading-copy mt-6 space-y-4">
+            <div class="reading-copy mt-6 space-y-2">
                 @foreach ($verses as $verse)
-                    <div class="group flex gap-3 rounded-xl border border-transparent p-2 transition hover:border-amber-100 hover:bg-amber-50/50">
-                        <button
-                            type="button"
-                            data-bible-read-verse
-                            data-bible-reference="{{ $book?->name }} {{ $verse->chapter }}:{{ $verse->verse }} {{ $version }}"
-                            data-bible-text="{{ $verse->text }}"
-                            class="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-900 shadow-sm transition hover:border-amber-400 hover:bg-amber-100"
-                            aria-label="Listen to {{ $book?->name }} {{ $verse->chapter }}:{{ $verse->verse }}"
-                        >
-                            <x-ui.icon name="volume-2" class="h-4 w-4" />
-                        </button>
-                        <p data-bible-verse-text class="min-w-0 flex-1">
-                            <sup class="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-amber-100 px-1 text-xs font-black text-amber-900">{{ $verse->verse }}</sup>{{ $verse->text }}
-                        </p>
+                    @php
+                        $engagement = $engagements[$verse->id] ?? null;
+                        $highlight = $engagement?->highlight_color;
+                        $highlightClass = match ($highlight) {
+                            'emerald' => 'border-emerald-100 bg-emerald-50/70',
+                            'sky' => 'border-sky-100 bg-sky-50/70',
+                            'rose' => 'border-rose-100 bg-rose-50/70',
+                            'violet' => 'border-violet-100 bg-violet-50/70',
+                            'amber' => 'border-amber-100 bg-amber-50/70',
+                            default => 'border-transparent hover:border-slate-100 hover:bg-slate-50/70',
+                        };
+                        $reference = "{$book?->name} {$verse->chapter}:{$verse->verse} {$version}";
+                        $hasPersonalMark = $engagement?->bookmarked_at || $engagement?->note || $highlight;
+                    @endphp
+                    <div id="verse-{{ $verse->verse }}" class="group rounded-xl border px-2 py-1 transition {{ $highlightClass }}">
+                        <div class="grid grid-cols-[minmax(0,1fr)_2.25rem] gap-2">
+                            <p data-bible-verse-text class="min-w-0 self-center py-1">
+                                <sup class="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-amber-100 px-1 text-xs font-black text-amber-900">{{ $verse->verse }}</sup>{{ $verse->text }}
+                            </p>
+
+                            <details class="relative justify-self-end" data-bible-verse-tools>
+                                <summary class="mt-1 inline-flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-full border {{ $hasPersonalMark ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-transparent bg-transparent text-slate-400 opacity-70 hover:border-slate-200 hover:bg-white hover:text-slate-800 group-hover:opacity-100' }} transition [&::-webkit-details-marker]:hidden" aria-label="Open tools for {{ $reference }}">
+                                    <x-ui.icon name="{{ $hasPersonalMark ? 'bookmark' : 'more-horizontal' }}" class="h-4 w-4" />
+                                </summary>
+
+                                <div class="mt-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:absolute sm:right-0 sm:z-10 sm:w-96">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <button
+                                            type="button"
+                                            data-bible-read-verse
+                                            data-bible-reference="{{ $reference }}"
+                                            data-bible-text="{{ $verse->text }}"
+                                            class="btn-secondary min-h-9 border-amber-200 px-3 py-1 text-xs text-amber-900 hover:bg-amber-50"
+                                            aria-label="Listen to {{ $book?->name }} {{ $verse->chapter }}:{{ $verse->verse }}"
+                                        >
+                                            <x-ui.icon name="volume-2" class="h-4 w-4" /> Listen
+                                        </button>
+
+                                        @auth
+                                            <button type="button" wire:click="toggleBookmark({{ $verse->id }})" class="btn-secondary min-h-9 border-slate-200 px-3 py-1 text-xs {{ $engagement?->bookmarked_at ? 'bg-sky-50 text-sky-900' : '' }}">
+                                                <x-ui.icon name="bookmark" class="h-4 w-4" /> {{ $engagement?->bookmarked_at ? 'Saved' : 'Save' }}
+                                            </button>
+                                        @else
+                                            <a href="{{ route('login') }}" class="btn-secondary min-h-9 border-slate-200 px-3 py-1 text-xs"><x-ui.icon name="log-in" class="h-4 w-4" /> Log in to save</a>
+                                        @endauth
+
+                                        <button
+                                            type="button"
+                                            @auth wire:click="recordShare({{ $verse->id }})" @endauth
+                                            data-bible-share
+                                            data-bible-share-text="{{ $reference }} - {{ $verse->text }}"
+                                            data-bible-share-url="{{ route('bible', ['book' => $book?->slug, 'chapter' => $verse->chapter, 'language' => $language, 'version' => $version]).'#verse-'.$verse->verse }}"
+                                            class="btn-secondary min-h-9 border-slate-200 px-3 py-1 text-xs"
+                                        >
+                                            <x-ui.icon name="share-2" class="h-4 w-4" /> Share
+                                        </button>
+                                    </div>
+
+                                    @auth
+                                        <div class="mt-3 flex items-center gap-2">
+                                            <span class="text-xs font-black uppercase tracking-normal text-slate-500">Highlight</span>
+                                            <div class="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1">
+                                                @foreach (['amber', 'emerald', 'sky', 'rose', 'violet'] as $color)
+                                                    @php
+                                                        $swatchClass = match ($color) {
+                                                            'emerald' => 'bg-emerald-300',
+                                                            'sky' => 'bg-sky-300',
+                                                            'rose' => 'bg-rose-300',
+                                                            'violet' => 'bg-violet-300',
+                                                            default => 'bg-amber-300',
+                                                        };
+                                                    @endphp
+                                                    <button
+                                                        type="button"
+                                                        wire:click="setHighlight({{ $verse->id }}, '{{ $color }}')"
+                                                        class="h-6 w-6 rounded-full border-2 {{ $highlight === $color ? 'border-slate-950' : 'border-white' }} {{ $swatchClass }} shadow-sm"
+                                                        aria-label="Highlight {{ $reference }} in {{ $color }}"
+                                                    ></button>
+                                                @endforeach
+                                                @if ($highlight)
+                                                    <button type="button" wire:click="setHighlight({{ $verse->id }}, null)" class="ml-1 text-xs font-bold text-slate-500">Clear</button>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3">
+                                            <label class="text-xs font-black uppercase tracking-normal text-slate-500">Personal note</label>
+                                            <div class="mt-1 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+                                                <textarea wire:model="notes.{{ $verse->id }}" rows="2" placeholder="What is God showing you in this verse?" class="field-input border-slate-200 text-sm focus:border-blue-600 focus:ring-blue-100"></textarea>
+                                                <button type="button" wire:click="saveNote({{ $verse->id }})" class="btn-primary self-start px-3">
+                                                    <x-ui.icon name="send" class="h-4 w-4" /> Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endauth
+                                </div>
+                            </details>
+                        </div>
                     </div>
                 @endforeach
             </div>
@@ -159,11 +260,28 @@
                 return reader?.querySelector('[data-bible-audio-status]');
             }
 
+            function shareStatusFor(reader) {
+                return reader?.querySelector('[data-bible-share-status]');
+            }
+
             function setStatus(reader, message) {
                 const status = statusFor(reader);
 
                 if (status) {
                     status.textContent = message;
+                }
+            }
+
+            function setShareStatus(reader, message) {
+                const status = shareStatusFor(reader);
+
+                if (status) {
+                    status.textContent = message;
+                    window.setTimeout(() => {
+                        if (status.textContent === message) {
+                            status.textContent = '';
+                        }
+                    }, 2500);
                 }
             }
 
@@ -390,8 +508,9 @@
                 const chapterButton = event.target.closest('[data-bible-read-chapter]');
                 const verseButton = event.target.closest('[data-bible-read-verse]');
                 const stopButton = event.target.closest('[data-bible-stop]');
+                const shareButton = event.target.closest('[data-bible-share]');
 
-                if (! changeControl && ! chapterButton && ! verseButton && ! stopButton) {
+                if (! changeControl && ! chapterButton && ! verseButton && ! stopButton && ! shareButton) {
                     return;
                 }
 
@@ -400,10 +519,28 @@
                     return;
                 }
 
-                const button = chapterButton || verseButton || stopButton;
+                const button = chapterButton || verseButton || stopButton || shareButton;
                 const reader = readerFor(button);
 
                 if (! reader) {
+                    return;
+                }
+
+                if (shareButton) {
+                    const text = `${shareButton.dataset.bibleShareText || ''}\n${shareButton.dataset.bibleShareUrl || ''}`.trim();
+
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'Bible verse',
+                            text: shareButton.dataset.bibleShareText || '',
+                            url: shareButton.dataset.bibleShareUrl || window.location.href,
+                        }).then(() => setShareStatus(reader, 'Verse shared.')).catch(() => {});
+                    } else if (navigator.clipboard) {
+                        navigator.clipboard.writeText(text).then(() => setShareStatus(reader, 'Verse copied to clipboard.'));
+                    } else {
+                        setShareStatus(reader, 'Copy sharing is not available in this browser.');
+                    }
+
                     return;
                 }
 

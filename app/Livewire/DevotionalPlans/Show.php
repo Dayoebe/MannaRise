@@ -3,7 +3,10 @@
 namespace App\Livewire\DevotionalPlans;
 
 use App\Models\DevotionalPlanCompletion;
+use App\Models\PersonalizedDailyPathCheckIn;
 use App\Support\DevotionalPlans;
+use App\Support\PersonalizedDailyPath;
+use Carbon\CarbonImmutable;
 use Livewire\Component;
 
 class Show extends Component
@@ -38,9 +41,30 @@ class Show extends Component
             ],
         );
 
+        $this->markPathDevotionalComplete();
+
         session()->flash('status', 'Plan day marked complete.');
 
         return null;
+    }
+
+    private function markPathDevotionalComplete(): void
+    {
+        $profile = auth()->user()->spiritualProfile()->first();
+        $path = PersonalizedDailyPath::forSeason($profile?->season);
+
+        PersonalizedDailyPathCheckIn::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'checked_on' => CarbonImmutable::today()->toDateString(),
+            ],
+            [
+                'season_key' => $path['key'],
+                'devotional_id' => $path['devotional']?->id,
+                'bible_reference' => $path['definition']['reference'],
+                'devotional_completed_at' => now(),
+            ],
+        );
     }
 
     public function render()

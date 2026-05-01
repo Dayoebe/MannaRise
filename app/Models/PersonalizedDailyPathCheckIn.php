@@ -55,4 +55,9 @@ class PersonalizedDailyPathCheckIn extends Model
             $this->action_completed_at,
         ])->filter()->count();
     }
+
+    public function progressPercent(): int
+    {
+        return (int) round(($this->completedCount() / 6) * 100);
+    }
 }

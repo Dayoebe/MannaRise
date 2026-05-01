@@ -30,6 +30,12 @@
         </div>
     </section>
 
+    @if (session('status'))
+        <div class="app-panel border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-900">
+            {{ session('status') }}
+        </div>
+    @endif
+
     <section data-prayer-session wire:ignore class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start">
         <div class="space-y-5">
             <div class="app-panel border-rose-200 bg-white">
@@ -81,6 +87,21 @@
             <div data-session-steps class="mt-4 space-y-3"></div>
         </aside>
     </section>
+
+    @auth
+        <section class="app-panel border-emerald-200 bg-emerald-50">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="app-eyebrow border-emerald-200 bg-white text-emerald-900"><x-ui.icon name="check-circle" class="h-4 w-4" /> Daily Path</p>
+                    <h2 class="mt-3 text-xl font-black tracking-normal text-slate-950">Connect this prayer to today&apos;s path</h2>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">After your session, mark prayer complete so your path can connect prayer with Bible, journal, and plan progress.</p>
+                </div>
+                <button type="button" wire:click="completePrayer" class="btn-primary bg-emerald-700 hover:bg-emerald-800">
+                    <x-ui.icon name="check-circle" class="h-4 w-4" /> Mark prayer complete
+                </button>
+            </div>
+        </section>
+    @endauth
 
     <script>
         (() => {

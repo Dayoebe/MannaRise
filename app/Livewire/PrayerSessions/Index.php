@@ -2,11 +2,37 @@
 
 namespace App\Livewire\PrayerSessions;
 
+use App\Models\PersonalizedDailyPathCheckIn;
 use App\Support\DailySpiritualRhythm;
+use App\Support\PersonalizedDailyPath;
+use Carbon\CarbonImmutable;
 use Livewire\Component;
 
 class Index extends Component
 {
+    public function completePrayer(): void
+    {
+        abort_unless(auth()->check(), 403);
+
+        $profile = auth()->user()->spiritualProfile()->first();
+        $path = PersonalizedDailyPath::forSeason($profile?->season);
+
+        PersonalizedDailyPathCheckIn::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'checked_on' => CarbonImmutable::today()->toDateString(),
+            ],
+            [
+                'season_key' => $path['key'],
+                'devotional_id' => $path['devotional']?->id,
+                'bible_reference' => $path['definition']['reference'],
+                'prayer_completed_at' => now(),
+            ],
+        );
+
+        session()->flash('status', 'Prayer marked complete for today\'s path.');
+    }
+
     public function render()
     {
         $dailyRhythm = DailySpiritualRhythm::forDate();

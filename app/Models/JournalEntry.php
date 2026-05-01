@@ -15,6 +15,8 @@ class JournalEntry extends Model
         'devotional_id',
         'title',
         'content',
+        'mood',
+        'topics',
         'entry_date',
     ];
 
@@ -22,6 +24,7 @@ class JournalEntry extends Model
     {
         return [
             'entry_date' => 'date',
+            'topics' => 'array',
         ];
     }
 

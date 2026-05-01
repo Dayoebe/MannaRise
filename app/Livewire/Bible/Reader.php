@@ -2,8 +2,14 @@
 
 namespace App\Livewire\Bible;
 
+use App\Models\BibleChapterCompletion;
 use App\Models\BibleBook;
 use App\Models\BibleVerse;
+use App\Models\PersonalizedDailyPathCheckIn;
+use App\Models\UserBibleReadingHistory;
+use App\Models\UserBibleVerseEngagement;
+use App\Support\PersonalizedDailyPath;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -25,37 +31,55 @@ class Reader extends Component
 
     public string $search = '';
 
+    /**
+     * @var array<int, string>
+     */
+    public array $notes = [];
+
     public function mount(?string $book = null, ?int $chapter = null): void
     {
+        $lastReading = auth()->check() && ! $book
+            ? UserBibleReadingHistory::with('book')
+                ->where('user_id', auth()->id())
+                ->latest('last_read_at')
+                ->first()
+            : null;
         $firstBook = BibleBook::orderBy('book_order')->first();
 
-        $this->bookSlug = $book ?: ($firstBook?->slug ?? '');
-        $this->chapter = max(1, $chapter ?: 1);
+        $this->bookSlug = $book ?: ($lastReading?->book?->slug ?: ($firstBook?->slug ?? ''));
+        $this->chapter = max(1, $chapter ?: ($lastReading?->chapter ?: 1));
+        $this->language = $lastReading && ! $book ? $lastReading->language : $this->language;
+        $this->version = $lastReading && ! $book ? $lastReading->version : $this->version;
         $this->normalizeSelection();
+        $this->recordReadingHistory();
     }
 
     public function updatedBookSlug(): void
     {
         $this->chapter = 1;
         $this->resetPage();
+        $this->recordReadingHistory();
     }
 
     public function updatedChapter(): void
     {
         $this->chapter = max(1, (int) $this->chapter);
         $this->resetPage();
+        $this->recordReadingHistory();
     }
 
     public function updatedLanguage(): void
     {
         $this->normalizeSelection();
         $this->resetPage();
+        $this->recordReadingHistory();
     }
 
     public function updatedVersion(): void
     {
         $this->normalizeSelection();
         $this->resetPage();
+        $this->recordReadingHistory();
     }
 
     public function updatedSearch(): void
@@ -73,6 +97,7 @@ class Reader extends Component
 
         if ($this->chapter > 1) {
             $this->chapter--;
+            $this->recordReadingHistory();
 
             return;
         }
@@ -82,6 +107,7 @@ class Reader extends Component
         if ($previousBook) {
             $this->bookSlug = $previousBook->slug;
             $this->chapter = $previousBook->chapters;
+            $this->recordReadingHistory();
         }
     }
 
@@ -95,6 +121,7 @@ class Reader extends Component
 
         if ($this->chapter < $book->chapters) {
             $this->chapter++;
+            $this->recordReadingHistory();
 
             return;
         }
@@ -104,7 +131,83 @@ class Reader extends Component
         if ($nextBook) {
             $this->bookSlug = $nextBook->slug;
             $this->chapter = 1;
+            $this->recordReadingHistory();
         }
+    }
+
+    public function toggleBookmark(int $verseId): void
+    {
+        abort_unless(auth()->check(), 403);
+
+        $engagement = $this->engagementForVerse($verseId);
+        $engagement->bookmarked_at = $engagement->bookmarked_at ? null : now();
+        $engagement->save();
+    }
+
+    public function setHighlight(int $verseId, ?string $color): void
+    {
+        abort_unless(auth()->check(), 403);
+
+        $allowed = ['amber', 'emerald', 'sky', 'rose', 'violet'];
+        $color = in_array($color, $allowed, true) ? $color : null;
+
+        $engagement = $this->engagementForVerse($verseId);
+        $engagement->highlight_color = $engagement->highlight_color === $color ? null : $color;
+        $engagement->highlighted_at = $engagement->highlight_color ? now() : null;
+        $engagement->save();
+    }
+
+    public function saveNote(int $verseId): void
+    {
+        abort_unless(auth()->check(), 403);
+
+        $note = trim((string) ($this->notes[$verseId] ?? ''));
+        $engagement = $this->engagementForVerse($verseId);
+        $engagement->note = $note !== '' ? $note : null;
+        $engagement->note_updated_at = $engagement->note ? now() : null;
+        $engagement->save();
+
+        session()->flash('status', 'Verse note saved.');
+    }
+
+    public function recordShare(int $verseId): void
+    {
+        if (! auth()->check()) {
+            return;
+        }
+
+        $engagement = $this->engagementForVerse($verseId);
+        $engagement->shared_at = now();
+        $engagement->save();
+    }
+
+    public function markChapterRead(): void
+    {
+        abort_unless(auth()->check(), 403);
+
+        $book = $this->selectedBook();
+
+        if (! $book) {
+            return;
+        }
+
+        BibleChapterCompletion::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'bible_book_id' => $book->id,
+                'chapter' => $this->chapter,
+            ],
+            [
+                'assigned_on' => today()->toDateString(),
+                'source' => 'personal-reader',
+                'completed_at' => now(),
+            ],
+        );
+
+        $this->recordReadingHistory(true);
+        $this->completePathScriptureIfMatched($book);
+
+        session()->flash('status', "{$book->name} {$this->chapter} marked as read.");
     }
 
     private function selectedBook(): ?BibleBook
@@ -198,6 +301,68 @@ class Reader extends Component
         ][$language] ?? strtoupper($language);
     }
 
+    private function engagementForVerse(int $verseId): UserBibleVerseEngagement
+    {
+        $verse = BibleVerse::whereKey($verseId)->firstOrFail();
+
+        return UserBibleVerseEngagement::firstOrCreate([
+            'user_id' => auth()->id(),
+            'bible_verse_id' => $verse->id,
+        ]);
+    }
+
+    private function recordReadingHistory(bool $forceIncrement = false): void
+    {
+        if (! auth()->check()) {
+            return;
+        }
+
+        $book = $this->selectedBook();
+
+        if (! $book) {
+            return;
+        }
+
+        $history = UserBibleReadingHistory::firstOrNew([
+            'user_id' => auth()->id(),
+            'bible_book_id' => $book->id,
+            'chapter' => $this->chapter,
+            'language' => $this->language,
+            'version' => $this->version,
+        ]);
+
+        $lastReadAt = $history->last_read_at;
+        $shouldIncrement = $forceIncrement || ! $lastReadAt || $lastReadAt->lt(now()->subMinutes(10));
+
+        $history->read_count = (int) $history->read_count + ($shouldIncrement ? 1 : 0);
+        $history->last_read_at = now();
+        $history->save();
+    }
+
+    private function completePathScriptureIfMatched(BibleBook $book): void
+    {
+        $profile = auth()->user()?->spiritualProfile()->first();
+        $path = PersonalizedDailyPath::forSeason($profile?->season);
+        $definition = $path['definition'];
+
+        if (($path['bible_book']?->id !== $book->id) || (int) $definition['chapter'] !== $this->chapter) {
+            return;
+        }
+
+        PersonalizedDailyPathCheckIn::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'checked_on' => CarbonImmutable::today()->toDateString(),
+            ],
+            [
+                'season_key' => $path['key'],
+                'devotional_id' => $path['devotional']?->id,
+                'bible_reference' => $definition['reference'],
+                'scripture_completed_at' => now(),
+            ],
+        );
+    }
+
     public function render()
     {
         $translations = $this->availableTranslations();
@@ -229,6 +394,20 @@ class Reader extends Component
                 ->get()
             : collect();
 
+        $engagements = auth()->check() && $verses->isNotEmpty()
+            ? UserBibleVerseEngagement::query()
+                ->where('user_id', auth()->id())
+                ->whereIn('bible_verse_id', $verses->pluck('id'))
+                ->get()
+                ->keyBy('bible_verse_id')
+            : collect();
+
+        foreach ($engagements as $verseId => $engagement) {
+            if (! array_key_exists((int) $verseId, $this->notes)) {
+                $this->notes[(int) $verseId] = (string) ($engagement->note ?? '');
+            }
+        }
+
         $searchResults = trim($this->search) !== ''
             ? BibleVerse::query()
                 ->with('book')
@@ -247,6 +426,13 @@ class Reader extends Component
             'verses' => $verses,
             'chapterCount' => $chapterCount,
             'searchResults' => $searchResults,
+            'engagements' => $engagements,
+            'lastReading' => auth()->check()
+                ? UserBibleReadingHistory::with('book')
+                    ->where('user_id', auth()->id())
+                    ->latest('last_read_at')
+                    ->first()
+                : null,
             'translations' => $translations,
             'languages' => $translations->unique('language')->values(),
             'versions' => $translations->where('language', $this->language)->values(),

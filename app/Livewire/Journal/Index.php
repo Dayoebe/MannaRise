@@ -4,6 +4,9 @@ namespace App\Livewire\Journal;
 
 use App\Models\Devotional;
 use App\Models\JournalEntry;
+use App\Models\PersonalizedDailyPathCheckIn;
+use App\Support\PersonalizedDailyPath;
+use Carbon\CarbonImmutable;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -19,6 +22,10 @@ class Index extends Component
 
     public string $content = '';
 
+    public string $mood = '';
+
+    public string $topicsInput = '';
+
     public string $entry_date = '';
 
     public function mount(): void
@@ -32,11 +39,17 @@ class Index extends Component
             'devotional_id' => ['nullable', 'exists:devotionals,id'],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'min:10'],
+            'mood' => ['nullable', 'string', 'max:60'],
+            'topicsInput' => ['nullable', 'string', 'max:255'],
             'entry_date' => ['required', 'date'],
         ]);
 
         $payload = [
-            ...$validated,
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'mood' => $validated['mood'] ?: null,
+            'topics' => $this->normalizedTopics($validated['topicsInput'] ?? ''),
+            'entry_date' => $validated['entry_date'],
             'devotional_id' => $this->devotional_id !== '' ? $this->devotional_id : null,
             'user_id' => auth()->id(),
         ];
@@ -45,6 +58,10 @@ class Index extends Component
             JournalEntry::where('user_id', auth()->id())->findOrFail($this->editingId)->update($payload);
         } else {
             JournalEntry::create($payload);
+        }
+
+        if (CarbonImmutable::parse($payload['entry_date'])->isSameDay(today())) {
+            $this->markPathJournalComplete();
         }
 
         $this->resetForm();
@@ -59,6 +76,8 @@ class Index extends Component
         $this->devotional_id = (string) ($entry->devotional_id ?? '');
         $this->title = $entry->title;
         $this->content = $entry->content;
+        $this->mood = (string) ($entry->mood ?? '');
+        $this->topicsInput = collect($entry->topics ?? [])->join(', ');
         $this->entry_date = $entry->entry_date->toDateString();
     }
 
@@ -74,7 +93,39 @@ class Index extends Component
         $this->devotional_id = '';
         $this->title = '';
         $this->content = '';
+        $this->mood = '';
+        $this->topicsInput = '';
         $this->entry_date = today()->toDateString();
+    }
+
+    private function normalizedTopics(string $topics): array
+    {
+        return collect(explode(',', $topics))
+            ->map(fn (string $topic) => trim($topic))
+            ->filter()
+            ->unique()
+            ->take(8)
+            ->values()
+            ->all();
+    }
+
+    private function markPathJournalComplete(): void
+    {
+        $profile = auth()->user()->spiritualProfile()->first();
+        $path = PersonalizedDailyPath::forSeason($profile?->season);
+
+        PersonalizedDailyPathCheckIn::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'checked_on' => CarbonImmutable::today()->toDateString(),
+            ],
+            [
+                'season_key' => $path['key'],
+                'devotional_id' => $path['devotional']?->id,
+                'bible_reference' => $path['definition']['reference'],
+                'journal_completed_at' => now(),
+            ],
+        );
     }
 
     public function render()

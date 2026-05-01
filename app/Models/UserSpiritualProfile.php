@@ -10,7 +10,18 @@ class UserSpiritualProfile extends Model
     protected $fillable = [
         'user_id',
         'season',
+        'seasons',
+        'path_goal',
+        'support_note',
+        'preferred_time',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'seasons' => 'array',
+        ];
+    }
 
     public function user(): BelongsTo
     {

@@ -27,6 +27,20 @@
                 @error('entry_date') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
             </div>
 
+            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700">Mood</label>
+                    <input type="text" wire:model="mood" placeholder="Peaceful, anxious, hopeful" class="field-input mt-1 border-mauve-300 focus:border-mauve-600 focus:ring-mauve-100">
+                    @error('mood') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700">Topics</label>
+                    <input type="text" wire:model="topicsInput" placeholder="faith, family, purpose" class="field-input mt-1 border-mauve-300 focus:border-mauve-600 focus:ring-mauve-100">
+                    @error('topicsInput') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
             <div>
                 <label class="block text-sm font-bold text-slate-700">Reflection</label>
                 <textarea wire:model="content" rows="8" class="field-input mt-1 border-mauve-300 focus:border-mauve-600 focus:ring-mauve-100"></textarea>
@@ -65,6 +79,14 @@
                         <div>
                             <h3 class="text-lg font-black tracking-normal text-slate-950">{{ $entry->title }}</h3>
                             <p class="mt-1 text-sm font-bold text-slate-500">{{ $entry->entry_date->format('M j, Y') }} @if ($entry->devotional) · {{ $entry->devotional->title }} @endif</p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                @if ($entry->mood)
+                                    <span class="rounded-full bg-mauve-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-mauve-900">{{ $entry->mood }}</span>
+                                @endif
+                                @foreach ($entry->topics ?? [] as $topic)
+                                    <span class="rounded-full bg-sky-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-sky-900">{{ $topic }}</span>
+                                @endforeach
+                            </div>
                         </div>
                         <div class="flex gap-2">
                             <button type="button" wire:click="edit({{ $entry->id }})" class="btn-secondary min-h-10 border-sky-200 px-3 py-1.5">Edit</button>
