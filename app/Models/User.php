@@ -190,4 +190,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserSpiritualProfile::class);
     }
+
+    public function notificationDeliveryLogs(): HasMany
+    {
+        return $this->hasMany(NotificationDeliveryLog::class);
+    }
 }

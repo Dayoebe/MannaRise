@@ -6,11 +6,11 @@ use App\Models\DevotionalReminder;
 use App\Support\NotificationDelivery;
 use Illuminate\Console\Command;
 
-class SendDevotionalReminders extends Command
+class SendWeeklySpiritualDigests extends Command
 {
-    protected $signature = 'mannarise:send-devotional-reminders';
+    protected $signature = 'mannarise:send-weekly-spiritual-digests';
 
-    protected $description = 'Send due devotional reminder notifications.';
+    protected $description = 'Send weekly spiritual progress digest notifications.';
 
     public function handle(): int
     {
@@ -23,17 +23,17 @@ class SendDevotionalReminders extends Command
             })
             ->chunkById(100, function ($reminders) use (&$sent): void {
                 foreach ($reminders as $reminder) {
-                    if (! NotificationDelivery::dailyDue($reminder)) {
+                    if (! NotificationDelivery::weeklyDue($reminder)) {
                         continue;
                     }
 
-                    if (NotificationDelivery::sendDaily($reminder)['sent']) {
+                    if (NotificationDelivery::sendWeeklyDigest($reminder)['sent']) {
                         $sent++;
                     }
                 }
             });
 
-        $this->components->info('Sent '.$sent.' devotional reminder(s).');
+        $this->components->info('Sent '.$sent.' weekly spiritual digest(s).');
 
         return self::SUCCESS;
     }

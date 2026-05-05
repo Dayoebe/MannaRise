@@ -63,6 +63,66 @@
         </div>
     </section>
 
+    <section class="app-panel border-cyan-200 bg-cyan-50">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <p class="app-eyebrow border-cyan-200 bg-white text-cyan-900"><x-ui.icon name="bell" class="h-4 w-4" /> Notification delivery</p>
+                <h2 class="mt-3 app-section-title">Reminder and digest logs</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-700">Recent email and in-app delivery records for daily reminders, missed-day nudges, and weekly digests.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
+                @foreach ([
+                    ['Sent', $deliveryStats['sent'], 'text-emerald-900'],
+                    ['Failed', $deliveryStats['failed'], 'text-red-900'],
+                    ['Email', $deliveryStats['email'], 'text-blue-900'],
+                    ['Push ready', $deliveryStats['push_ready'], 'text-violet-900'],
+                ] as [$label, $value, $color])
+                    <div class="rounded-xl border border-white bg-white px-3 py-2">
+                        <p class="text-xl font-black tracking-normal text-slate-950">{{ $value }}</p>
+                        <p class="text-xs font-bold uppercase tracking-normal {{ $color }}">{{ $label }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="mt-5 overflow-x-auto rounded-xl border border-cyan-200 bg-white">
+            <table class="min-w-full divide-y divide-cyan-100 text-sm">
+                <thead class="bg-cyan-50 text-left text-cyan-900">
+                    <tr>
+                        <th class="px-4 py-3 font-black">When</th>
+                        <th class="px-4 py-3 font-black">User</th>
+                        <th class="px-4 py-3 font-black">Type</th>
+                        <th class="px-4 py-3 font-black">Channel</th>
+                        <th class="px-4 py-3 font-black">Status</th>
+                        <th class="px-4 py-3 font-black">Message</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-cyan-100">
+                    @forelse ($deliveryLogs as $log)
+                        <tr>
+                            <td class="whitespace-nowrap px-4 py-3 font-bold text-slate-600">{{ $log->created_at->format('M j, g:i A') }}</td>
+                            <td class="px-4 py-3">
+                                <p class="font-black tracking-normal text-slate-950">{{ $log->user?->name ?? 'Deleted user' }}</p>
+                                <p class="text-slate-500">{{ $log->user?->email }}</p>
+                            </td>
+                            <td class="px-4 py-3 font-bold text-slate-700">{{ str($log->notification_type)->headline() }}</td>
+                            <td class="px-4 py-3 font-bold text-slate-700">{{ $log->channel === 'database' ? 'In-app' : str($log->channel)->headline() }}</td>
+                            <td class="px-4 py-3">
+                                <span class="rounded-full px-2 py-1 text-xs font-black {{ $log->status === 'sent' ? 'bg-emerald-100 text-emerald-900' : 'bg-red-100 text-red-900' }}">{{ str($log->status)->headline() }}</span>
+                            </td>
+                            <td class="max-w-md px-4 py-3 text-slate-600">
+                                <p class="font-bold text-slate-800">{{ $log->subject }}</p>
+                                <p class="mt-1">{{ \Illuminate\Support\Str::limit($log->error_message ?: $log->message, 120) }}</p>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6" class="px-4 py-6 text-slate-600">No reminder or digest delivery logs yet.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <section class="overflow-x-auto rounded-xl border border-blue-200 bg-white shadow-sm">
         <table class="min-w-full divide-y divide-blue-100 text-sm">
             <thead class="bg-blue-50 text-left text-blue-900">

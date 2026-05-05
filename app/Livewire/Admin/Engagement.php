@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Devotional;
 use App\Models\DevotionalCategory;
 use App\Models\DevotionalCompletion;
+use App\Models\NotificationDeliveryLog;
 use App\Models\User;
 use App\Support\ContentPlanningIntelligence;
 use Illuminate\Support\Str;
@@ -68,6 +69,13 @@ class Engagement extends Component
                 ->get(),
             'completionCountThisWeek' => DevotionalCompletion::where('completed_on', '>=', now()->subWeek()->toDateString())->count(),
             'contentSuggestions' => ContentPlanningIntelligence::suggestions(),
+            'deliveryStats' => [
+                'sent' => NotificationDeliveryLog::where('status', 'sent')->where('created_at', '>=', now()->subDays(7))->count(),
+                'failed' => NotificationDeliveryLog::where('status', 'failed')->where('created_at', '>=', now()->subDays(7))->count(),
+                'email' => NotificationDeliveryLog::where('channel', 'mail')->where('created_at', '>=', now()->subDays(7))->count(),
+                'push_ready' => NotificationDeliveryLog::where('channel', 'database')->where('created_at', '>=', now()->subDays(7))->count(),
+            ],
+            'deliveryLogs' => NotificationDeliveryLog::with('user')->latest()->take(10)->get(),
         ]);
     }
 

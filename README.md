@@ -8,10 +8,10 @@ MannaRise is a Laravel and Livewire devotional platform for daily spiritual grow
 - Bible reader and spiritual library
 - Prayer wall, guided prayer, and prayer rooms
 - Testimony submission and moderation
-- Personal journal, favorites, reminders, and growth path
+- Personal journal, favorites, personalized reminders, missed-day nudges, weekly spiritual digest, and growth path
 - Memory verses, scripture cards, and devotional plans
 - Community groups and group invitations
-- Admin dashboard for content, moderation, engagement, roles, settings, and audio devotionals
+- Admin dashboard for content, moderation, engagement, scheduled mail delivery, notification logs, roles, settings, and audio devotionals
 - PWA-ready layout with manifest and app icons
 
 ## Tech Stack

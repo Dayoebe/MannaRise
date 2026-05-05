@@ -189,7 +189,7 @@ Key fields:
 
 ## Devotional Reminders
 
-Stores user reminder preferences where reminder features are enabled.
+Stores user reminder preferences for daily path reminders, missed-day nudges, weekly digest delivery, active weekdays, channels, email opt-out, and timezone-aware send times.
 
 Key fields:
 
@@ -202,6 +202,23 @@ Key fields:
 - push_enabled
 - is_active
 - last_sent_at
+
+## Notification Delivery Logs
+
+Stores reminder and digest delivery history for admin visibility, sent mail history, manual send troubleshooting, and failed delivery review.
+
+Key fields:
+
+- user_id
+- notification_type
+- channel
+- status
+- subject
+- message
+- action_url
+- error_message
+- meta
+- sent_at
 
 ## Audio Devotionals
 
@@ -319,20 +336,6 @@ Suggested fields:
 - image_path
 - public_token
 - expires_at
-
-## Notification Delivery Logs
-
-Needed for debugging reminder delivery.
-
-Suggested fields:
-
-- user_id
-- notifiable_type
-- notifiable_id
-- channel
-- status
-- error_message
-- sent_at
 
 ## Admin Audit Logs
 

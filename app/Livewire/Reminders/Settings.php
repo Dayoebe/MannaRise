@@ -11,10 +11,45 @@ class Settings extends Component
     public string $remind_at = '06:00';
     public string $timezone = 'Africa/Lagos';
     public array $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    public array $reminderTypes = ['devotional', 'bible', 'prayer'];
+    public array $reminderTypes = ['devotional', 'bible', 'prayer', 'missed', 'digest'];
     public bool $email_enabled = true;
     public bool $push_enabled = false;
     public bool $is_active = true;
+
+    public function toggleChannel(string $field): void
+    {
+        if (! in_array($field, ['email_enabled', 'push_enabled', 'is_active'], true)) {
+            return;
+        }
+
+        $this->{$field} = ! $this->{$field};
+    }
+
+    public function toggleDay(string $day): void
+    {
+        $allowed = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+        if (! in_array($day, $allowed, true)) {
+            return;
+        }
+
+        $this->days = in_array($day, $this->days, true)
+            ? array_values(array_diff($this->days, [$day]))
+            : array_values(array_unique([...$this->days, $day]));
+    }
+
+    public function toggleReminderType(string $type): void
+    {
+        $allowed = ['devotional', 'bible', 'journal', 'prayer', 'plan', 'memory', 'group', 'missed', 'digest'];
+
+        if (! in_array($type, $allowed, true)) {
+            return;
+        }
+
+        $this->reminderTypes = in_array($type, $this->reminderTypes, true)
+            ? array_values(array_diff($this->reminderTypes, [$type]))
+            : array_values(array_unique([...$this->reminderTypes, $type]));
+    }
 
     public function mount(): void
     {
@@ -43,7 +78,7 @@ class Settings extends Component
             'days' => ['array'],
             'days.*' => ['in:monday,tuesday,wednesday,thursday,friday,saturday,sunday'],
             'reminderTypes' => ['array'],
-            'reminderTypes.*' => ['in:devotional,bible,journal,prayer,plan,memory,group'],
+            'reminderTypes.*' => ['in:devotional,bible,journal,prayer,plan,memory,group,missed,digest'],
             'email_enabled' => ['boolean'],
             'push_enabled' => ['boolean'],
             'is_active' => ['boolean'],
@@ -88,6 +123,8 @@ class Settings extends Component
                 'plan' => ['Plan continuation', 'route'],
                 'memory' => ['Memory verse', 'award'],
                 'group' => ['Group prayer', 'users'],
+                'missed' => ['Missed-day nudges', 'refresh-cw'],
+                'digest' => ['Weekly spiritual digest', 'bar-chart'],
             ],
         ]);
     }

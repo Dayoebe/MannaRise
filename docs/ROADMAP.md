@@ -26,10 +26,16 @@ This roadmap separates shipped foundation work from pending product work.
 - Spiritual growth score on the user dashboard
 - Personalized daily path
 - Bible-in-a-year catch-up mode with chapter completion tracking
+- Personalized daily reminders pointing to today's path
+- Missed-day rhythm nudges
+- Weekly spiritual digest on dashboard and email/in-app notifications
+- Notification delivery logs in admin engagement
+- Admin scheduled mail center with sent mail history and manual send controls
+- Signed email opt-out links plus user-controlled mail preferences
 
 ## In Progress or Partial
 
-- Reminder settings and devotional reminder delivery
+- Browser push subscription delivery
 - Audio devotional public/admin flows
 - Role and permission management
 - PWA shell, manifest, offline page, and service worker
@@ -54,13 +60,10 @@ This roadmap separates shipped foundation work from pending product work.
 
 ## Phase 3: Notifications and Reminders
 
-- Harden scheduled reminder command behavior
-- Add notification delivery logs
-- Add email reminders
+- Expand browser push from in-app notification records to true device push
 - Add web push reminders
-- Add weekly reading digest
-- Add missed-day nudges
-- Add user timezone and reminder-day preferences
+- Add richer missed-day recovery sequences
+- Add monthly spiritual rhythm review
 
 ## Phase 4: Sharing and Engagement
 
