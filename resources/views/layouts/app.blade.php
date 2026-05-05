@@ -179,6 +179,10 @@
                             ['label' => 'Settings', 'route' => 'admin.settings', 'icon' => 'settings', 'active' => ['admin.settings']],
                         ];
 
+                        if ($user->canDo('manage-notifications')) {
+                            $adminLinks[] = ['label' => 'Mail Center', 'route' => 'admin.notifications', 'icon' => 'mail', 'active' => ['admin.notifications']];
+                        }
+
                         if ($user->canDo('manage-users')) {
                             $adminLinks[] = ['label' => 'Users', 'route' => 'admin.users', 'icon' => 'users', 'active' => ['admin.users']];
                         }

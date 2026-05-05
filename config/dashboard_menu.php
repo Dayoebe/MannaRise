@@ -177,6 +177,13 @@ return [
                     'active' => ['admin.engagement'],
                 ],
                 [
+                    'label' => 'Mail center',
+                    'route' => 'admin.notifications',
+                    'icon' => 'mail',
+                    'active' => ['admin.notifications'],
+                    'ability' => 'manage-notifications',
+                ],
+                [
                     'label' => 'Users',
                     'route' => 'admin.users',
                     'icon' => 'users',

@@ -5,6 +5,7 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\URL;
 
 class DailyDevotionalReminder extends Notification
 {
@@ -31,6 +32,7 @@ class DailyDevotionalReminder extends Notification
             ->line($this->reminder['message'] ?? 'It is time for your daily devotional rhythm.')
             ->line(($this->reminder['path_label'] ?? 'Personalized daily path').' · '.($this->reminder['reference'] ?? ''))
             ->action($this->reminder['action_label'] ?? 'Open MannaRise', $this->reminder['action_url'] ?? route('dashboard'))
+            ->line('You can turn off email notifications here: '.URL::temporarySignedRoute('mail.notifications.opt-out', now()->addDays(30), ['user' => $notifiable->id]))
             ->line('Keep growing one faithful step at a time.');
     }
 

@@ -8,6 +8,7 @@ use App\Livewire\Admin\Devotionals as AdminDevotionals;
 use App\Livewire\Admin\Engagement as AdminEngagement;
 use App\Livewire\Admin\FeaturedContent as AdminFeaturedContent;
 use App\Livewire\Admin\ModerationQueue as AdminModerationQueue;
+use App\Livewire\Admin\NotificationDeliveries as AdminNotificationDeliveries;
 use App\Livewire\Admin\PrayerRequests as AdminPrayerRequests;
 use App\Livewire\Admin\DailyDevotions as AdminDailyDevotions;
 use App\Livewire\Admin\ResourceCategories as AdminResourceCategories;
@@ -89,6 +90,28 @@ Route::get('/prayer-wall', PrayerWall::class)->name('prayer-requests.wall');
 Route::get('/testimonies', TestimonyIndex::class)->name('testimonies.index');
 Route::get('/testimony', SubmitTestimony::class)->name('testimonies.submit');
 
+Route::get('/mail/notifications/opt-out/{user}', function (Request $request, \App\Models\User $user) {
+    abort_unless($request->hasValidSignature(), 403);
+
+    \App\Models\DevotionalReminder::updateOrCreate(
+        ['user_id' => $user->id],
+        [
+            'title' => 'Daily devotional reminder',
+            'remind_at' => '06:00:00',
+            'timezone' => config('app.timezone'),
+            'days' => [
+                'weekdays' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+                'types' => ['devotional', 'bible', 'prayer', 'missed', 'digest'],
+            ],
+            'email_enabled' => false,
+            'push_enabled' => true,
+            'is_active' => true,
+        ],
+    );
+
+    return redirect()->route('reminders.settings')->with('status', 'Email notifications have been turned off. In-app reminders can still stay active.');
+})->middleware('signed')->name('mail.notifications.opt-out');
+
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', Login::class)->name('login');
     Route::get('/register', Register::class)->name('register');
@@ -154,6 +177,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/prayer-requests', AdminPrayerRequests::class)->middleware('permission:manage-prayer-requests')->name('prayer-requests');
     Route::get('/testimonies', AdminTestimonies::class)->middleware('permission:manage-testimonies')->name('testimonies');
     Route::get('/engagement', AdminEngagement::class)->middleware('permission:view-engagement')->name('engagement');
+    Route::get('/notifications', AdminNotificationDeliveries::class)->middleware('permission:manage-notifications')->name('notifications');
     Route::get('/audio-devotionals', AdminAudioDevotionals::class)->middleware('permission:manage-audio-devotionals')->name('audio-devotionals');
     Route::get('/users', AdminUsers::class)->middleware('permission:manage-users')->name('users');
     Route::get('/roles', AdminRoles::class)->middleware('permission:manage-roles')->name('roles');
