@@ -108,6 +108,44 @@
         </div>
     </section>
 
+    <section class="app-panel border-amber-200 bg-amber-50">
+        <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,24rem)] lg:items-start">
+            <div>
+                <p class="app-eyebrow border-amber-200 bg-white text-amber-900"><x-ui.icon name="bell" class="h-4 w-4" /> Reminders and digest</p>
+                <h2 class="mt-3 app-section-title">Your weekly spiritual recap</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-700">{{ $retentionSummary['weekly_digest']['sentence'] }}</p>
+                <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div class="rounded-xl border border-white bg-white p-3">
+                        <p class="text-xs font-bold uppercase tracking-normal text-amber-900">Prayer</p>
+                        <p class="mt-1 text-2xl font-black tracking-normal text-slate-950">{{ $retentionSummary['weekly_digest']['prayer_days'] }} days</p>
+                    </div>
+                    <div class="rounded-xl border border-white bg-white p-3">
+                        <p class="text-xs font-bold uppercase tracking-normal text-amber-900">Readings</p>
+                        <p class="mt-1 text-2xl font-black tracking-normal text-slate-950">{{ $retentionSummary['weekly_digest']['devotional_days'] }}</p>
+                    </div>
+                    <div class="rounded-xl border border-white bg-white p-3">
+                        <p class="text-xs font-bold uppercase tracking-normal text-amber-900">Consistency</p>
+                        <p class="mt-1 text-2xl font-black tracking-normal text-slate-950">{{ $retentionSummary['weekly_digest']['consistent_days'] }} days</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-surface border-amber-200 bg-white p-4">
+                <h3 class="font-black tracking-normal text-slate-950">Next reminder</h3>
+                @if ($retentionSummary['next_reminder_at'])
+                    <p class="mt-2 text-2xl font-black tracking-normal text-slate-950">{{ $retentionSummary['next_reminder_at']->format('D, M j') }}</p>
+                    <p class="mt-1 text-sm font-bold text-amber-900">{{ $retentionSummary['next_reminder_at']->format('g:i A T') }}</p>
+                @else
+                    <p class="mt-2 text-sm leading-6 text-slate-600">No active reminder is scheduled yet.</p>
+                @endif
+                <div class="mt-4 flex flex-col gap-2">
+                    <a href="{{ route('growth-path.index') }}" class="btn-primary bg-amber-600 text-slate-950 hover:bg-amber-500"><x-ui.icon name="route" class="h-4 w-4" /> Today&apos;s path</a>
+                    <a href="{{ route('reminders.settings') }}" class="btn-secondary border-amber-200"><x-ui.icon name="settings" class="h-4 w-4" /> Reminder settings</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <article class="app-panel border-violet-200 bg-violet-50">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

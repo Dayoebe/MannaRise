@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Devotional;
 use App\Models\DevotionalPlanCompletion;
+use App\Models\DevotionalReminder;
 use App\Models\MemoryVerseProgress;
 use App\Models\User;
 use App\Models\UserBibleReadingHistory;
@@ -11,6 +12,7 @@ use App\Support\DailySpiritualRhythm;
 use App\Support\DevotionalPlans;
 use App\Support\PersonalizedDailyPath;
 use App\Support\SpiritualGrowthScore;
+use App\Support\SpiritualRetentionSummary;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -146,6 +148,7 @@ class Dashboard extends Component
     {
         $user = auth()->user();
         $unifiedProgress = $this->unifiedProgress($user);
+        $reminder = DevotionalReminder::where('user_id', $user->id)->first();
 
         return view('livewire.dashboard', [
             'dailyRhythm' => DailySpiritualRhythm::forDate(),
@@ -160,6 +163,11 @@ class Dashboard extends Component
                 'streak' => $this->streakFromDates($user->devotionalCompletions()->pluck('completed_on')),
             ],
             'unifiedProgress' => $unifiedProgress,
+            'retentionSummary' => [
+                'weekly_digest' => SpiritualRetentionSummary::weeklyDigest($user),
+                'next_reminder_at' => SpiritualRetentionSummary::nextReminderAt($reminder),
+                'reminder' => $reminder,
+            ],
             'todayDevotional' => Devotional::with('category')->published()->latest('published_at')->first(),
             'recentJournalEntries' => $user->journalEntries()->with('devotional')->latest('entry_date')->take(4)->get(),
             'recentFavorites' => $user->favoriteDevotionals()->with('category')->latest('devotional_favorites.created_at')->take(4)->get(),
