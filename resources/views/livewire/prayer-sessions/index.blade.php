@@ -11,9 +11,9 @@
             <div>
                 <p class="app-eyebrow border-rose-200 bg-rose-50 text-rose-900"><x-ui.icon name="timer" class="h-4 w-4" /> Guided prayer</p>
                 <h1 class="mt-3 app-section-title">Guided prayer sessions</h1>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Choose a 3, 5, or 10 minute prayer flow with Scripture, silence, prompts, and a closing declaration.</p>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Choose a 3, 5, 10, 30, or 60 minute prayer flow, or set a custom time with Scripture, silence, prompts, and a closing declaration.</p>
             </div>
-            <div class="app-surface grid grid-cols-3 gap-3 border-rose-200 bg-rose-50 p-4 text-center">
+            <div class="app-surface grid grid-cols-3 gap-3 border-rose-200 bg-rose-50 p-4 text-center sm:grid-cols-6">
                 <div>
                     <p class="text-2xl font-black tracking-normal text-slate-950">3</p>
                     <p class="text-xs font-bold uppercase tracking-normal text-rose-900">Minutes</p>
@@ -25,6 +25,18 @@
                 <div>
                     <p class="text-2xl font-black tracking-normal text-slate-950">10</p>
                     <p class="text-xs font-bold uppercase tracking-normal text-rose-900">Minutes</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-black tracking-normal text-slate-950">30</p>
+                    <p class="text-xs font-bold uppercase tracking-normal text-rose-900">Minutes</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-black tracking-normal text-slate-950">1</p>
+                    <p class="text-xs font-bold uppercase tracking-normal text-rose-900">Hour</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-black tracking-normal text-slate-950">Custom</p>
+                    <p class="text-xs font-bold uppercase tracking-normal text-rose-900">Time</p>
                 </div>
             </div>
         </div>
@@ -42,9 +54,25 @@
                 <div class="flex flex-wrap gap-2" data-session-tabs>
                     @foreach ($sessions as $key => $session)
                         <button type="button" data-session-key="{{ $key }}" class="rounded-full border px-4 py-2 text-sm font-bold transition">
-                            {{ $session['minutes'] }} min
+                            {{ $session['minutes'] === 60 ? '1 hour' : $session['minutes'].' min' }}
                         </button>
                     @endforeach
+                    <button type="button" data-session-key="custom" class="rounded-full border px-4 py-2 text-sm font-bold transition">
+                        Custom
+                    </button>
+                </div>
+
+                <div class="mt-4 hidden rounded-xl border border-slate-200 bg-slate-50 p-4" data-custom-session-controls>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <label class="block text-sm font-bold text-slate-700">
+                            Custom minutes
+                            <input type="number" data-custom-minutes min="1" max="180" step="1" value="20" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-950 outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 sm:w-40">
+                        </label>
+                        <button type="button" data-custom-apply class="btn-secondary border-slate-200 bg-white hover:bg-slate-50">
+                            <x-ui.icon name="timer" class="h-4 w-4" /> Set custom time
+                        </button>
+                        <p class="text-sm leading-6 text-slate-600">The full prayer flow stays intact and each step is resized to your time.</p>
+                    </div>
                 </div>
 
                 <div class="mt-6 rounded-xl border border-rose-100 bg-rose-50 p-5">
@@ -127,6 +155,9 @@
             const startButton = root.querySelector('[data-session-start]');
             const pauseButton = root.querySelector('[data-session-pause]');
             const resetButton = root.querySelector('[data-session-reset]');
+            const customControls = root.querySelector('[data-custom-session-controls]');
+            const customInput = root.querySelector('[data-custom-minutes]');
+            const customApply = root.querySelector('[data-custom-apply]');
 
             let activeKey = '3';
             let remaining = totalSeconds(sessions[activeKey]);
@@ -134,6 +165,65 @@
 
             function totalSeconds(session) {
                 return session.steps.reduce((total, step) => total + Number(step.seconds), 0);
+            }
+
+            function customTemplate() {
+                return sessions['60'] || sessions['30'] || sessions['10'];
+            }
+
+            function customMinutes() {
+                const minutes = Number.parseInt(customInput.value, 10);
+
+                if (Number.isNaN(minutes)) {
+                    return 20;
+                }
+
+                return Math.max(1, Math.min(180, minutes));
+            }
+
+            function buildCustomSession(minutes) {
+                const template = customTemplate();
+                const targetSeconds = minutes * 60;
+                const templateTotal = totalSeconds(template);
+
+                const steps = template.steps.map((step) => ({
+                    ...step,
+                    seconds: Math.max(1, Math.round((Number(step.seconds) / templateTotal) * targetSeconds)),
+                }));
+
+                let difference = targetSeconds - steps.reduce((total, step) => total + Number(step.seconds), 0);
+
+                while (difference !== 0) {
+                    for (const step of steps) {
+                        if (difference === 0) {
+                            break;
+                        }
+
+                        if (difference > 0) {
+                            step.seconds += 1;
+                            difference -= 1;
+                        } else if (step.seconds > 1) {
+                            step.seconds -= 1;
+                            difference += 1;
+                        }
+                    }
+                }
+
+                return {
+                    minutes,
+                    name: `${minutes} minute custom prayer`,
+                    scripture: template.scripture,
+                    declaration: template.declaration,
+                    steps,
+                };
+            }
+
+            function setCustomSession() {
+                const minutes = customMinutes();
+                customInput.value = minutes;
+                sessions.custom = buildCustomSession(minutes);
+                activeKey = 'custom';
+                reset();
             }
 
             function elapsedSeconds() {
@@ -156,8 +246,14 @@
             }
 
             function format(seconds) {
-                const minutes = Math.floor(seconds / 60).toString().padStart(2, '0');
-                const rest = Math.floor(seconds % 60).toString().padStart(2, '0');
+                const wholeSeconds = Math.floor(seconds);
+                const hours = Math.floor(wholeSeconds / 3600);
+                const minutes = Math.floor((wholeSeconds % 3600) / 60).toString().padStart(2, '0');
+                const rest = Math.floor(wholeSeconds % 60).toString().padStart(2, '0');
+
+                if (hours > 0) {
+                    return `${hours.toString().padStart(2, '0')}:${minutes}:${rest}`;
+                }
 
                 return `${minutes}:${rest}`;
             }
@@ -167,6 +263,8 @@
                     const isActive = tab.dataset.sessionKey === activeKey;
                     tab.className = `rounded-full border px-4 py-2 text-sm font-bold transition ${isActive ? 'border-rose-700 bg-rose-700 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`;
                 });
+
+                customControls.classList.toggle('hidden', activeKey !== 'custom');
             }
 
             function renderSteps() {
@@ -235,6 +333,11 @@
             tabs.forEach((tab) => {
                 tab.addEventListener('click', () => {
                     activeKey = tab.dataset.sessionKey;
+
+                    if (activeKey === 'custom') {
+                        sessions.custom = sessions.custom || buildCustomSession(customMinutes());
+                    }
+
                     reset();
                 });
             });
@@ -242,6 +345,8 @@
             startButton.addEventListener('click', start);
             pauseButton.addEventListener('click', stop);
             resetButton.addEventListener('click', reset);
+            customApply.addEventListener('click', setCustomSession);
+            customInput.addEventListener('change', setCustomSession);
 
             render();
         })();
