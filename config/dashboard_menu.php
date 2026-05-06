@@ -162,7 +162,7 @@ return [
                     'label' => 'Content',
                     'route' => 'admin.devotionals',
                     'icon' => 'sparkles',
-                    'active' => ['admin.categories', 'admin.devotionals', 'admin.featured-content'],
+                    'active' => ['admin.categories', 'admin.devotionals', 'admin.daily-devotions', 'admin.daily-scriptures', 'admin.featured-content'],
                 ],
                 [
                     'label' => 'Moderation',

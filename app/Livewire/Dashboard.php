@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\DailyScripture;
 use App\Models\Devotional;
 use App\Models\DevotionalPlanCompletion;
 use App\Models\DevotionalReminder;
@@ -152,6 +153,7 @@ class Dashboard extends Component
 
         return view('livewire.dashboard', [
             'dailyRhythm' => DailySpiritualRhythm::forDate(),
+            'todayScripture' => DailyScripture::query()->active()->forToday()->first(),
             'catchUpPlan' => DailySpiritualRhythm::catchUpPlanForUser($user),
             'growthScore' => SpiritualGrowthScore::forUser($user),
             'personalPath' => PersonalizedDailyPath::forSeason($user->spiritualProfile?->season),

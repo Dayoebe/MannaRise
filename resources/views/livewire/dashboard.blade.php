@@ -1,6 +1,7 @@
 <div class="space-y-6 sm:space-y-8">
     @php
         $dailyVerse = $dailyRhythm['verse'];
+        $dashboardScriptureRoute = $todayScripture?->bibleRouteParameters();
         $dailyAffirmation = $dailyRhythm['affirmation'];
         $dailyChallenge = $dailyRhythm['challenge'];
         $dashboardChallenge = $catchUpPlan ?: $dailyChallenge;
@@ -206,8 +207,17 @@
 
     <section class="grid gap-4 lg:grid-cols-3">
         <article class="app-panel border-blue-200 bg-blue-50">
-            <p class="app-eyebrow border-blue-200 bg-white text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> Verse of the day</p>
-            @if ($dailyVerse)
+            <p class="app-eyebrow border-blue-200 bg-white text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> Today&apos;s scripture</p>
+            @if ($todayScripture)
+                <blockquote class="mt-4 font-serif text-lg font-semibold leading-7 text-slate-950">"{{ $todayScripture->text }}"</blockquote>
+                <p class="mt-3 text-sm font-black text-blue-900">{{ $todayScripture->reference }} {{ strtoupper((string) $todayScripture->translation) }}</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <a href="{{ route('daily.index') }}" class="btn-secondary border-blue-200 px-3">Daily page</a>
+                    @if ($dashboardScriptureRoute)
+                        <a href="{{ route('bible', $dashboardScriptureRoute) }}" class="btn-primary bg-blue-700 px-3 hover:bg-blue-800">Chapter</a>
+                    @endif
+                </div>
+            @elseif ($dailyVerse)
                 <blockquote class="mt-4 font-serif text-lg font-semibold leading-7 text-slate-950">"{{ $dailyVerse->text }}"</blockquote>
                 <p class="mt-3 text-sm font-black text-blue-900">{{ $dailyVerse->book->name }} {{ $dailyVerse->chapter }}:{{ $dailyVerse->verse }} KJV</p>
             @else
