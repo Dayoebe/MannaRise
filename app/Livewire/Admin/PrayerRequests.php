@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\PrayerRequest;
+use App\Support\Toast;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -26,7 +27,7 @@ class PrayerRequests extends Component
     public function delete(int $id): void
     {
         PrayerRequest::findOrFail($id)->delete();
-        session()->flash('status', 'Prayer request deleted.');
+        Toast::status($this, 'Prayer request deleted.');
     }
 
     public function render()
