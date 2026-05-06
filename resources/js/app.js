@@ -1,5 +1,75 @@
 import './bootstrap';
 
+function showMannaRiseToast(message, type = 'success') {
+    const region = document.querySelector('[data-toast-region]');
+
+    if (! region || ! message) {
+        return;
+    }
+
+    const toast = document.createElement('div');
+    toast.className = [
+        'pointer-events-auto',
+        'translate-x-4',
+        'rounded-2xl',
+        'border',
+        type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-slate-200 bg-white text-slate-900',
+        'px-4',
+        'py-3',
+        'text-sm',
+        'font-bold',
+        'shadow-2xl',
+        'opacity-0',
+        'transition',
+        'duration-200',
+    ].join(' ');
+    toast.setAttribute('role', 'status');
+
+    const row = document.createElement('div');
+    row.className = 'flex items-start gap-3';
+
+    const dot = document.createElement('span');
+    dot.className = 'mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-600';
+
+    const text = document.createElement('span');
+    text.className = 'min-w-0 flex-1 leading-5';
+    text.textContent = message;
+
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'ml-1 shrink-0 rounded-full px-2 text-lg leading-none text-slate-500 hover:bg-white hover:text-slate-900';
+    close.setAttribute('aria-label', 'Dismiss alert');
+    close.textContent = '×';
+
+    row.append(dot, text, close);
+    toast.append(row);
+    region.prepend(toast);
+
+    const dismiss = () => {
+        toast.classList.add('translate-x-4', 'opacity-0');
+        window.setTimeout(() => toast.remove(), 220);
+    };
+
+    close.addEventListener('click', dismiss);
+    window.setTimeout(() => {
+        toast.classList.remove('translate-x-4', 'opacity-0');
+    }, 20);
+    window.setTimeout(dismiss, 3600);
+}
+
+window.showMannaRiseToast = showMannaRiseToast;
+
+window.addEventListener('mannarise-toast', (event) => {
+    showMannaRiseToast(event.detail?.message ?? event.detail?.[0] ?? event.detail);
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-mannarise-toast]').forEach((source) => {
+        showMannaRiseToast(source.dataset.mannariseToast);
+        source.remove();
+    });
+});
+
 const standalone =
     window.matchMedia('(display-mode: standalone)').matches ||
     window.navigator.standalone === true;
