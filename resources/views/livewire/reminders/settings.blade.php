@@ -8,12 +8,6 @@
         </div>
     </div>
 
-    @if (session('status'))
-        <div class="app-panel border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-900">
-            {{ session('status') }}
-        </div>
-    @endif
-
     <form wire:submit="save" class="app-panel border-emerald-200 bg-emerald-50">
         <div class="grid gap-4 md:grid-cols-2">
             <div>

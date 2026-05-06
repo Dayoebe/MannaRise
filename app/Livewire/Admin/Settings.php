@@ -3,19 +3,29 @@
 namespace App\Livewire\Admin;
 
 use App\Models\PlatformSetting;
+use App\Support\Toast;
 use Livewire\Component;
 
 class Settings extends Component
 {
     public string $site_name = '';
+
     public string $site_tagline = '';
+
     public string $support_email = '';
+
     public int $default_reading_time = 5;
+
     public bool $daily_verse_enabled = true;
+
     public bool $daily_affirmations_enabled = true;
+
     public bool $daily_bible_challenge_enabled = true;
+
     public bool $prayer_public_default = true;
+
     public bool $testimony_requires_approval = true;
+
     public string $default_timezone = 'Africa/Lagos';
 
     public function mount(): void
@@ -58,7 +68,7 @@ class Settings extends Component
         PlatformSetting::write('moderation.testimony_requires_approval', $validated['testimony_requires_approval']);
         PlatformSetting::write('notifications.default_timezone', $validated['default_timezone']);
 
-        session()->flash('status', 'Platform settings saved.');
+        Toast::status($this, 'Platform settings saved.');
     }
 
     public function render()

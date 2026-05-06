@@ -3,17 +3,25 @@
 namespace App\Livewire\Reminders;
 
 use App\Models\DevotionalReminder;
+use App\Support\Toast;
 use Livewire\Component;
 
 class Settings extends Component
 {
     public string $title = 'Daily devotional reminder';
+
     public string $remind_at = '06:00';
+
     public string $timezone = 'Africa/Lagos';
+
     public array $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
     public array $reminderTypes = ['devotional', 'bible', 'prayer', 'missed', 'digest'];
+
     public bool $email_enabled = true;
+
     public bool $push_enabled = false;
+
     public bool $is_active = true;
 
     public function toggleChannel(string $field): void
@@ -100,7 +108,7 @@ class Settings extends Component
             ]
         );
 
-        session()->flash('status', 'Reminder preferences saved.');
+        Toast::status($this, 'Reminder preferences saved.');
     }
 
     public function render()
