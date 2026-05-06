@@ -4,6 +4,7 @@ namespace App\Livewire\ResourceHub;
 
 use App\Models\ResourceItem;
 use App\Services\ResourceHub\ResourceHubService;
+use App\Support\Toast;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -25,7 +26,7 @@ class Audio extends Component
         $query = trim($this->search) ?: config('resourcehub.audio_keywords.0', 'bible');
         $count = $service->import('librivox', $query, ['limit' => 10])->count();
 
-        session()->flash('status', "{$count} audio resources refreshed.");
+        Toast::status($this, "{$count} audio resources refreshed.");
     }
 
     public function render()

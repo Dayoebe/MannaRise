@@ -3,6 +3,7 @@
 namespace App\Livewire\Testimonies;
 
 use App\Models\Testimony;
+use App\Support\Toast;
 use Livewire\Component;
 
 class Submit extends Component
@@ -38,7 +39,7 @@ class Submit extends Component
         ]);
 
         $this->reset('title', 'body', 'is_anonymous');
-        session()->flash('status', 'Testimony submitted for review.');
+        Toast::status($this, 'Testimony submitted for review.');
     }
 
     public function render()

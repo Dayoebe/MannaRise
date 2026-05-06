@@ -6,6 +6,7 @@ use App\Models\Devotional;
 use App\Models\DevotionalCompletion;
 use App\Models\DevotionalFavorite;
 use App\Models\JournalEntry;
+use App\Support\Toast;
 use Livewire\Component;
 
 class Show extends Component
@@ -38,7 +39,7 @@ class Show extends Component
 
         if ($favorite) {
             $favorite->delete();
-            session()->flash('status', 'Removed from favorites.');
+            Toast::status($this, 'Removed from favorites.');
 
             return null;
         }
@@ -48,7 +49,7 @@ class Show extends Component
             'devotional_id' => $this->devotional->id,
         ]);
 
-        session()->flash('status', 'Saved to favorites.');
+        Toast::status($this, 'Saved to favorites.');
 
         return null;
     }
@@ -65,7 +66,7 @@ class Show extends Component
             'completed_on' => today()->toDateString(),
         ]);
 
-        session()->flash('status', 'Marked as completed for today.');
+        Toast::status($this, 'Marked as completed for today.');
 
         return null;
     }
@@ -91,7 +92,7 @@ class Show extends Component
 
         $this->journalContent = '';
 
-        session()->flash('status', 'Journal entry saved.');
+        Toast::status($this, 'Journal entry saved.');
 
         return null;
     }

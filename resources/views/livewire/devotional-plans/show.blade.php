@@ -22,11 +22,6 @@
 @endphp
 
 <div class="space-y-6 sm:space-y-8">
-    @if (session('status'))
-        <div class="app-panel border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-900">
-            {{ session('status') }}
-        </div>
-    @endif
 
     <section class="app-panel overflow-hidden p-0 sm:p-0 {{ $palette['panel'] }}">
         <div class="color-strip rounded-none">

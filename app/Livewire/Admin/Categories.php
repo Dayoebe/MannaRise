@@ -3,8 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Models\DevotionalCategory;
-use Illuminate\Validation\Rule;
+use App\Support\Toast;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Categories extends Component
@@ -37,7 +38,7 @@ class Categories extends Component
         }
 
         $this->resetForm();
-        session()->flash('status', 'Category saved.');
+        Toast::status($this, 'Category saved.');
     }
 
     public function edit(int $id): void
@@ -62,7 +63,7 @@ class Categories extends Component
         }
 
         $category->delete();
-        session()->flash('status', 'Category deleted.');
+        Toast::status($this, 'Category deleted.');
     }
 
     public function resetForm(): void

@@ -6,6 +6,7 @@ use App\Models\DevotionalReminder;
 use App\Models\UserSpiritualProfile;
 use App\Support\DevotionalPlans;
 use App\Support\PersonalizedDailyPath;
+use App\Support\Toast;
 use Livewire\Component;
 
 class Index extends Component
@@ -71,7 +72,7 @@ class Index extends Component
             );
         }
 
-        session()->flash('status', 'Your MannaRise path is ready.');
+        Toast::status($this, 'Your MannaRise path is ready.');
 
         return redirect()->route('devotional-plans.show', $validated['first_plan']);
     }

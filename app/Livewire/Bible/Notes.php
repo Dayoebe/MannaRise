@@ -3,6 +3,7 @@
 namespace App\Livewire\Bible;
 
 use App\Models\UserBibleVerseEngagement;
+use App\Support\Toast;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -25,7 +26,7 @@ class Notes extends Component
             'note_updated_at' => null,
         ]);
 
-        session()->flash('status', 'Bible note removed.');
+        Toast::status($this, 'Bible note removed.');
     }
 
     public function render()

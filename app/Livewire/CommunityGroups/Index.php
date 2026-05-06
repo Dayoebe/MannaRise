@@ -5,6 +5,7 @@ namespace App\Livewire\CommunityGroups;
 use App\Models\CommunityGroup;
 use App\Models\CommunityGroupMembership;
 use App\Models\CommunityGroupReadingChallenge;
+use App\Support\Toast;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -64,7 +65,7 @@ class Index extends Component
         $this->visibility = 'private';
         $this->resetErrorBag();
 
-        session()->flash('status', 'Community group created.');
+        Toast::status($this, 'Community group created.');
 
         return redirect()->route('community-groups.show', $group->slug);
     }
@@ -86,7 +87,7 @@ class Index extends Component
             ],
         );
 
-        session()->flash('status', "You joined {$group->name}.");
+        Toast::status($this, "You joined {$group->name}.");
 
         return redirect()->route('community-groups.show', $group->slug);
     }

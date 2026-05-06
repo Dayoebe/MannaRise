@@ -8,6 +8,7 @@ use App\Models\DevotionalCompletion;
 use App\Models\NotificationDeliveryLog;
 use App\Models\User;
 use App\Support\ContentPlanningIntelligence;
+use App\Support\Toast;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -45,7 +46,7 @@ class Engagement extends Component
             'reading_time' => 5,
         ]);
 
-        session()->flash('status', 'Content planning draft created.');
+        Toast::status($this, 'Content planning draft created.');
     }
 
     public function render()

@@ -2,14 +2,15 @@
 
 namespace App\Livewire\Bible;
 
-use App\Models\BibleChapterCompletion;
 use App\Models\BibleBook;
+use App\Models\BibleChapterCompletion;
 use App\Models\BibleVerse;
 use App\Models\PersonalizedDailyPathCheckIn;
 use App\Models\UserBibleReadingHistory;
 use App\Models\UserBibleVerseEngagement;
 use App\Support\BibleChapterStudyGuide;
 use App\Support\PersonalizedDailyPath;
+use App\Support\Toast;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
@@ -168,7 +169,7 @@ class Reader extends Component
         $engagement->note_updated_at = $engagement->note ? now() : null;
         $engagement->save();
 
-        session()->flash('status', 'Verse note saved.');
+        Toast::status($this, 'Verse note saved.');
     }
 
     public function recordShare(int $verseId): void
@@ -208,7 +209,7 @@ class Reader extends Component
         $this->recordReadingHistory(true);
         $this->completePathScriptureIfMatched($book);
 
-        session()->flash('status', "{$book->name} {$this->chapter} marked as read.");
+        Toast::status($this, "{$book->name} {$this->chapter} marked as read.");
     }
 
     private function selectedBook(): ?BibleBook

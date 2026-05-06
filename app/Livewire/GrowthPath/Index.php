@@ -6,6 +6,7 @@ use App\Models\PersonalizedDailyPathCheckIn;
 use App\Models\UserSpiritualProfile;
 use App\Support\PersonalizedDailyPath;
 use App\Support\SpiritualConnectionInsight;
+use App\Support\Toast;
 use Carbon\CarbonImmutable;
 use Livewire\Component;
 
@@ -50,7 +51,7 @@ class Index extends Component
             ],
         );
 
-        session()->flash('status', 'Your daily path was updated.');
+        Toast::status($this, 'Your daily path was updated.');
     }
 
     public function completeStep(string $step): void

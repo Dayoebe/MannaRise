@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\PrayerRequest;
 use App\Models\Testimony;
+use App\Support\Toast;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
@@ -27,7 +28,7 @@ class ModerationQueue extends Component
             'moderated_at' => now(),
         ]);
 
-        session()->flash('status', 'Prayer request approved.');
+        Toast::status($this, 'Prayer request approved.');
     }
 
     public function rejectPrayer(int $id): void
@@ -39,7 +40,7 @@ class ModerationQueue extends Component
             'moderated_at' => now(),
         ]);
 
-        session()->flash('status', 'Prayer request rejected.');
+        Toast::status($this, 'Prayer request rejected.');
     }
 
     public function queuePrayer(int $id): void
@@ -51,7 +52,7 @@ class ModerationQueue extends Component
             'moderated_at' => now(),
         ]);
 
-        session()->flash('status', 'Prayer request returned to review.');
+        Toast::status($this, 'Prayer request returned to review.');
     }
 
     public function approveTestimony(int $id): void
@@ -63,7 +64,7 @@ class ModerationQueue extends Component
             'moderated_at' => now(),
         ]);
 
-        session()->flash('status', 'Testimony approved.');
+        Toast::status($this, 'Testimony approved.');
     }
 
     public function rejectTestimony(int $id): void
@@ -75,7 +76,7 @@ class ModerationQueue extends Component
             'moderated_at' => now(),
         ]);
 
-        session()->flash('status', 'Testimony rejected.');
+        Toast::status($this, 'Testimony rejected.');
     }
 
     public function queueTestimony(int $id): void
@@ -87,7 +88,7 @@ class ModerationQueue extends Component
             'moderated_at' => now(),
         ]);
 
-        session()->flash('status', 'Testimony returned to review.');
+        Toast::status($this, 'Testimony returned to review.');
     }
 
     public function render()

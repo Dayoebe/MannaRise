@@ -6,6 +6,7 @@ use App\Models\DevotionalPlanCompletion;
 use App\Models\PersonalizedDailyPathCheckIn;
 use App\Support\DevotionalPlans;
 use App\Support\PersonalizedDailyPath;
+use App\Support\Toast;
 use Carbon\CarbonImmutable;
 use Livewire\Component;
 
@@ -43,7 +44,7 @@ class Show extends Component
 
         $this->markPathDevotionalComplete();
 
-        session()->flash('status', 'Plan day marked complete.');
+        Toast::status($this, 'Plan day marked complete.');
 
         return null;
     }

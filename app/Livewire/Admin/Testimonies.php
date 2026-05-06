@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Testimony;
+use App\Support\Toast;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -23,19 +24,19 @@ class Testimonies extends Component
 
         if ($testimony->moderation_status === Testimony::STATUS_APPROVED) {
             $testimony->markPending(auth()->id());
-            session()->flash('status', 'Testimony moved back to pending review.');
+            Toast::status($this, 'Testimony moved back to pending review.');
 
             return;
         }
 
         $testimony->approve(auth()->id());
-        session()->flash('status', 'Testimony approved.');
+        Toast::status($this, 'Testimony approved.');
     }
 
     public function delete(int $id): void
     {
         Testimony::findOrFail($id)->delete();
-        session()->flash('status', 'Testimony deleted.');
+        Toast::status($this, 'Testimony deleted.');
     }
 
     public function render()

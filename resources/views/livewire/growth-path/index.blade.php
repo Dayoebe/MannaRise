@@ -53,12 +53,6 @@
         </div>
     </section>
 
-    @if (session('status'))
-        <div class="app-panel border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-900">
-            {{ session('status') }}
-        </div>
-    @endif
-
     <section class="app-panel border-indigo-200 bg-indigo-50">
         <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] lg:items-start">
             <div>

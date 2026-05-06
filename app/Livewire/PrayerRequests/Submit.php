@@ -4,6 +4,7 @@ namespace App\Livewire\PrayerRequests;
 
 use App\Models\PrayerRequest;
 use App\Models\PrayerRoom;
+use App\Support\Toast;
 use Livewire\Component;
 
 class Submit extends Component
@@ -59,7 +60,7 @@ class Submit extends Component
         ]);
 
         $this->reset('title', 'body', 'is_public');
-        session()->flash('status', 'Prayer request submitted.');
+        Toast::status($this, 'Prayer request submitted.');
     }
 
     public function render()

@@ -5,6 +5,7 @@ namespace App\Livewire\PrayerRequests;
 use App\Models\PrayerRequest;
 use App\Models\PrayerRoomMembership;
 use App\Models\PrayerRoomPrayer;
+use App\Support\Toast;
 use Illuminate\Support\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -43,7 +44,7 @@ class Wall extends Component
             $this->updatePrayerRoomStreak($request->prayer_room_id);
         }
 
-        session()->flash('status', 'Prayer count updated.');
+        Toast::status($this, 'Prayer count updated.');
     }
 
     public function render()

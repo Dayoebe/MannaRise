@@ -16,10 +16,6 @@
         </div>
     </div>
 
-    @if (session('status'))
-        <div class="app-panel border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-900">{{ session('status') }}</div>
-    @endif
-
     @if (session('error'))
         <div class="app-panel border-red-200 bg-red-50 text-sm font-bold text-red-900">{{ session('error') }}</div>
     @endif

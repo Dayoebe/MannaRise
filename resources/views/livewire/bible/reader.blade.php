@@ -108,12 +108,6 @@
             </section>
         @endif
 
-        @if (session('status'))
-            <div class="app-panel border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-900">
-                {{ session('status') }}
-            </div>
-        @endif
-
         <article class="app-panel bible-reader-card border-olive-200 bg-white p-4 sm:p-8" data-bible-reader data-bible-language="{{ $language }}">
             <div class="bible-reader-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>

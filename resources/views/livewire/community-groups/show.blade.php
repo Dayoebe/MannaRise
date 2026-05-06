@@ -54,12 +54,6 @@
         </div>
     </section>
 
-    @if (session('status'))
-        <div class="app-panel border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-900">
-            {{ session('status') }}
-        </div>
-    @endif
-
     @if ($membership)
         <section class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
             <article class="app-panel border-cyan-200 bg-cyan-50">

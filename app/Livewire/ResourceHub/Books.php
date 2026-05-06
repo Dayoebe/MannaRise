@@ -4,6 +4,7 @@ namespace App\Livewire\ResourceHub;
 
 use App\Models\ResourceItem;
 use App\Services\ResourceHub\ResourceHubService;
+use App\Support\Toast;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -26,7 +27,7 @@ class Books extends Component
         $count = $service->import('gutendex', $query, ['limit' => 8])->count()
             + $service->import('open_library', $query, ['limit' => 8])->count();
 
-        session()->flash('status', "{$count} book resources refreshed.");
+        Toast::status($this, "{$count} book resources refreshed.");
     }
 
     public function render()

@@ -94,6 +94,7 @@
 
                     <div class="flex shrink-0 items-center gap-2">
                         @auth
+                            <livewire:notifications.center />
                             @unless ($usesAccountSidebar)
                                 <a href="{{ route('dashboard') }}" class="btn-secondary px-3" title="Dashboard">
                                     <x-ui.icon name="layout-dashboard" class="h-4 w-4" />
@@ -173,7 +174,7 @@
                         $adminLinks = [
                             ['label' => 'Admin Home', 'route' => 'admin.dashboard', 'icon' => 'shield', 'active' => ['admin.dashboard']],
                             ['label' => 'Content', 'route' => 'admin.devotionals', 'icon' => 'sparkles', 'active' => ['admin.categories', 'admin.devotionals', 'admin.featured-content']],
-                            ['label' => 'Resource Admin', 'route' => 'admin.resource-items', 'icon' => 'library', 'active' => ['admin.resource-categories', 'admin.resource-items', 'admin.daily-devotions']],
+                            ['label' => 'Resource Admin', 'route' => 'admin.resource-items', 'icon' => 'library', 'active' => ['admin.resource-categories', 'admin.resource-items', 'admin.daily-devotions', 'admin.daily-scriptures']],
                             ['label' => 'Moderation', 'route' => 'admin.moderation', 'icon' => 'message-circle', 'active' => ['admin.moderation', 'admin.prayer-requests', 'admin.testimonies']],
                             ['label' => 'Engagement', 'route' => 'admin.engagement', 'icon' => 'bar-chart', 'active' => ['admin.engagement']],
                             ['label' => 'Settings', 'route' => 'admin.settings', 'icon' => 'settings', 'active' => ['admin.settings']],
@@ -305,14 +306,14 @@
 
             <main class="app-main w-full min-w-0">
                 @if (session('status'))
-                    <div class="mb-6 app-surface flex items-center gap-2 border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-900">
-                        <x-ui.icon name="sparkles" class="h-4 w-4" /> {{ session('status') }}
-                    </div>
+                    <div class="sr-only" data-mannarise-toast="{{ session('status') }}"></div>
                 @endif
 
                 {{ $slot }}
             </main>
         </div>
+
+        <div data-toast-region class="pointer-events-none fixed right-3 top-[calc(5rem+env(safe-area-inset-top))] z-[70] flex w-[min(24rem,calc(100vw-1.5rem))] flex-col gap-2 sm:right-5 lg:top-24" aria-live="polite" aria-atomic="true"></div>
 
         <nav class="mobile-bottom-nav">
             <div class="mx-auto grid max-w-lg grid-cols-5 gap-1.5">

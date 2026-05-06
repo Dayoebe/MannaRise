@@ -4,6 +4,7 @@ namespace App\Livewire\Favorites;
 
 use App\Models\Devotional;
 use App\Models\DevotionalFavorite;
+use App\Support\Toast;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -17,7 +18,7 @@ class Index extends Component
             ->where('devotional_id', $devotionalId)
             ->delete();
 
-        session()->flash('status', 'Favorite removed.');
+        Toast::status($this, 'Favorite removed.');
     }
 
     public function render()

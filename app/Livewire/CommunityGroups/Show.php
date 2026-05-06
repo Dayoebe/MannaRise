@@ -11,9 +11,9 @@ use App\Models\CommunityGroupPrayer;
 use App\Models\CommunityGroupPrayerLog;
 use App\Models\CommunityGroupReadingChallenge;
 use App\Models\CommunityGroupReadingLog;
+use App\Support\Toast;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Show extends Component
@@ -81,7 +81,7 @@ class Show extends Component
 
         $this->joinGroup();
 
-        session()->flash('status', "You joined {$this->communityGroup->name}.");
+        Toast::status($this, "You joined {$this->communityGroup->name}.");
     }
 
     public function createChallenge(): void
@@ -112,7 +112,7 @@ class Show extends Component
         $this->challengeEndsOn = '';
         $this->dailyChapterGoal = 1;
 
-        session()->flash('status', 'Reading challenge created.');
+        Toast::status($this, 'Reading challenge created.');
     }
 
     public function logReading(): void
@@ -142,9 +142,9 @@ class Show extends Component
 
         if ($log->wasRecentlyCreated) {
             $this->updateReadingStreak($membership);
-            session()->flash('status', 'Reading logged and leaderboard updated.');
+            Toast::status($this, 'Reading logged and leaderboard updated.');
         } else {
-            session()->flash('status', 'That chapter is already logged for today.');
+            Toast::status($this, 'That chapter is already logged for today.');
         }
 
         $this->readingNotes = '';
@@ -169,7 +169,7 @@ class Show extends Component
         $this->prayerTitle = '';
         $this->prayerBody = '';
 
-        session()->flash('status', 'Prayer shared with your private circle.');
+        Toast::status($this, 'Prayer shared with your private circle.');
     }
 
     public function pray(int $id): void
@@ -188,7 +188,7 @@ class Show extends Component
             $prayer->increment('prayed_count');
         }
 
-        session()->flash('status', 'Private prayer count updated.');
+        Toast::status($this, 'Private prayer count updated.');
     }
 
     public function markPrayerAnswered(int $id): void
@@ -226,7 +226,7 @@ class Show extends Component
         $this->inviteExpiresAt = '';
         $this->inviteMaxUses = '';
 
-        session()->flash('status', 'Invite link created.');
+        Toast::status($this, 'Invite link created.');
     }
 
     public function toggleInvite(int $id): void
@@ -253,7 +253,7 @@ class Show extends Component
             'reminder_time' => $validated['reminderTime'] ?: null,
         ]);
 
-        session()->flash('status', 'Group rhythm updated.');
+        Toast::status($this, 'Group rhythm updated.');
     }
 
     public function createPrompt(): void
@@ -277,7 +277,7 @@ class Show extends Component
         $this->promptTitle = '';
         $this->promptText = '';
 
-        session()->flash('status', 'Weekly discussion prompt added.');
+        Toast::status($this, 'Weekly discussion prompt added.');
     }
 
     public function render()

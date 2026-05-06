@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\ResourceCategory;
+use App\Support\Toast;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -13,11 +14,17 @@ class ResourceCategories extends Component
     use WithPagination;
 
     public ?int $editingId = null;
+
     public string $name = '';
+
     public string $slug = '';
+
     public string $description = '';
+
     public string $icon = 'library';
+
     public string $type = '';
+
     public bool $is_active = true;
 
     public function save(): void
@@ -35,7 +42,7 @@ class ResourceCategories extends Component
 
         ResourceCategory::updateOrCreate(['id' => $this->editingId], $validated);
         $this->resetForm();
-        session()->flash('status', 'Resource category saved.');
+        Toast::status($this, 'Resource category saved.');
     }
 
     public function edit(int $id): void
@@ -53,7 +60,7 @@ class ResourceCategories extends Component
     public function delete(int $id): void
     {
         ResourceCategory::findOrFail($id)->delete();
-        session()->flash('status', 'Resource category deleted.');
+        Toast::status($this, 'Resource category deleted.');
     }
 
     public function resetForm(): void

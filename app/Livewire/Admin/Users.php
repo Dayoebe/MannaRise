@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Support\Toast;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -92,7 +93,7 @@ class Users extends Component
         $this->password_confirmation = '';
         $this->selectUser($user->id);
 
-        session()->flash('status', 'User information updated.');
+        Toast::status($this, 'User information updated.');
     }
 
     public function saveUserAccess(int $userId): void
@@ -112,8 +113,9 @@ class Users extends Component
             || $roles->contains('name', 'super-admin');
 
         if ($user->is(auth()->user()) && ! $isSuperAdmin && auth()->user()->is_super_admin) {
-            session()->flash('status', 'You cannot remove your own super admin access.');
+            Toast::status($this, 'You cannot remove your own super admin access.');
             $this->syncUserState($user->fresh('roles'), true);
+
             return;
         }
 
@@ -134,7 +136,7 @@ class Users extends Component
         $this->syncUserState($user->fresh('roles.permissions'), true);
         $this->refreshSelectedUser($user->id);
 
-        session()->flash('status', "{$user->name}'s access was updated.");
+        Toast::status($this, "{$user->name}'s access was updated.");
     }
 
     public function makeAdmin(int $userId): void
@@ -152,7 +154,7 @@ class Users extends Component
         $this->syncUserState($user->fresh('roles.permissions'), true);
         $this->refreshSelectedUser($user->id);
 
-        session()->flash('status', "{$user->name} is now an admin.");
+        Toast::status($this, "{$user->name} is now an admin.");
     }
 
     public function removeAdmin(int $userId): void
@@ -162,7 +164,8 @@ class Users extends Component
         $user = User::with('roles')->findOrFail($userId);
 
         if ($user->is(auth()->user())) {
-            session()->flash('status', 'You cannot remove your own admin access here.');
+            Toast::status($this, 'You cannot remove your own admin access here.');
+
             return;
         }
 
@@ -172,7 +175,7 @@ class Users extends Component
         $this->syncUserState($user->fresh('roles.permissions'), true);
         $this->refreshSelectedUser($user->id);
 
-        session()->flash('status', "{$user->name}'s admin access was removed.");
+        Toast::status($this, "{$user->name}'s admin access was removed.");
     }
 
     public function render()

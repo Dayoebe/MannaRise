@@ -7,6 +7,7 @@ use App\Models\JournalEntry;
 use App\Models\PersonalizedDailyPathCheckIn;
 use App\Models\PrayerRequest;
 use App\Support\PersonalizedDailyPath;
+use App\Support\Toast;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -67,7 +68,7 @@ class Index extends Component
         }
 
         $this->resetForm();
-        session()->flash('status', 'Journal entry saved.');
+        Toast::status($this, 'Journal entry saved.');
     }
 
     public function edit(int $id): void
@@ -86,7 +87,7 @@ class Index extends Component
     public function delete(int $id): void
     {
         JournalEntry::where('user_id', auth()->id())->findOrFail($id)->delete();
-        session()->flash('status', 'Journal entry deleted.');
+        Toast::status($this, 'Journal entry deleted.');
     }
 
     public function resetForm(): void

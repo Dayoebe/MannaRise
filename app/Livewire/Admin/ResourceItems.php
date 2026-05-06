@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\ResourceCategory;
 use App\Models\ResourceItem;
 use App\Services\ResourceHub\ResourceHubService;
+use App\Support\Toast;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -15,26 +16,47 @@ class ResourceItems extends Component
     use WithPagination;
 
     public string $search = '';
+
     public ?int $editingId = null;
+
     public string $resource_category_id = '';
+
     public string $title = '';
+
     public string $slug = '';
+
     public string $excerpt = '';
+
     public string $description = '';
+
     public string $content = '';
+
     public string $type = 'article';
+
     public string $source_name = 'MannaRise';
+
     public string $source_url = '';
+
     public string $external_id = '';
+
     public string $author = '';
+
     public string $thumbnail_url = '';
+
     public string $media_url = '';
+
     public string $embed_url = '';
+
     public string $language = 'en';
+
     public string $license = '';
+
     public string $tags = '';
+
     public bool $is_featured = false;
+
     public bool $is_published = true;
+
     public string $published_at = '';
 
     public function mount(): void
@@ -90,7 +112,7 @@ class ResourceItems extends Component
 
         ResourceItem::updateOrCreate(['id' => $this->editingId], $payload);
         $this->resetForm();
-        session()->flash('status', 'Resource item saved.');
+        Toast::status($this, 'Resource item saved.');
     }
 
     public function edit(int $id): void
@@ -122,7 +144,7 @@ class ResourceItems extends Component
     public function delete(int $id): void
     {
         ResourceItem::findOrFail($id)->delete();
-        session()->flash('status', 'Resource item deleted.');
+        Toast::status($this, 'Resource item deleted.');
     }
 
     public function resetForm(): void

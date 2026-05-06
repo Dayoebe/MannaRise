@@ -4,6 +4,7 @@ namespace App\Livewire\MemoryVerses;
 
 use App\Models\MemoryVerseProgress;
 use App\Support\MemoryVerseChallenge;
+use App\Support\Toast;
 use Livewire\Component;
 
 class Index extends Component
@@ -26,7 +27,7 @@ class Index extends Component
         $progress = $this->currentProgress();
         $progress->increment('practiced_count');
 
-        session()->flash('status', 'Practice logged for this week.');
+        Toast::status($this, 'Practice logged for this week.');
 
         return null;
     }
@@ -41,7 +42,7 @@ class Index extends Component
         $progress->update(['reminder_enabled' => ! $progress->reminder_enabled]);
         $this->reminder_enabled = $progress->fresh()->reminder_enabled;
 
-        session()->flash('status', $this->reminder_enabled ? 'Memory verse reminder enabled.' : 'Memory verse reminder disabled.');
+        Toast::status($this, $this->reminder_enabled ? 'Memory verse reminder enabled.' : 'Memory verse reminder disabled.');
 
         return null;
     }
@@ -58,7 +59,7 @@ class Index extends Component
             'practiced_count' => max(1, $progress->practiced_count),
         ]);
 
-        session()->flash('status', 'Memory verse completed. Badge earned.');
+        Toast::status($this, 'Memory verse completed. Badge earned.');
 
         return null;
     }

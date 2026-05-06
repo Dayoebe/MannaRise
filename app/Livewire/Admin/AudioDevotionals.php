@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\AudioDevotional;
 use App\Models\Devotional;
+use App\Support\Toast;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -14,15 +15,25 @@ class AudioDevotionals extends Component
     use WithPagination;
 
     public string $search = '';
+
     public ?int $editingId = null;
+
     public string $devotional_id = '';
+
     public string $title = '';
+
     public string $slug = '';
+
     public string $description = '';
+
     public string $audio_url = '';
+
     public string $speaker = '';
+
     public ?int $duration_seconds = null;
+
     public bool $is_published = false;
+
     public string $published_at = '';
 
     public function mount(): void
@@ -67,7 +78,7 @@ class AudioDevotionals extends Component
         }
 
         $this->resetForm();
-        session()->flash('status', 'Audio devotional saved.');
+        Toast::status($this, 'Audio devotional saved.');
     }
 
     public function edit(int $id): void
@@ -103,7 +114,7 @@ class AudioDevotionals extends Component
         abort_unless(auth()->user()?->canDo('manage-audio-devotionals'), 403);
 
         AudioDevotional::findOrFail($id)->delete();
-        session()->flash('status', 'Audio devotional deleted.');
+        Toast::status($this, 'Audio devotional deleted.');
     }
 
     public function resetForm(): void

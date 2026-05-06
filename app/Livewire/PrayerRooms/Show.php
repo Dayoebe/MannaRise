@@ -7,6 +7,7 @@ use App\Models\PrayerRequestUpdate;
 use App\Models\PrayerRoom;
 use App\Models\PrayerRoomMembership;
 use App\Models\PrayerRoomPrayer;
+use App\Support\Toast;
 use Illuminate\Support\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -58,7 +59,7 @@ class Show extends Component
             ['joined_at' => now()],
         );
 
-        session()->flash('status', "You joined the {$this->prayerRoom->name} prayer room.");
+        Toast::status($this, "You joined the {$this->prayerRoom->name} prayer room.");
     }
 
     public function leave(): void
@@ -72,7 +73,7 @@ class Show extends Component
             ->where('prayer_room_id', $this->prayerRoom->id)
             ->delete();
 
-        session()->flash('status', "You left the {$this->prayerRoom->name} prayer room.");
+        Toast::status($this, "You left the {$this->prayerRoom->name} prayer room.");
     }
 
     public function pray(int $id)
@@ -97,7 +98,7 @@ class Show extends Component
 
         $this->updatePrayerStreak();
 
-        session()->flash('status', 'Prayer logged and streak updated.');
+        Toast::status($this, 'Prayer logged and streak updated.');
     }
 
     public function beginAnsweredUpdate(int $id): void
@@ -136,7 +137,7 @@ class Show extends Component
         $this->answeringRequestId = null;
         $this->answeredUpdateBody = '';
 
-        session()->flash('status', 'Answered-prayer update shared.');
+        Toast::status($this, 'Answered-prayer update shared.');
     }
 
     public function render()

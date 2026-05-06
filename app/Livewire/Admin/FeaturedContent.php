@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Devotional;
 use App\Models\FeaturedContentSlot;
+use App\Support\Toast;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 
@@ -47,7 +48,7 @@ class FeaturedContent extends Component
         ]);
 
         $this->loadSlots();
-        session()->flash('status', "{$slot->label} updated.");
+        Toast::status($this, "{$slot->label} updated.");
     }
 
     public function clearSlot(string $slotKey): void
@@ -62,7 +63,7 @@ class FeaturedContent extends Component
         ]);
 
         $this->loadSlots();
-        session()->flash('status', "{$slot->label} cleared.");
+        Toast::status($this, "{$slot->label} cleared.");
     }
 
     public function render()

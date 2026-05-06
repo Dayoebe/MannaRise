@@ -4,6 +4,7 @@ namespace App\Livewire\ResourceHub;
 
 use App\Models\ResourceItem;
 use App\Services\ResourceHub\ResourceHubService;
+use App\Support\Toast;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -25,7 +26,7 @@ class Videos extends Component
         $query = trim($this->search) ?: config('resourcehub.youtube_keywords.0', 'Christian devotional');
         $count = $service->import('youtube', $query, ['limit' => 8])->count();
 
-        session()->flash('status', $count > 0 ? "{$count} video resources refreshed." : 'Add a YouTube API key to fetch external videos.');
+        Toast::status($this, $count > 0 ? "{$count} video resources refreshed." : 'Add a YouTube API key to fetch external videos.');
     }
 
     public function render()

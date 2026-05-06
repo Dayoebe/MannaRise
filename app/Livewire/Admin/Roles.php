@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Permission;
 use App\Models\Role;
+use App\Support\Toast;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,9 +14,13 @@ class Roles extends Component
     use WithPagination;
 
     public ?int $editingId = null;
+
     public string $name = '';
+
     public string $label = '';
+
     public string $description = '';
+
     public array $selectedPermissions = [];
 
     public function save(): void
@@ -32,7 +37,7 @@ class Roles extends Component
 
         $role = $this->editingId
             ? Role::findOrFail($this->editingId)
-            : new Role();
+            : new Role;
 
         $role->fill([
             'name' => str($validated['name'])->slug()->toString(),
@@ -44,7 +49,7 @@ class Roles extends Component
         $role->permissions()->sync($validated['selectedPermissions'] ?? []);
 
         $this->resetForm();
-        session()->flash('status', 'Role saved.');
+        Toast::status($this, 'Role saved.');
     }
 
     public function edit(int $id): void
@@ -66,12 +71,13 @@ class Roles extends Component
         $role = Role::findOrFail($id);
 
         if ($role->is_system) {
-            session()->flash('status', 'System roles cannot be deleted.');
+            Toast::status($this, 'System roles cannot be deleted.');
+
             return;
         }
 
         $role->delete();
-        session()->flash('status', 'Role deleted.');
+        Toast::status($this, 'Role deleted.');
     }
 
     public function resetForm(): void

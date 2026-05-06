@@ -5,6 +5,7 @@ namespace App\Livewire\ResourceHub;
 use App\Models\ResourceItem;
 use App\Models\UserResourceBookmark;
 use App\Models\UserResourceProgress;
+use App\Support\Toast;
 use Livewire\Component;
 
 class ShowResource extends Component
@@ -40,7 +41,8 @@ class ShowResource extends Component
 
         if ($bookmark) {
             $bookmark->delete();
-            session()->flash('status', 'Resource removed from bookmarks.');
+            Toast::status($this, 'Resource removed from bookmarks.');
+
             return;
         }
 
@@ -49,7 +51,7 @@ class ShowResource extends Component
             'resource_item_id' => $this->resource->id,
         ]);
 
-        session()->flash('status', 'Resource bookmarked.');
+        Toast::status($this, 'Resource bookmarked.');
     }
 
     public function updateProgress(): void
@@ -58,7 +60,7 @@ class ShowResource extends Component
 
         $this->progressValue = max(0, min(100, $this->progressValue));
         $this->touchProgress();
-        session()->flash('status', 'Progress saved.');
+        Toast::status($this, 'Progress saved.');
     }
 
     private function touchProgress(): void
