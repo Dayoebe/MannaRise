@@ -42,12 +42,6 @@
         </div>
     </section>
 
-    @if (session('status'))
-        <div class="app-panel border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-900">
-            {{ session('status') }}
-        </div>
-    @endif
-
     <section data-prayer-session wire:ignore class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start">
         <div class="space-y-5">
             <div class="app-panel border-rose-200 bg-white">

@@ -5,6 +5,7 @@ namespace App\Livewire\PrayerSessions;
 use App\Models\PersonalizedDailyPathCheckIn;
 use App\Support\DailySpiritualRhythm;
 use App\Support\PersonalizedDailyPath;
+use App\Support\Toast;
 use Carbon\CarbonImmutable;
 use Livewire\Component;
 
@@ -133,7 +134,7 @@ class Index extends Component
             ],
         );
 
-        session()->flash('status', 'Prayer marked complete for today\'s path.');
+        Toast::status($this, 'Prayer marked complete for today\'s path.');
     }
 
     public function render()
