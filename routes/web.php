@@ -93,7 +93,7 @@ Route::get('/testimony', SubmitTestimony::class)->name('testimonies.submit');
 Route::get('/mail/notifications/opt-out/{user}', function (Request $request, \App\Models\User $user) {
     abort_unless($request->hasValidSignature(), 403);
 
-    \App\Models\DevotionalReminder::updateOrCreate(
+    $reminder = \App\Models\DevotionalReminder::firstOrCreate(
         ['user_id' => $user->id],
         [
             'title' => 'Daily devotional reminder',
@@ -103,11 +103,12 @@ Route::get('/mail/notifications/opt-out/{user}', function (Request $request, \Ap
                 'weekdays' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
                 'types' => ['devotional', 'bible', 'prayer', 'missed', 'digest'],
             ],
-            'email_enabled' => false,
             'push_enabled' => true,
             'is_active' => true,
         ],
     );
+
+    $reminder->forceFill(['email_enabled' => false])->save();
 
     return redirect()->route('reminders.settings')->with('status', 'Email notifications have been turned off. In-app reminders can still stay active.');
 })->middleware('signed')->name('mail.notifications.opt-out');

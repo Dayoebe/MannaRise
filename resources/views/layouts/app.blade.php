@@ -399,7 +399,14 @@
                     <span class="h-3 w-3 rounded-full bg-sky-400"></span>
                     <span class="h-3 w-3 rounded-full bg-amber-400"></span>
                     <span class="h-3 w-3 rounded-full bg-rose-400"></span>
-                    <span class="ml-1">{{ now()->year }}</span>
+                    <span class="h-3 w-3 rounded-full bg-violet-400"></span>
+                    <span class="h-3 w-3 rounded-full bg-teal-400"></span>
+                    <span class="h-3 w-3 rounded-full bg-pink-400"></span>
+
+                    <span class="inline-flex items-center gap-1 text-rose-500"> &copy;
+                        <span class="ml-1">{{ now()->year }}</span>
+                    </span>
+                    <a href="https://dayoebe.github.io" target="_blank" class="text-sky-500 hover:text-sky-700">Wireless Terminal</a> <x-ui.icon name="heart" class="h-3 w-3" />
                 </div>
             </div>
         </footer>

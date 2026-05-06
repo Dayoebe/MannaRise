@@ -24,7 +24,7 @@ class NotificationDelivery
             return false;
         }
 
-        if ($reminder->last_sent_at && $reminder->last_sent_at->copy()->timezone($now->timezone)->isSameDay($now)) {
+        if ($reminder->last_sent_at && $reminder->last_sent_at->copy()->timezone($now->getTimezone())->isSameDay($now)) {
             return false;
         }
 
