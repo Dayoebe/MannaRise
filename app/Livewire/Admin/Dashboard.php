@@ -17,7 +17,9 @@ use App\Models\SpiritualBook;
 use App\Models\SpiritualBookChapter;
 use App\Models\Testimony;
 use App\Models\User;
+use App\Support\Toast;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -26,11 +28,17 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public string $quickCategoryName = '';
+
     public string $quickCategoryDescription = '';
+
     public string $quickDevotionalCategoryId = '';
+
     public string $quickDevotionalTitle = '';
+
     public string $quickBibleReference = '';
+
     public string $quickDevotionalContent = '';
+
     public bool $quickPublish = false;
 
     public function createQuickCategory(): void
@@ -50,7 +58,7 @@ class Dashboard extends Component
         $this->quickCategoryName = '';
         $this->quickCategoryDescription = '';
         $this->resetErrorBag();
-        session()->flash('status', 'Category added from the dashboard.');
+        Toast::status($this, 'Category added from the dashboard.');
     }
 
     public function createQuickDevotional(): void
@@ -82,7 +90,7 @@ class Dashboard extends Component
         $this->quickDevotionalContent = '';
         $this->quickPublish = false;
         $this->resetErrorBag();
-        session()->flash('status', 'Devotional draft added from the dashboard.');
+        Toast::status($this, 'Devotional draft added from the dashboard.');
     }
 
     public function render()
@@ -195,7 +203,7 @@ class Dashboard extends Component
 
     private function optionalCount(string $modelClass): int|string
     {
-        if (! class_exists($modelClass) || ! is_subclass_of($modelClass, \Illuminate\Database\Eloquent\Model::class)) {
+        if (! class_exists($modelClass) || ! is_subclass_of($modelClass, Model::class)) {
             return 'Not installed';
         }
 

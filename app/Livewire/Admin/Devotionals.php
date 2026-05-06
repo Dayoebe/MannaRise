@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Devotional;
 use App\Models\DevotionalCategory;
+use App\Support\Toast;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -86,7 +87,7 @@ class Devotionals extends Component
         }
 
         $this->resetForm();
-        session()->flash('status', 'Devotional saved.');
+        Toast::status($this, 'Devotional saved.');
     }
 
     public function edit(int $id): void
@@ -127,7 +128,7 @@ class Devotionals extends Component
     public function delete(int $id): void
     {
         Devotional::findOrFail($id)->delete();
-        session()->flash('status', 'Devotional deleted.');
+        Toast::status($this, 'Devotional deleted.');
     }
 
     public function resetForm(): void
