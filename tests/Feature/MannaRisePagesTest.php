@@ -64,7 +64,7 @@ class MannaRisePagesTest extends TestCase
 
         $this->actingAs($admin);
 
-        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/resource-categories', '/admin/resource-items', '/admin/daily-devotions', '/admin/featured-content', '/admin/moderation', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/settings'] as $path) {
+        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/resource-categories', '/admin/resource-items', '/admin/daily-devotions', '/admin/daily-scriptures', '/admin/featured-content', '/admin/moderation', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/settings'] as $path) {
             $this->get($path)->assertOk();
         }
     }
@@ -78,7 +78,7 @@ class MannaRisePagesTest extends TestCase
 
         $this->actingAs($superAdmin);
 
-        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/featured-content', '/admin/moderation', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/audio-devotionals', '/admin/roles', '/admin/settings'] as $path) {
+        foreach (['/admin', '/admin/categories', '/admin/devotionals', '/admin/daily-scriptures', '/admin/featured-content', '/admin/moderation', '/admin/prayer-requests', '/admin/testimonies', '/admin/engagement', '/admin/audio-devotionals', '/admin/roles', '/admin/settings'] as $path) {
             $this->get($path)->assertOk();
         }
     }

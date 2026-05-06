@@ -12,6 +12,7 @@ MannaRise is a Laravel and Livewire devotional platform for daily spiritual grow
 - Memory verses, scripture cards, and devotional plans
 - Community groups and group invitations
 - Admin dashboard for content, moderation, engagement, scheduled mail delivery, notification logs, roles, settings, and audio devotionals
+- Daily Scripture API integration with bible-api.com by default, optional Our Manna/API.Bible fallback, local caching, and admin refresh controls
 - PWA-ready layout with manifest and app icons
 
 ## Tech Stack
@@ -29,6 +30,7 @@ MannaRise is a Laravel and Livewire devotional platform for daily spiritual grow
 - [Database plan](docs/DATABASE.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Local setup](docs/SETUP.md)
+- [Daily Scripture API integration](docs/bible-api-integration.md)
 - [Development plan](PROJECT_PLAN.md)
 
 ## Local Installation
@@ -124,6 +126,7 @@ php artisan test
 
 ```bash
 php artisan optimize:clear
+php artisan mannarise:sync-daily-scripture
 php artisan migrate --seed
 php artisan test
 npm run build
