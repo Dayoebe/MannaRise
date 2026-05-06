@@ -5,6 +5,7 @@ namespace App\Livewire\ResourceHub;
 use App\Models\DailyDevotion as DailyDevotionModel;
 use App\Models\UserResourceBookmark;
 use App\Services\ResourceHub\ResourceHubService;
+use App\Support\Toast;
 use Livewire\Component;
 
 class DailyDevotion extends Component
@@ -28,7 +29,8 @@ class DailyDevotion extends Component
 
         if ($bookmark) {
             $bookmark->delete();
-            session()->flash('status', 'Devotion removed from bookmarks.');
+            Toast::status($this, 'Devotion removed from bookmarks.');
+
             return;
         }
 
@@ -37,7 +39,7 @@ class DailyDevotion extends Component
             'daily_devotion_id' => $this->devotion->id,
         ]);
 
-        session()->flash('status', 'Devotion bookmarked.');
+        Toast::status($this, 'Devotion bookmarked.');
     }
 
     public function render()

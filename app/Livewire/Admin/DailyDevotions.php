@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\DailyDevotion;
+use App\Support\Toast;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -13,17 +14,29 @@ class DailyDevotions extends Component
     use WithPagination;
 
     public ?int $editingId = null;
+
     public string $title = '';
+
     public string $slug = '';
+
     public string $bible_reference = '';
+
     public string $bible_text = '';
+
     public string $memory_verse = '';
+
     public string $devotion_text = '';
+
     public string $prayer = '';
+
     public string $reflection_questions = '';
+
     public string $action_point = '';
+
     public string $devotion_date = '';
+
     public string $author = 'MannaRise';
+
     public bool $is_published = true;
 
     public function mount(): void
@@ -57,7 +70,7 @@ class DailyDevotions extends Component
 
         DailyDevotion::updateOrCreate(['id' => $this->editingId], $payload);
         $this->resetForm();
-        session()->flash('status', 'Daily devotion saved.');
+        Toast::status($this, 'Daily devotion saved.');
     }
 
     public function edit(int $id): void
@@ -81,7 +94,7 @@ class DailyDevotions extends Component
     public function delete(int $id): void
     {
         DailyDevotion::findOrFail($id)->delete();
-        session()->flash('status', 'Daily devotion deleted.');
+        Toast::status($this, 'Daily devotion deleted.');
     }
 
     public function resetForm(): void

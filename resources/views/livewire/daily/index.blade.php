@@ -1,6 +1,7 @@
 <div class="space-y-6 sm:space-y-8">
     @php
         $verse = $dailyRhythm['verse'];
+        $scriptureRoute = $todayScripture?->bibleRouteParameters();
         $affirmation = $dailyRhythm['affirmation'];
         $challenge = $dailyRhythm['challenge'];
         $activeChallenge = $catchUpPlan ?: $challenge;
@@ -41,8 +42,34 @@
 
     <section class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <article class="app-panel border-blue-200 bg-blue-50">
-            <p class="app-eyebrow border-blue-200 bg-white text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> Verse of the day</p>
-            @if ($verse)
+            <p class="app-eyebrow border-blue-200 bg-white text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> Today&apos;s scripture</p>
+            @if ($todayScripture)
+                <blockquote class="mt-4 font-serif text-2xl font-semibold leading-9 text-slate-950">
+                    "{{ $todayScripture->text }}"
+                </blockquote>
+                <div class="mt-4 flex flex-wrap items-center gap-2">
+                    <p class="text-sm font-black tracking-normal text-blue-900">{{ $todayScripture->reference }}</p>
+                    <span class="rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-black uppercase text-blue-900">{{ $todayScripture->translation ?: 'Bible' }}</span>
+                    <span class="rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-black text-blue-900">{{ $todayScripture->provider }}</span>
+                </div>
+                <div class="mt-5 flex flex-wrap gap-2">
+                    @if ($scriptureRoute)
+                        <a href="{{ route('bible', $scriptureRoute) }}" class="btn-secondary border-blue-200 text-blue-900 hover:bg-white">
+                            Read full chapter <x-ui.icon name="chevron-right" class="h-4 w-4" />
+                        </a>
+                    @endif
+                    @auth
+                        <button type="button" wire:click="saveDailyScriptureToMemory" class="btn-primary bg-blue-700 hover:bg-blue-800">
+                            <x-ui.icon name="award" class="h-4 w-4" /> Save to memory verses
+                        </button>
+                        <a href="{{ route('journal.index') }}" class="btn-secondary border-blue-200 text-blue-900">
+                            <x-ui.icon name="journal" class="h-4 w-4" /> Add journal reflection
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="btn-secondary border-blue-200 text-blue-900">Log in to save</a>
+                    @endauth
+                </div>
+            @elseif ($verse)
                 <blockquote class="mt-4 font-serif text-2xl font-semibold leading-9 text-slate-950">
                     "{{ $verse->text }}"
                 </blockquote>
@@ -61,7 +88,7 @@
                 @endauth
             @else
                 <p class="mt-4 rounded-2xl border border-dashed border-blue-200 bg-white p-4 text-sm text-slate-600">
-                    The Bible has not been imported yet. Run `php artisan db:seed --class=BibleSeeder`.
+                    No daily scripture is available yet. Run <code>php artisan mannarise:sync-daily-scripture</code> or import the local Bible seed data.
                 </p>
             @endif
         </article>
