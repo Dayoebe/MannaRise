@@ -1,313 +1,368 @@
-<div class="space-y-6 sm:space-y-8">
-    <div class="app-panel overflow-hidden border-blue-200 p-0 sm:p-0">
-        <div class="color-strip rounded-none">
-            <span class="bg-blue-500"></span>
-            <span class="bg-indigo-500"></span>
-            <span class="bg-violet-500"></span>
-            <span class="bg-purple-500"></span>
-            <span class="bg-emerald-500"></span>
-            <span class="bg-amber-400"></span>
-        </div>
-        <div class="flex flex-col gap-4 p-5 sm:p-6 md:flex-row md:items-end md:justify-between">
-            <div>
-                <p class="app-eyebrow border-blue-200 bg-blue-50 text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $languageLabel }} · {{ $version }}</p>
-                <h1 class="mt-3 app-section-title">Bible reader</h1>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Read available Bible translations by book, chapter, language, and version, or search within the selected translation.</p>
-            </div>
-            <div class="grid gap-2 sm:grid-cols-2 md:flex">
-                @if ($lastReading)
-                    <a href="{{ route('bible', ['book' => $lastReading->book?->slug, 'chapter' => $lastReading->chapter, 'language' => $lastReading->language, 'version' => $lastReading->version]) }}" class="btn-primary w-full sm:w-auto"><x-ui.icon name="bookmark" class="h-4 w-4" /> Continue reading</a>
-                @endif
-                <a href="{{ route('library.index') }}" class="btn-secondary w-full border-cyan-200 text-cyan-900 hover:bg-cyan-50 sm:w-auto"><x-ui.icon name="library" class="h-4 w-4" /> Open library</a>
-            </div>
-        </div>
-    </div>
+@php
+    $referenceTitle = trim(($book?->name ?? 'Bible').' '.$chapter);
+    $chapterProgress = $chapterCount > 0 ? min(100, max(3, ((int) $chapter / $chapterCount) * 100)) : 0;
+    $chapterMeta = $verses->count().' '.\Illuminate\Support\Str::plural('verse', $verses->count()).' · '.$languageLabel.' · '.$version;
+@endphp
 
+<div class="bible-reader-page" data-bible-reader data-bible-language="{{ $language }}">
     @if ($books->isEmpty())
         <div class="app-panel border-dashed border-slate-300 text-sm text-slate-600">
             The Bible has not been imported yet. Run `php artisan db:seed --class=BibleSeeder`.
         </div>
     @else
-<details class="app-panel bible-filter-panel border-sky-200 bg-sky-50" open>
-            <summary class="flex cursor-pointer items-center justify-between gap-3 p-4 text-sm font-bold text-slate-700 sm:hidden">
-                <span class="inline-flex items-center gap-2">
-                    <x-ui.icon name="book-open" class="h-4 w-4 text-blue-700" /> Bible reader controls
-                </span>
-                <span class="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-700">
-                    <x-ui.icon name="chevron-down" class="h-4 w-4" /> Toggle
-                </span>
-            </summary>
+        <section class="bible-reader-hero">
+            <div class="min-w-0">
+                <p class="app-eyebrow border-emerald-200 bg-white text-emerald-900">
+                    <x-ui.icon name="book-open" class="h-4 w-4" /> Bible reader
+                </p>
+                <h1>{{ $referenceTitle }}</h1>
+                <p>{{ $chapterMeta }}</p>
 
-            <div class="px-4 pb-4 sm:px-0 sm:pb-0">
-                <div class="grid gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_8rem_12rem_12rem_minmax(0,1fr)]">
-                    <div>
-                        <label class="flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="book-open" class="h-4 w-4 text-blue-700" /> Book</label>
-                        <select wire:model.live="bookSlug" data-bible-change class="field-input mt-1 border-sky-300 focus:border-blue-600 focus:ring-blue-100">
-                            @foreach ($books as $option)
-                                <option value="{{ $option->slug }}">{{ $option->name }}</option>
-                            @endforeach
-                        </select>
+                <div class="mt-4 max-w-xl">
+                    <div class="flex items-center justify-between text-xs font-black uppercase tracking-normal text-slate-500">
+                        <span>{{ $book?->name }}</span>
+                        <span>{{ $chapter }} / {{ $chapterCount }}</span>
                     </div>
+                    <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+                        <span class="block h-full rounded-full bg-emerald-700" style="width: {{ $chapterProgress }}%"></span>
+                    </div>
+                </div>
 
-                    <div>
-                        <label class="flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="bookmark" class="h-4 w-4 text-blue-700" /> Chapter</label>
-                        <select wire:model.live="chapter" data-bible-change class="field-input mt-1 border-sky-300 focus:border-blue-600 focus:ring-blue-100">
-                            @if ($book)
-                                @for ($i = 1; $i <= $chapterCount; $i++)
-                                    <option value="{{ $i }}">{{ $i }}</option>
-                                @endfor
-                            @endif
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="globe" class="h-4 w-4 text-blue-700" /> Language</label>
-                        <select wire:model.live="language" data-bible-change class="field-input mt-1 border-sky-300 focus:border-blue-600 focus:ring-blue-100">
-                            @foreach ($languages as $translation)
-                                <option value="{{ $translation['language'] }}">{{ $translation['language_label'] }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="layers" class="h-4 w-4 text-blue-700" /> Version</label>
-                        <select wire:model.live="version" data-bible-change class="field-input mt-1 border-sky-300 focus:border-blue-600 focus:ring-blue-100">
-                            @foreach ($versions as $translation)
-                                <option value="{{ $translation['version'] }}">{{ $translation['version'] }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="search" class="h-4 w-4 text-blue-700" /> Search Bible</label>
-                        <input type="search" wire:model.live.debounce.400ms="search" placeholder="Search words or phrase" class="field-input mt-1 border-sky-300 focus:border-blue-600 focus:ring-blue-100">
-                    </div>
+                <div class="reader-status-strip" aria-live="polite">
+                    <span data-bible-audio-status></span>
+                    <span data-bible-share-status></span>
                 </div>
             </div>
-        </details>
 
-        @if ($searchResults)
-            <section class="app-panel border-mauve-200 bg-mauve-50">
-                <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="search" class="h-5 w-5 text-mauve-700" /> Search results</h2>
-                    <span class="inline-flex w-fit rounded-full bg-white px-3 py-1 text-sm font-bold text-mauve-800 shadow-sm">{{ $searchResults->total() }} verses</span>
-                </div>
-
-                <div class="space-y-3">
-                    @forelse ($searchResults as $result)
-                        <article class="rounded-xl border border-mauve-200 bg-white p-3 sm:p-4 shadow-sm">
-                            <p class="text-sm font-black tracking-normal text-mauve-800">{{ $result->book->name }} {{ $result->chapter }}:{{ $result->verse }} · {{ strtoupper($result->language) }} {{ $result->version }}</p>
-                            <p class="mt-2 text-base leading-7 text-slate-800">{{ $result->text }}</p>
-                        </article>
-                    @empty
-                        <p class="rounded-xl border border-dashed border-mauve-300 bg-white p-4 text-sm text-slate-600">No verses matched that search.</p>
-                    @endforelse
-                </div>
-
-                <div class="mt-5">{{ $searchResults->links() }}</div>
-            </section>
-        @endif
-
-        <article class="app-panel bible-reader-card border-olive-200 bg-white p-4 sm:p-8" data-bible-reader data-bible-language="{{ $language }}">
-            <div class="bible-reader-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <p class="inline-flex items-center gap-2 rounded-full border border-olive-200 bg-olive-50 px-3 py-1 text-sm font-black uppercase tracking-normal text-olive-800"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $book?->testament }} · {{ strtoupper($language) }} {{ $version }}</p>
-                    <h2 class="mt-3 wrap-break-word text-3xl font-black tracking-normal text-slate-950 sm:text-4xl">{{ $book?->name }} {{ $chapter }}</h2>
-                    <p data-bible-audio-status class="mt-2 min-h-5 text-sm font-bold text-olive-800"></p>
-                    <p data-bible-share-status class="min-h-5 text-sm font-bold text-sky-800"></p>
-                </div>
-                <div class="bible-reader-actions grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
-                    @auth
-                        <button type="button" wire:click="markChapterRead" class="btn-warm col-span-2 sm:col-span-1 px-3">
-                            <x-ui.icon name="check-circle" class="h-4 w-4" /> Mark read
-                        </button>
-                    @endauth
-                    <button type="button" data-offline-save data-offline-save-url="{{ request()->fullUrl() }}" class="btn-secondary col-span-2 border-sky-200 px-3 text-sky-900 hover:bg-sky-50 sm:col-span-1">
-                        <x-ui.icon name="download" class="h-4 w-4" /> Save offline
+            <div class="bible-hero-actions">
+                @if ($lastReading)
+                    <a href="{{ route('bible', ['book' => $lastReading->book?->slug, 'chapter' => $lastReading->chapter, 'language' => $lastReading->language, 'version' => $lastReading->version]) }}" class="btn-secondary">
+                        <x-ui.icon name="bookmark" class="h-4 w-4" /> Continue
+                    </a>
+                @endif
+                @auth
+                    <button type="button" wire:click="markChapterRead" class="btn-primary">
+                        <x-ui.icon name="check-circle" class="h-4 w-4" /> Mark read
                     </button>
-                    <button type="button" data-bible-read-chapter data-bible-reference="{{ $book?->name }} {{ $chapter }} {{ $version }}" class="btn-secondary col-span-2 border-olive-300 bg-olive-50 px-3 text-olive-900 hover:bg-olive-100 sm:col-span-1">
+                    <a href="{{ route('bible.notes') }}" class="btn-secondary">
+                        <x-ui.icon name="journal" class="h-4 w-4" /> Notes
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="btn-secondary">
+                        <x-ui.icon name="log-in" class="h-4 w-4" /> Save notes
+                    </a>
+                @endauth
+                <a href="{{ route('library.index') }}" class="btn-secondary">
+                    <x-ui.icon name="library" class="h-4 w-4" /> Library
+                </a>
+            </div>
+        </section>
+
+        <section class="bible-mobile-reference lg:hidden">
+            <button type="button" wire:click="previousChapter" data-bible-change aria-label="Previous chapter">
+                <x-ui.icon name="chevron-left" class="h-5 w-5" />
+            </button>
+            <div>
+                <span>{{ $referenceTitle }}</span>
+                <small>{{ $chapterMeta }}</small>
+            </div>
+            <button type="button" wire:click="nextChapter" data-bible-change aria-label="Next chapter">
+                <x-ui.icon name="chevron-right" class="h-5 w-5" />
+            </button>
+        </section>
+
+        <section class="bible-reader-workspace">
+            <aside class="bible-control-rail">
+                <details class="bible-control-panel" open>
+                    <summary>
+                        <span>
+                            <x-ui.icon name="settings" class="h-4 w-4" />
+                            Change passage
+                        </span>
+                        <x-ui.icon name="chevron-right" class="h-4 w-4 bible-summary-icon" />
+                    </summary>
+
+                    <div class="bible-control-grid">
+                        <label>
+                            <span><x-ui.icon name="book-open" class="h-4 w-4" /> Book</span>
+                            <select wire:model.live="bookSlug" data-bible-change class="field-input">
+                                @foreach ($books as $option)
+                                    <option value="{{ $option->slug }}">{{ $option->name }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+
+                        <label>
+                            <span><x-ui.icon name="bookmark" class="h-4 w-4" /> Chapter</span>
+                            <select wire:model.live="chapter" data-bible-change class="field-input">
+                                @if ($book)
+                                    @for ($i = 1; $i <= $chapterCount; $i++)
+                                        <option value="{{ $i }}">{{ $i }}</option>
+                                    @endfor
+                                @endif
+                            </select>
+                        </label>
+
+                        <label>
+                            <span><x-ui.icon name="globe" class="h-4 w-4" /> Language</span>
+                            <select wire:model.live="language" data-bible-change class="field-input">
+                                @foreach ($languages as $translation)
+                                    <option value="{{ $translation['language'] }}">{{ $translation['language_label'] }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+
+                        <label>
+                            <span><x-ui.icon name="layers" class="h-4 w-4" /> Version</span>
+                            <select wire:model.live="version" data-bible-change class="field-input">
+                                @foreach ($versions as $translation)
+                                    <option value="{{ $translation['version'] }}">{{ $translation['version'] }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+
+                        <label class="bible-search-control">
+                            <span><x-ui.icon name="search" class="h-4 w-4" /> Search Bible</span>
+                            <input type="search" wire:model.live.debounce.400ms="search" placeholder="Search words or phrase" class="field-input">
+                        </label>
+                    </div>
+                </details>
+
+                <div class="bible-action-panel">
+                    <button type="button" data-bible-read-chapter data-bible-reference="{{ $referenceTitle }} {{ $version }}" class="btn-secondary" title="Listen" aria-label="Listen to this chapter">
                         <x-ui.icon name="volume-2" class="h-4 w-4" /> Listen
                     </button>
-                    <button type="button" data-bible-stop class="btn-secondary col-span-2 border-rose-200 px-3 text-rose-900 hover:bg-rose-50 sm:col-span-1">
+                    <button type="button" data-bible-stop class="btn-secondary" title="Stop" aria-label="Stop Bible audio">
                         <x-ui.icon name="square" class="h-4 w-4" /> Stop
                     </button>
-                    <button type="button" wire:click="previousChapter" data-bible-change class="btn-secondary col-span-1 border-slate-300 px-3">
-                        <x-ui.icon name="chevron-left" class="h-4 w-4" /> Previous
-                    </button>
-                    <button type="button" wire:click="nextChapter" data-bible-change class="btn-primary col-span-1 px-3">
-                        Next <x-ui.icon name="chevron-right" class="h-4 w-4" />
+                    <button type="button" data-offline-save data-offline-save-url="{{ request()->fullUrl() }}" class="btn-secondary" title="Save offline" aria-label="Save this chapter offline">
+                        <x-ui.icon name="download" class="h-4 w-4" /> Save offline
                     </button>
                 </div>
-            </div>
 
-            <details class="bible-study-panel mt-6 block rounded-xl border border-indigo-100 bg-indigo-50/70 p-4">
-                <summary class="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
-                    <span>
-                        <span class="app-eyebrow border-indigo-200 bg-white text-indigo-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> Study mode</span>
-                        <span class="mt-2 block text-lg font-black tracking-normal text-slate-950">Understand {{ $book?->name }} {{ $chapter }}</span>
-                    </span>
-                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-indigo-200 bg-white text-indigo-900">
-                        <x-ui.icon name="chevron-right" class="h-4 w-4" />
-                    </span>
-                </summary>
+                <details class="bible-study-panel" open>
+                    <summary>
+                        <span>
+                            <x-ui.icon name="sparkles" class="h-4 w-4" />
+                            Study mode
+                        </span>
+                        <x-ui.icon name="chevron-right" class="h-4 w-4 bible-summary-icon" />
+                    </summary>
 
-                <div class="mt-5 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.75fr)]">
-                    <div class="space-y-4">
-                        <article class="rounded-xl border border-white bg-white p-4">
-                            <h3 class="font-black tracking-normal text-slate-950">Chapter summary</h3>
-                            <p class="mt-2 text-sm leading-6 text-slate-700">{{ $studyGuide['summary'] }}</p>
-                        </article>
+                    <div class="bible-study-content">
+                        <div>
+                            <h2>Chapter summary</h2>
+                            <p>{{ $studyGuide['summary'] }}</p>
+                        </div>
 
-                        <article class="rounded-xl border border-white bg-white p-4">
-                            <h3 class="font-black tracking-normal text-slate-950">Reflection questions</h3>
-                            <div class="mt-3 space-y-2">
-                                @foreach ($studyGuide['reflection_questions'] as $question)
-                                    <p class="rounded-lg bg-slate-50 p-3 text-sm leading-6 text-slate-700">{{ $question }}</p>
-                                @endforeach
-                            </div>
-                        </article>
-                    </div>
-
-                    <aside class="space-y-4">
-                        <article class="rounded-xl border border-white bg-white p-4">
-                            <h3 class="font-black tracking-normal text-slate-950">Key themes</h3>
-                            <div class="mt-3 flex flex-wrap gap-2">
+                        <div>
+                            <h2>Key themes</h2>
+                            <div class="bible-theme-list">
                                 @foreach ($studyGuide['themes'] as $theme)
-                                    <span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-normal text-indigo-900">{{ $theme }}</span>
+                                    <span>{{ $theme }}</span>
                                 @endforeach
                             </div>
-                        </article>
+                        </div>
 
-                        <article class="rounded-xl border border-white bg-white p-4">
-                            <h3 class="font-black tracking-normal text-slate-950">Prayer points</h3>
-                            <div class="mt-3 space-y-2">
+                        <div>
+                            <h2>Reflection questions</h2>
+                            <div class="space-y-2">
+                                @foreach ($studyGuide['reflection_questions'] as $question)
+                                    <p class="bible-study-note">{{ $question }}</p>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2>Prayer points</h2>
+                            <div class="space-y-2">
                                 @foreach ($studyGuide['prayer_points'] as $point)
-                                    <p class="text-sm leading-6 text-slate-700">{{ $point }}</p>
+                                    <p class="bible-study-note">{{ $point }}</p>
                                 @endforeach
                             </div>
-                        </article>
+                        </div>
 
-                        <article class="rounded-xl border border-white bg-white p-4">
-                            <h3 class="font-black tracking-normal text-slate-950">Related devotionals</h3>
-                            <div class="mt-3 space-y-2">
+                        <div>
+                            <h2>Related devotionals</h2>
+                            <div class="space-y-2">
                                 @forelse ($studyGuide['related_devotionals'] as $devotional)
-                                    <a href="{{ route('devotionals.show', $devotional->slug) }}" class="block rounded-lg border border-emerald-100 bg-emerald-50 p-3 text-sm font-bold text-emerald-950 hover:border-emerald-300">
+                                    <a href="{{ route('devotionals.show', $devotional->slug) }}" class="bible-related-link">
                                         {{ $devotional->title }}
-                                        <span class="mt-1 block text-xs text-emerald-800">{{ $devotional->category?->name }}</span>
+                                        <span>{{ $devotional->category?->name }}</span>
                                     </a>
                                 @empty
-                                    <p class="text-sm leading-6 text-slate-600">No related devotional found yet. Published devotionals will appear here as your library grows.</p>
+                                    <p class="bible-study-note">No related devotional found yet. Published devotionals will appear here as your library grows.</p>
                                 @endforelse
                             </div>
-                        </article>
-                    </aside>
-                </div>
-            </details>
-
-            <div class="reading-copy mt-6 space-y-2">
-                @foreach ($verses as $verse)
-                    @php
-                        $engagement = $engagements[$verse->id] ?? null;
-                        $highlight = $engagement?->highlight_color;
-                        $highlightClass = match ($highlight) {
-                            'emerald' => 'border-emerald-100 bg-emerald-50/70',
-                            'sky' => 'border-sky-100 bg-sky-50/70',
-                            'rose' => 'border-rose-100 bg-rose-50/70',
-                            'violet' => 'border-violet-100 bg-violet-50/70',
-                            'amber' => 'border-amber-100 bg-amber-50/70',
-                            default => 'border-transparent hover:border-slate-100 hover:bg-slate-50/70',
-                        };
-                        $reference = "{$book?->name} {$verse->chapter}:{$verse->verse} {$version}";
-                        $hasPersonalMark = $engagement?->bookmarked_at || $engagement?->note || $highlight;
-                    @endphp
-                    <div id="verse-{{ $verse->verse }}" class="group rounded-xl border px-3 py-1 transition {{ $highlightClass }}">
-                        <div class="grid grid-cols-[minmax(0,1fr)_2.25rem] gap-2 relative">
-                            <p data-bible-verse-text class="min-w-0 self-center py-1.5 leading-7 text-slate-800">
-                                <sup class="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-amber-100 px-1 text-xs font-black text-amber-900">{{ $verse->verse }}</sup>{{ $verse->text }}
-                            </p>
-
-                            <details class="relative justify-self-end self-start" data-bible-verse-tools>
-                                <summary class="mt-1 inline-flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-full border {{ $hasPersonalMark ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-transparent bg-transparent text-slate-400 opacity-70 hover:border-slate-200 hover:bg-white hover:text-slate-800 group-hover:opacity-100' }} transition [&::-webkit-details-marker]:hidden" aria-label="Open tools for {{ $reference }}">
-                                    <x-ui.icon name="{{ $hasPersonalMark ? 'bookmark' : 'more-horizontal' }}" class="h-4 w-4" />
-                                </summary>
-
-                                <div class="bible-verse-tool-panel mt-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm absolute right-0 z-20 w-[min(24rem,85vw)]">
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <button
-                                            type="button"
-                                            data-bible-read-verse
-                                            data-bible-reference="{{ $reference }}"
-                                            data-bible-text="{{ $verse->text }}"
-                                            class="btn-secondary min-h-9 border-amber-200 px-3 py-1 text-xs text-amber-900 hover:bg-amber-50"
-                                            aria-label="Listen to {{ $book?->name }} {{ $verse->chapter }}:{{ $verse->verse }}"
-                                        >
-                                            <x-ui.icon name="volume-2" class="h-4 w-4" /> Listen
-                                        </button>
-
-                                        @auth
-                                            <button type="button" wire:click="toggleBookmark({{ $verse->id }})" class="btn-secondary min-h-9 border-slate-200 px-3 py-1 text-xs {{ $engagement?->bookmarked_at ? 'bg-sky-50 text-sky-900' : '' }}">
-                                                <x-ui.icon name="bookmark" class="h-4 w-4" /> {{ $engagement?->bookmarked_at ? 'Saved' : 'Save' }}
-                                            </button>
-                                        @else
-                                            <a href="{{ route('login') }}" class="btn-secondary min-h-9 border-slate-200 px-3 py-1 text-xs"><x-ui.icon name="log-in" class="h-4 w-4" /> Log in to save</a>
-                                        @endauth
-
-                                        <button
-                                            type="button"
-                                            @auth wire:click="recordShare({{ $verse->id }})" @endauth
-                                            data-bible-share
-                                            data-bible-share-text="{{ $reference }} - {{ $verse->text }}"
-                                            data-bible-share-url="{{ route('bible', ['book' => $book?->slug, 'chapter' => $verse->chapter, 'language' => $language, 'version' => $version]).'#verse-'.$verse->verse }}"
-                                            class="btn-secondary min-h-9 border-slate-200 px-3 py-1 text-xs"
-                                        >
-                                            <x-ui.icon name="share-2" class="h-4 w-4" /> Share
-                                        </button>
-                                    </div>
-
-                                    @auth
-                                        <div class="mt-3 flex items-center gap-2">
-                                            <span class="text-xs font-black uppercase tracking-normal text-slate-500">Highlight</span>
-                                            <div class="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1">
-                                                @foreach (['amber', 'emerald', 'sky', 'rose', 'violet'] as $color)
-                                                    @php
-                                                        $swatchClass = match ($color) {
-                                                            'emerald' => 'bg-emerald-300',
-                                                            'sky' => 'bg-sky-300',
-                                                            'rose' => 'bg-rose-300',
-                                                            'violet' => 'bg-violet-300',
-                                                            default => 'bg-amber-300',
-                                                        };
-                                                    @endphp
-                                                    <button
-                                                        type="button"
-                                                        wire:click="setHighlight({{ $verse->id }}, '{{ $color }}')"
-                                                        class="h-6 w-6 rounded-full border-2 {{ $highlight === $color ? 'border-slate-950' : 'border-white' }} {{ $swatchClass }} shadow-sm"
-                                                        aria-label="Highlight {{ $reference }} in {{ $color }}"
-                                                    ></button>
-                                                @endforeach
-                                                @if ($highlight)
-                                                    <button type="button" wire:click="setHighlight({{ $verse->id }}, null)" class="ml-1 text-xs font-bold text-slate-500">Clear</button>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <div class="mt-3">
-                                            <label class="text-xs font-black uppercase tracking-normal text-slate-500">Personal note</label>
-                                            <div class="mt-1 grid gap-2 grid-cols-[minmax(0,1fr)_auto]">
-                                                <textarea wire:model="notes.{{ $verse->id }}" rows="2" placeholder="What is God showing you in this verse?" class="field-input border-slate-200 text-sm focus:border-blue-600 focus:ring-blue-100"></textarea>
-                                                <button type="button" wire:click="saveNote({{ $verse->id }})" class="btn-primary self-start px-3">
-                                                    <x-ui.icon name="send" class="h-4 w-4" /> Save
-                                                </button>
-                                            </div>
-                                        </div>
-                                    @endauth
-                                </div>
-                            </details>
                         </div>
                     </div>
-                @endforeach
-            </div>
-        </article>
+                </details>
+            </aside>
+
+            <main class="bible-reading-column">
+                @if ($searchResults)
+                    <section class="bible-search-results">
+                        <div class="bible-search-results-header">
+                            <div>
+                                <p class="app-eyebrow border-sky-200 bg-sky-50 text-sky-900">
+                                    <x-ui.icon name="search" class="h-4 w-4" /> Search results
+                                </p>
+                                <h2>{{ $searchResults->total() }} {{ \Illuminate\Support\Str::plural('verse', $searchResults->total()) }} found</h2>
+                            </div>
+                            <span>{{ strtoupper($language) }} {{ $version }}</span>
+                        </div>
+
+                        <div class="bible-result-list">
+                            @forelse ($searchResults as $result)
+                                <article>
+                                    <a href="{{ route('bible', ['book' => $result->book->slug, 'chapter' => $result->chapter, 'language' => $language, 'version' => $version]).'#verse-'.$result->verse }}">
+                                        {{ $result->book->name }} {{ $result->chapter }}:{{ $result->verse }}
+                                    </a>
+                                    <p>{{ $result->text }}</p>
+                                </article>
+                            @empty
+                                <p class="bible-empty-message">No verses matched that search.</p>
+                            @endforelse
+                        </div>
+
+                        <div class="mt-5">{{ $searchResults->links() }}</div>
+                    </section>
+                @endif
+
+                <article class="bible-reading-surface">
+                    <header class="bible-reading-header">
+                        <div>
+                            <span>{{ $book?->testament }} · {{ strtoupper($language) }} {{ $version }}</span>
+                            <h2>{{ $referenceTitle }}</h2>
+                        </div>
+                        <div class="bible-reading-actions">
+                            <button type="button" wire:click="previousChapter" data-bible-change class="btn-secondary">
+                                <x-ui.icon name="chevron-left" class="h-4 w-4" /> Previous
+                            </button>
+                            <button type="button" wire:click="nextChapter" data-bible-change class="btn-primary">
+                                Next <x-ui.icon name="chevron-right" class="h-4 w-4" />
+                            </button>
+                        </div>
+                    </header>
+
+                    @if ($verses->isEmpty())
+                        <p class="bible-empty-message">No verses are available for this chapter in the selected translation.</p>
+                    @else
+                        <div class="bible-verses reading-copy">
+                            @foreach ($verses as $verse)
+                                @php
+                                    $engagement = $engagements[$verse->id] ?? null;
+                                    $highlight = $engagement?->highlight_color;
+                                    $highlightClass = match ($highlight) {
+                                        'emerald' => 'is-highlighted-emerald',
+                                        'sky' => 'is-highlighted-sky',
+                                        'rose' => 'is-highlighted-rose',
+                                        'violet' => 'is-highlighted-violet',
+                                        'amber' => 'is-highlighted-amber',
+                                        default => '',
+                                    };
+                                    $reference = "{$book?->name} {$verse->chapter}:{$verse->verse} {$version}";
+                                    $hasPersonalMark = $engagement?->bookmarked_at || $engagement?->note || $highlight;
+                                @endphp
+
+                                <div id="verse-{{ $verse->verse }}" class="bible-verse-row {{ $highlightClass }}">
+                                    <p data-bible-verse-text>
+                                        <sup>{{ $verse->verse }}</sup>{{ $verse->text }}
+                                    </p>
+
+                                    <details class="bible-verse-tools" data-bible-verse-tools>
+                                        <summary aria-label="Open tools for {{ $reference }}">
+                                            <x-ui.icon name="{{ $hasPersonalMark ? 'bookmark' : 'more-horizontal' }}" class="h-4 w-4" />
+                                        </summary>
+
+                                        <div class="bible-verse-tool-panel">
+                                            <div class="bible-verse-tool-header">
+                                                <div>
+                                                    <span>Verse tools</span>
+                                                    <strong>{{ $reference }}</strong>
+                                                </div>
+                                                <small>{{ $hasPersonalMark ? 'Saved to your rhythm' : 'Listen, save, highlight, or share' }}</small>
+                                            </div>
+
+                                            <div class="bible-tool-actions">
+                                                <button
+                                                    type="button"
+                                                    data-bible-read-verse
+                                                    data-bible-reference="{{ $reference }}"
+                                                    data-bible-text="{{ $verse->text }}"
+                                                    class="btn-secondary"
+                                                    aria-label="Listen to {{ $book?->name }} {{ $verse->chapter }}:{{ $verse->verse }}"
+                                                >
+                                                    <x-ui.icon name="volume-2" class="h-4 w-4" /> Listen
+                                                </button>
+
+                                                @auth
+                                                    <button type="button" wire:click="toggleBookmark({{ $verse->id }})" class="btn-secondary {{ $engagement?->bookmarked_at ? 'is-active' : '' }}">
+                                                        <x-ui.icon name="bookmark" class="h-4 w-4" /> {{ $engagement?->bookmarked_at ? 'Saved' : 'Save' }}
+                                                    </button>
+                                                @else
+                                                    <a href="{{ route('login') }}" class="btn-secondary">
+                                                        <x-ui.icon name="log-in" class="h-4 w-4" /> Log in
+                                                    </a>
+                                                @endauth
+
+                                                <button
+                                                    type="button"
+                                                    @auth wire:click="recordShare({{ $verse->id }})" @endauth
+                                                    data-bible-share
+                                                    data-bible-share-text="{{ $reference }} - {{ $verse->text }}"
+                                                    data-bible-share-url="{{ route('bible', ['book' => $book?->slug, 'chapter' => $verse->chapter, 'language' => $language, 'version' => $version]).'#verse-'.$verse->verse }}"
+                                                    class="btn-secondary"
+                                                >
+                                                    <x-ui.icon name="share-2" class="h-4 w-4" /> Share
+                                                </button>
+                                            </div>
+
+                                            @auth
+                                                <div class="bible-highlight-picker">
+                                                    <span>Highlight</span>
+                                                    <div>
+                                                        @foreach (['amber', 'emerald', 'sky', 'rose', 'violet'] as $color)
+                                                            @php
+                                                                $swatchClass = match ($color) {
+                                                                    'emerald' => 'bg-emerald-300',
+                                                                    'sky' => 'bg-sky-300',
+                                                                    'rose' => 'bg-rose-300',
+                                                                    'violet' => 'bg-violet-300',
+                                                                    default => 'bg-amber-300',
+                                                                };
+                                                            @endphp
+                                                            <button
+                                                                type="button"
+                                                                wire:click="setHighlight({{ $verse->id }}, '{{ $color }}')"
+                                                                class="{{ $swatchClass }} {{ $highlight === $color ? 'is-selected' : '' }}"
+                                                                aria-label="Highlight {{ $reference }} in {{ $color }}"
+                                                            ></button>
+                                                        @endforeach
+                                                        @if ($highlight)
+                                                            <button type="button" wire:click="setHighlight({{ $verse->id }}, null)" class="clear-highlight">Clear</button>
+                                                        @endif
+                                                    </div>
+                                                </div>
+
+                                                <div class="bible-note-editor">
+                                                    <label for="note-{{ $verse->id }}">Personal note</label>
+                                                    <textarea id="note-{{ $verse->id }}" wire:model="notes.{{ $verse->id }}" rows="3" placeholder="What is God showing you in this verse?" class="field-input"></textarea>
+                                                    <button type="button" wire:click="saveNote({{ $verse->id }})" class="btn-primary">
+                                                        <x-ui.icon name="send" class="h-4 w-4" /> Save note
+                                                    </button>
+                                                </div>
+                                            @endauth
+                                        </div>
+                                    </details>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </article>
+            </main>
+        </section>
+
     @endif
 
     <script>
@@ -317,6 +372,18 @@
             }
 
             window.MannaRiseBibleAudioReady = true;
+
+            function collapseMobileReaderPanels() {
+                if (! window.matchMedia?.('(max-width: 1023px)').matches) {
+                    return;
+                }
+
+                document.querySelectorAll('.bible-control-panel[open], .bible-study-panel[open]').forEach((panel) => {
+                    panel.open = false;
+                });
+            }
+
+            collapseMobileReaderPanels();
 
             let activeUtterance = null;
             let activeReader = null;
@@ -576,6 +643,12 @@
             }
 
             document.addEventListener('click', (event) => {
+                const openVerseTool = document.querySelector('[data-bible-verse-tools][open]');
+
+                if (openVerseTool && ! event.target.closest('[data-bible-verse-tools]')) {
+                    openVerseTool.open = false;
+                }
+
                 const changeControl = event.target.closest('[data-bible-change]');
                 const chapterButton = event.target.closest('[data-bible-read-chapter]');
                 const verseButton = event.target.closest('[data-bible-read-verse]');
@@ -655,6 +728,18 @@
 
                 speak(reader, text, chapterButton ? `Reading ${reference}.` : `Reading ${reference}.`);
             });
+
+            document.addEventListener('toggle', (event) => {
+                if (! event.target.matches?.('[data-bible-verse-tools][open]')) {
+                    return;
+                }
+
+                document.querySelectorAll('[data-bible-verse-tools][open]').forEach((tool) => {
+                    if (tool !== event.target) {
+                        tool.open = false;
+                    }
+                });
+            }, true);
 
             document.addEventListener('livewire:navigating', () => stopReading());
 
