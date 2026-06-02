@@ -52,8 +52,17 @@ class SeoTest extends TestCase
         $this->get(route('seo.sitemap'))
             ->assertOk()
             ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
+            ->assertSee('<sitemapindex', false)
+            ->assertSee(route('seo.sitemap.pages'), false)
+            ->assertSee(route('seo.sitemap.devotionals'), false);
+
+        $this->get(route('seo.sitemap.pages'))
+            ->assertOk()
             ->assertSee('<urlset', false)
-            ->assertSee(route('home'), false)
+            ->assertSee(route('home'), false);
+
+        $this->get(route('seo.sitemap.devotionals'))
+            ->assertOk()
             ->assertSee(route('devotionals.show', $devotional->slug), false);
     }
 
@@ -80,6 +89,24 @@ class SeoTest extends TestCase
             ->assertOk()
             ->assertSee('Faith for Today | MannaRise')
             ->assertSee('Hebrews 11:1')
-            ->assertSee('"@type": "Article"', false);
+            ->assertSee('"@type": "BlogPosting"', false);
+    }
+
+    public function test_ai_discovery_files_and_feed_are_available(): void
+    {
+        $this->get(route('seo.llms'))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'text/markdown; charset=UTF-8')
+            ->assertSee('# MannaRise')
+            ->assertSee(route('seo.sitemap'), false);
+
+        $this->get(route('seo.llms-full'))
+            ->assertOk()
+            ->assertSee('Full AI Digest');
+
+        $this->get(route('seo.feed'))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/rss+xml; charset=UTF-8')
+            ->assertSee('<rss', false);
     }
 }

@@ -42,7 +42,7 @@ class MannaRisePagesTest extends TestCase
             'is_approved' => true,
         ]);
 
-        foreach (['/', '/daily', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/audio-devotionals', '/resources', '/resources/devotion', '/resources/books', '/resources/videos', '/resources/audio', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
+        foreach (['/', '/about', '/contact', '/daily', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/audio-devotionals', '/resources', '/resources/devotion', '/resources/books', '/resources/videos', '/resources/audio', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
             $this->get($path)->assertOk();
         }
     }

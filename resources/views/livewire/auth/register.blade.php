@@ -31,7 +31,7 @@
                     <label for="password" class="block text-sm font-bold text-slate-700">Password</label>
                     <div class="relative">
                         <input id="password" type="password" wire:model="password" autocomplete="new-password" class="field-input mt-1 border-violet-300 focus:border-violet-600 focus:ring-violet-100 pr-10">
-                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                        <button type="button" onclick="togglePassword()" aria-label="Show password" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
                             <x-ui.icon name="eye" class="h-4 w-4 text-gray-400" id="eye-open" />
                             <x-ui.icon name="eye-off" class="h-4 w-4 text-gray-400 hidden" id="eye-closed" />
                         </button>
@@ -43,7 +43,7 @@
                     <label for="password_confirmation" class="block text-sm font-bold text-slate-700">Confirm password</label>
                     <div class="relative">
                         <input id="password_confirmation" type="password" wire:model="password_confirmation" autocomplete="new-password" class="field-input mt-1 border-violet-300 focus:border-violet-600 focus:ring-violet-100 pr-10">
-                        <button type="button" onclick="togglePasswordConfirm()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                        <button type="button" onclick="togglePasswordConfirm()" aria-label="Show password confirmation" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
                             <x-ui.icon name="eye" class="h-4 w-4 text-gray-400" id="eye-open-confirm" />
                             <x-ui.icon name="eye-off" class="h-4 w-4 text-gray-400 hidden" id="eye-closed-confirm" />
                         </button>

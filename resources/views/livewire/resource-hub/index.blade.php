@@ -27,8 +27,10 @@
 
     <section class="app-panel border-emerald-200 bg-emerald-50">
         <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_12rem_16rem]">
-            <input type="search" wire:model.live.debounce.350ms="search" placeholder="Search resources, authors, topics..." class="field-input border-emerald-300 bg-white focus:border-emerald-700 focus:ring-emerald-100">
-            <select wire:model.live="type" class="field-input border-emerald-300 bg-white focus:border-emerald-700 focus:ring-emerald-100">
+            <label for="resource-search" class="sr-only">Search resources</label>
+            <input id="resource-search" type="search" wire:model.live.debounce.350ms="search" placeholder="Search resources, authors, topics..." class="field-input border-emerald-300 bg-white focus:border-emerald-700 focus:ring-emerald-100">
+            <label for="resource-type" class="sr-only">Resource type</label>
+            <select id="resource-type" wire:model.live="type" class="field-input border-emerald-300 bg-white focus:border-emerald-700 focus:ring-emerald-100">
                 <option value="">All types</option>
                 <option value="devotion">Devotion</option>
                 <option value="bible">Bible</option>
@@ -38,7 +40,8 @@
                 <option value="article">Article</option>
                 <option value="education">Education</option>
             </select>
-            <select wire:model.live="category" class="field-input border-emerald-300 bg-white focus:border-emerald-700 focus:ring-emerald-100">
+            <label for="resource-category" class="sr-only">Resource category</label>
+            <select id="resource-category" wire:model.live="category" class="field-input border-emerald-300 bg-white focus:border-emerald-700 focus:ring-emerald-100">
                 <option value="">All categories</option>
                 @foreach ($categories as $resourceCategory)
                     <option value="{{ $resourceCategory->id }}">{{ $resourceCategory->name }}</option>

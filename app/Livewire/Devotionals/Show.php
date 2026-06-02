@@ -113,6 +113,15 @@ class Show extends Component
         return view('livewire.devotionals.show', [
             'isFavorited' => $isFavorited,
             'completedToday' => $completedToday,
+            'summary' => \App\Support\Seo::summarize($this->devotional->content),
+            'relatedDevotionals' => Devotional::query()
+                ->with('category')
+                ->published()
+                ->whereKeyNot($this->devotional->id)
+                ->when($this->devotional->devotional_category_id, fn ($query) => $query->where('devotional_category_id', $this->devotional->devotional_category_id))
+                ->latest('published_at')
+                ->take(3)
+                ->get(),
         ]);
     }
 }

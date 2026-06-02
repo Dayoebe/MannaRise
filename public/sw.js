@@ -1,5 +1,5 @@
-const CACHE_NAME = 'mannarise-v3';
-const STATIC_CACHE_NAME = 'mannarise-static-v3';
+const CACHE_NAME = 'mannarise-v4';
+const STATIC_CACHE_NAME = 'mannarise-static-v4';
 const OFFLINE_READING_CACHE = 'mannarise-offline-reading-v1';
 const OFFLINE_URL = '/offline.html';
 const CORE_ASSETS = [
@@ -16,10 +16,13 @@ const CORE_ASSETS = [
     '/icons/icon-512.svg'
 ];
 const OFFLINE_NAVIGATION_PATHS = [
+    '/about',
     '/bible',
     '/bible-notes',
+    '/contact',
     '/daily',
     '/devotionals',
+    '/resources',
     '/guided-prayer',
     '/prayer-wall',
     '/prayer-rooms',

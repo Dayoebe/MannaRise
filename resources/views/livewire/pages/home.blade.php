@@ -39,7 +39,7 @@
                     <a href="{{ route('prayer-requests.submit') }}" class="btn-secondary w-full sm:w-auto"><x-ui.icon name="send" class="h-4 w-4" /> Prayer request</a>
                 </div>
 
-                <div class="mt-7 grid gap-3 text-sm font-bold text-slate-800 sm:grid-cols-3">
+                <div class="mt-7 grid gap-3 text-sm font-bold text-slate-800 sm:grid-cols-2 lg:grid-cols-5">
                     <a href="{{ route('library.index') }}" class="rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 hover:bg-cyan-100">
                         Library
                     </a>
@@ -48,6 +48,12 @@
                     </a>
                     <a href="{{ route('testimonies.index') }}" class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 hover:bg-violet-100">
                         Testimonies
+                    </a>
+                    <a href="{{ route('about') }}" class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 hover:bg-emerald-100">
+                        About
+                    </a>
+                    <a href="{{ route('contact') }}" class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 hover:bg-sky-100">
+                        Contact
                     </a>
                 </div>
             </div>

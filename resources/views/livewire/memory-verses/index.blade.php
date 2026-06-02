@@ -52,7 +52,8 @@
                         <p class="app-eyebrow border-sky-200 bg-sky-50 text-sky-900"><x-ui.icon name="eye-off" class="h-4 w-4" /> Hidden-word practice</p>
                         <h2 class="mt-3 text-2xl font-black tracking-normal text-slate-950">Practice recall</h2>
                     </div>
-                    <select data-memory-level class="field-input border-sky-300 focus:border-sky-600 focus:ring-sky-100 sm:max-w-56">
+                    <label for="memory-practice-level" class="sr-only">Memory practice level</label>
+                    <select id="memory-practice-level" data-memory-level class="field-input border-sky-300 focus:border-sky-600 focus:ring-sky-100 sm:max-w-56">
                         <option value="3">Hide every third word</option>
                         <option value="2">Hide every other word</option>
                         <option value="1">First-letter mode</option>

@@ -10,7 +10,8 @@
                 <button type="button" wire:click="importExternal" class="btn-primary bg-amber-600 text-slate-950 hover:bg-amber-500"><x-ui.icon name="download" class="h-4 w-4" /> Refresh audio</button>
             @endif
         </div>
-        <input type="search" wire:model.live.debounce.350ms="search" placeholder="Search audio" class="field-input mt-5 border-amber-300 focus:border-amber-700 focus:ring-amber-100">
+        <label for="resource-audio-search" class="sr-only">Search audio</label>
+        <input id="resource-audio-search" type="search" wire:model.live.debounce.350ms="search" placeholder="Search audio" class="field-input mt-5 border-amber-300 focus:border-amber-700 focus:ring-amber-100">
     </section>
 
     <div class="space-y-4">
@@ -25,7 +26,7 @@
                     </div>
                     <div>
                         @if ($audio->media_url)
-                            <audio controls src="{{ $audio->media_url }}" class="w-full"></audio>
+                            <audio controls preload="none" src="{{ $audio->media_url }}" class="w-full" aria-label="{{ $audio->title }}"></audio>
                         @endif
                         <a href="{{ route('resources.show', $audio->slug) }}" class="btn-secondary mt-3 w-full border-amber-200">Open details</a>
                     </div>

@@ -9,7 +9,8 @@
                 <h1 class="mt-3 app-section-title">Audio devotionals</h1>
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Listen while commuting, preparing for work, resting, or praying through your day.</p>
             </div>
-            <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search audio devotionals" class="field-input border-violet-300 focus:border-violet-600 focus:ring-violet-100">
+            <label for="audio-devotional-search" class="sr-only">Search audio devotionals</label>
+            <input id="audio-devotional-search" type="search" wire:model.live.debounce.300ms="search" placeholder="Search audio devotionals" class="field-input border-violet-300 focus:border-violet-600 focus:ring-violet-100">
         </div>
     </div>
 
@@ -23,7 +24,7 @@
                 <h2 class="mt-3 text-xl font-black tracking-normal text-slate-950">{{ $audio->title }}</h2>
                 @if ($audio->description)<p class="mt-3 flex-1 text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit($audio->description, 150) }}</p>@endif
                 @if ($audio->devotional)<a href="{{ route('devotionals.show', $audio->devotional->slug) }}" class="mt-3 text-sm font-bold text-emerald-800 hover:underline">Linked devotional: {{ $audio->devotional->title }}</a>@endif
-                <audio class="mt-4 w-full" controls preload="none" src="{{ $audio->audio_url }}"></audio>
+                <audio class="mt-4 w-full" controls preload="none" src="{{ $audio->audio_url }}" aria-label="{{ $audio->title }}"></audio>
             </article>
         @empty
             <div class="md:col-span-2 xl:col-span-3"><x-ui.empty-state title="No audio devotionals yet" message="Published audio devotionals will appear here when they are added from the admin dashboard." /></div>

@@ -17,9 +17,12 @@
             @if ($devotional->published_at)
                     <span class="rounded-full bg-mist-100 px-3 py-1 font-bold text-mist-800">{{ $devotional->published_at->format('M j, Y') }}</span>
             @endif
+                    <span class="rounded-full bg-white px-3 py-1 font-bold text-slate-700">Updated {{ $devotional->updated_at->format('M j, Y') }}</span>
                 </div>
 
                 <h1 class="mt-5 text-3xl font-black tracking-normal text-slate-950 sm:text-4xl">{{ $devotional->title }}</h1>
+                <p class="mt-4 max-w-3xl rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4 text-base font-semibold leading-7 text-slate-700">{{ $summary }}</p>
+                <p class="mt-3 text-sm font-bold text-slate-500">Published by {{ $devotional->author?->name ?: config('seo.site_name') }}</p>
 
                 @if ($devotional->bible_reference || $devotional->bible_text)
                     <blockquote class="mt-6 border-l-4 border-amber-400 bg-amber-50 px-4 py-4">
@@ -37,6 +40,26 @@
                 </div>
             </div>
         </section>
+
+        @if ($devotional->bible_reference || $devotional->reflection_question || $devotional->prayer_point || $devotional->declaration)
+            <section class="app-panel border-emerald-200 bg-emerald-50">
+                <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="check-circle" class="h-5 w-5 text-emerald-800" /> Key takeaways</h2>
+                <ul class="mt-4 grid gap-3 text-sm leading-6 text-slate-700 md:grid-cols-2">
+                    @if ($devotional->bible_reference)
+                        <li class="rounded-xl bg-white p-3"><span class="font-black text-slate-950">Scripture:</span> {{ $devotional->bible_reference }}</li>
+                    @endif
+                    @if ($devotional->reflection_question)
+                        <li class="rounded-xl bg-white p-3"><span class="font-black text-slate-950">Reflect:</span> {{ $devotional->reflection_question }}</li>
+                    @endif
+                    @if ($devotional->prayer_point)
+                        <li class="rounded-xl bg-white p-3"><span class="font-black text-slate-950">Pray:</span> {{ $devotional->prayer_point }}</li>
+                    @endif
+                    @if ($devotional->declaration)
+                        <li class="rounded-xl bg-white p-3"><span class="font-black text-slate-950">Declare:</span> {{ $devotional->declaration }}</li>
+                    @endif
+                </ul>
+            </section>
+        @endif
 
         <div class="grid gap-4 md:grid-cols-3">
             @if ($devotional->reflection_question)
@@ -60,6 +83,21 @@
                 </section>
             @endif
         </div>
+
+        @if ($relatedDevotionals->isNotEmpty())
+            <section>
+                <h2 class="mb-4 text-2xl font-black tracking-normal text-slate-950">Related devotionals</h2>
+                <div class="grid gap-4 md:grid-cols-3">
+                    @foreach ($relatedDevotionals as $related)
+                        <a href="{{ route('devotionals.show', $related->slug) }}" class="app-panel app-panel-hover border-slate-200 bg-white">
+                            <p class="text-xs font-black uppercase tracking-normal text-emerald-800">{{ $related->category?->name }}</p>
+                            <h3 class="mt-2 font-black tracking-normal text-slate-950">{{ $related->title }}</h3>
+                            <p class="mt-2 text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit(strip_tags($related->content), 100) }}</p>
+                        </a>
+                    @endforeach
+                </div>
+            </section>
+        @endif
     </article>
 
     <aside class="space-y-4 lg:sticky lg:top-36">

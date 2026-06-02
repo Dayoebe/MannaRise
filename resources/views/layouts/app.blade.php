@@ -28,16 +28,22 @@
         <meta property="og:description" content="{{ $seo['description'] }}">
         <meta property="og:url" content="{{ $seo['canonical'] }}">
         <meta property="og:image" content="{{ $seo['image'] }}">
-        <meta property="og:image:alt" content="{{ $seo['raw_title'] }}">
+        <meta property="og:image:alt" content="{{ $seo['image_alt'] }}">
+        <meta property="og:image:width" content="512">
+        <meta property="og:image:height" content="512">
 
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="{{ $seo['title'] }}">
         <meta name="twitter:description" content="{{ $seo['description'] }}">
         <meta name="twitter:image" content="{{ $seo['image'] }}">
+        <meta name="twitter:image:alt" content="{{ $seo['image_alt'] }}">
         @if ($seo['twitter_site'])
             <meta name="twitter:site" content="{{ $seo['twitter_site'] }}">
         @endif
 
+        <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ route('seo.sitemap') }}">
+        <link rel="alternate" type="application/rss+xml" title="{{ $seo['site_name'] }} RSS Feed" href="{{ route('seo.feed') }}">
+        <link rel="alternate" type="application/atom+xml" title="{{ $seo['site_name'] }} Atom Feed" href="{{ route('seo.feed.atom') }}">
         <link rel="manifest" href="/manifest.webmanifest">
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png">
@@ -309,6 +315,22 @@
                     <div class="sr-only" data-mannarise-toast="{{ session('status') }}"></div>
                 @endif
 
+                @if (! request()->routeIs('home') && count($seo['breadcrumbs'] ?? []) > 1)
+                    <nav aria-label="Breadcrumb" class="mb-4 flex flex-wrap items-center gap-2 text-sm font-bold text-slate-500">
+                        @foreach ($seo['breadcrumbs'] as $index => $breadcrumb)
+                            @if ($index > 0)
+                                <x-ui.icon name="chevron-right" class="h-3.5 w-3.5 text-slate-400" />
+                            @endif
+
+                            @if (! empty($breadcrumb['url']) && ! $loop->last)
+                                <a href="{{ $breadcrumb['url'] }}" class="hover:text-emerald-800">{{ $breadcrumb['label'] }}</a>
+                            @else
+                                <span class="{{ $loop->last ? 'text-slate-800' : '' }}">{{ $breadcrumb['label'] }}</span>
+                            @endif
+                        @endforeach
+                    </nav>
+                @endif
+
                 {{ $slot }}
             </main>
         </div>
@@ -395,7 +417,12 @@
         <footer class="app-footer border-t border-slate-200 bg-white">
             <div class="mx-auto flex max-w-7xl flex-col gap-4 px-3 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-5 lg:px-8">
                 <span class="inline-flex items-center gap-2 font-semibold text-slate-700"><x-ui.icon name="sparkles" class="h-4 w-4 text-emerald-800" /> MannaRise devotional and spiritual growth platform.</span>
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <a href="{{ route('about') }}" class="font-bold text-slate-600 hover:text-emerald-800">About</a>
+                    <a href="{{ route('contact') }}" class="font-bold text-slate-600 hover:text-emerald-800">Contact</a>
+                    <a href="{{ route('seo.sitemap') }}" class="font-bold text-slate-600 hover:text-emerald-800">Sitemap</a>
+                    <a href="{{ route('seo.llms') }}" class="font-bold text-slate-600 hover:text-emerald-800">llms.txt</a>
+                    <a href="{{ route('seo.feed') }}" class="font-bold text-slate-600 hover:text-emerald-800">RSS</a>
                     <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
                     <span class="h-3 w-3 rounded-full bg-sky-400"></span>
                     <span class="h-3 w-3 rounded-full bg-amber-400"></span>

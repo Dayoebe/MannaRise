@@ -10,14 +10,15 @@
                 <button type="button" wire:click="importExternal" class="btn-primary bg-emerald-700 hover:bg-emerald-800"><x-ui.icon name="download" class="h-4 w-4" /> Refresh free books</button>
             @endif
         </div>
-        <input type="search" wire:model.live.debounce.350ms="search" placeholder="Search books or authors" class="field-input mt-5 border-emerald-300 focus:border-emerald-700 focus:ring-emerald-100">
+        <label for="resource-books-search" class="sr-only">Search books</label>
+        <input id="resource-books-search" type="search" wire:model.live.debounce.350ms="search" placeholder="Search books or authors" class="field-input mt-5 border-emerald-300 focus:border-emerald-700 focus:ring-emerald-100">
     </section>
 
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         @forelse ($books as $book)
             <a href="{{ route('resources.show', $book->slug) }}" class="app-panel app-panel-hover border-slate-200 bg-white">
                 @if ($book->thumbnail_url)
-                    <img src="{{ $book->thumbnail_url }}" alt="" class="mb-4 h-44 w-full rounded-xl object-cover">
+                    <img src="{{ $book->thumbnail_url }}" alt="{{ $book->title }} cover image" loading="lazy" width="640" height="360" class="mb-4 h-44 w-full rounded-xl object-cover">
                 @endif
                 <p class="text-xs font-black uppercase text-emerald-800">{{ $book->source_name ?: 'Book' }}</p>
                 <h2 class="mt-2 text-xl font-black tracking-normal text-slate-950">{{ $book->title }}</h2>

@@ -11,7 +11,12 @@
                 <div>
                     <p class="app-eyebrow border-emerald-200 bg-emerald-50 text-emerald-900"><x-ui.icon :name="$resource->category?->icon ?: 'library'" class="h-4 w-4" /> {{ $resource->type }}</p>
                     <h1 class="mt-4 max-w-4xl font-display text-4xl font-black leading-tight tracking-normal text-slate-950">{{ $resource->title }}</h1>
-                    <p class="mt-3 text-sm font-bold text-slate-500">{{ $resource->author ?: $resource->source_name }} @if ($resource->license) · {{ $resource->license }} @endif</p>
+                    <p class="mt-3 text-sm font-bold text-slate-500">
+                        {{ $resource->author ?: $resource->source_name ?: config('seo.site_name') }}
+                        @if ($resource->published_at) · Published {{ $resource->published_at->format('M j, Y') }} @endif
+                        · Updated {{ $resource->updated_at->format('M j, Y') }}
+                        @if ($resource->license) · {{ $resource->license }} @endif
+                    </p>
                 </div>
                 @auth
                     <button type="button" wire:click="toggleBookmark" class="btn-secondary border-emerald-200 px-3">
@@ -23,7 +28,7 @@
             </div>
 
             @if ($resource->thumbnail_url && ! in_array($resource->type, ['video'], true))
-                <img src="{{ $resource->thumbnail_url }}" alt="" class="mt-6 max-h-96 w-full rounded-2xl object-cover">
+                <img src="{{ $resource->thumbnail_url }}" alt="{{ $resource->title }} cover image" loading="lazy" width="1200" height="630" class="mt-6 max-h-96 w-full rounded-2xl object-cover">
             @endif
 
             @if ($resource->type === 'video' && $resource->embed_url)
@@ -32,12 +37,12 @@
                 </div>
             @elseif (in_array($resource->type, ['audio', 'sermon'], true) && $resource->media_url)
                 <div class="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                    <audio controls class="w-full" src="{{ $resource->media_url }}"></audio>
+                    <audio controls preload="none" class="w-full" src="{{ $resource->media_url }}" aria-label="{{ $resource->title }}"></audio>
                 </div>
             @endif
 
             @if ($resource->excerpt)
-                <p class="mt-6 text-lg font-semibold leading-8 text-slate-700">{{ $resource->excerpt }}</p>
+                <p class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-lg font-semibold leading-8 text-slate-700">{{ $resource->excerpt }}</p>
             @endif
 
             @if ($resource->content || $resource->description)

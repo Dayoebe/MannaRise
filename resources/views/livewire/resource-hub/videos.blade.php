@@ -10,7 +10,8 @@
                 <button type="button" wire:click="importExternal" class="btn-primary bg-sky-700 hover:bg-sky-800"><x-ui.icon name="download" class="h-4 w-4" /> Refresh videos</button>
             @endif
         </div>
-        <input type="search" wire:model.live.debounce.350ms="search" placeholder="Search videos" class="field-input mt-5 border-sky-300 focus:border-sky-700 focus:ring-sky-100">
+        <label for="resource-videos-search" class="sr-only">Search videos</label>
+        <input id="resource-videos-search" type="search" wire:model.live.debounce.350ms="search" placeholder="Search videos" class="field-input mt-5 border-sky-300 focus:border-sky-700 focus:ring-sky-100">
     </section>
 
     <div class="grid gap-4 lg:grid-cols-3">
@@ -18,7 +19,7 @@
             <a href="{{ route('resources.show', $video->slug) }}" class="app-panel app-panel-hover border-slate-200 bg-white">
                 <div class="aspect-video overflow-hidden rounded-xl bg-slate-950">
                     @if ($video->thumbnail_url)
-                        <img src="{{ $video->thumbnail_url }}" alt="" class="h-full w-full object-cover">
+                        <img src="{{ $video->thumbnail_url }}" alt="{{ $video->title }} video thumbnail" loading="lazy" width="640" height="360" class="h-full w-full object-cover">
                     @endif
                 </div>
                 <p class="mt-4 text-xs font-black uppercase text-sky-800">{{ $video->source_name ?: 'Video' }}</p>
