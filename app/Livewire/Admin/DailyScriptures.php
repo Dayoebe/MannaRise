@@ -47,10 +47,10 @@ class DailyScriptures extends Component
 
     public function refreshToday(BibleVerseService $service): void
     {
-        $verse = $service->getDailyVerse($this->provider, today(), true);
+        $verse = $service->getThemedDailyVerse(today(), $this->provider, true);
 
         if (! $verse) {
-            $this->statusMessage = 'The selected provider did not return a verse. Check provider settings or try again later.';
+            $this->statusMessage = 'No themed local verse or provider verse is available. Check Bible seed data, provider settings, or try again later.';
 
             return;
         }

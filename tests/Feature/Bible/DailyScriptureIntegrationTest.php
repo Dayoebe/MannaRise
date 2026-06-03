@@ -3,6 +3,8 @@
 namespace Tests\Feature\Bible;
 
 use App\Livewire\Daily\Index as DailyIndex;
+use App\Models\BibleBook;
+use App\Models\BibleVerse;
 use App\Models\DailyScripture;
 use App\Models\MemoryVerseProgress;
 use App\Models\User;
@@ -11,6 +13,8 @@ use App\Services\Bible\BibleProviderInterface;
 use App\Services\Bible\BibleVerseData;
 use App\Services\Bible\BibleVerseService;
 use App\Services\Bible\OurMannaProvider;
+use App\Support\DailySpiritualRhythm;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
@@ -155,6 +159,95 @@ class DailyScriptureIntegrationTest extends TestCase
             'verse_date' => today()->toDateString(),
             'reference' => 'John 15:5',
             'provider' => 'bible_api_com',
+        ]);
+    }
+
+    public function test_daily_rhythm_selects_a_stable_themed_verse_for_the_affirmation(): void
+    {
+        $james = BibleBook::create([
+            'book_order' => 59,
+            'name' => 'James',
+            'slug' => 'james',
+            'abbreviation' => 'Jas',
+            'testament' => 'New Testament',
+            'chapters' => 5,
+        ]);
+
+        $genesis = BibleBook::create([
+            'book_order' => 1,
+            'name' => 'Genesis',
+            'slug' => 'genesis',
+            'abbreviation' => 'Gen',
+            'testament' => 'Old Testament',
+            'chapters' => 1,
+        ]);
+
+        BibleVerse::create([
+            'bible_book_id' => $genesis->id,
+            'language' => 'en',
+            'version' => 'KJV',
+            'chapter' => 1,
+            'verse' => 1,
+            'text' => 'In the beginning God created the heaven and the earth.',
+        ]);
+
+        BibleVerse::create([
+            'bible_book_id' => $james->id,
+            'language' => 'en',
+            'version' => 'KJV',
+            'chapter' => 1,
+            'verse' => 5,
+            'text' => 'If any of you lack wisdom, let him ask of God.',
+        ]);
+
+        $rhythm = DailySpiritualRhythm::forDate(CarbonImmutable::parse('2024-01-01'));
+
+        $this->assertSame('wisdom', $rhythm['affirmation']['theme']);
+        $this->assertSame('James', $rhythm['verse']?->book->name);
+        $this->assertSame(1, $rhythm['verse']?->chapter);
+        $this->assertSame(5, $rhythm['verse']?->verse);
+    }
+
+    public function test_sync_daily_scripture_prefers_local_themed_verse_when_available(): void
+    {
+        $james = BibleBook::create([
+            'book_order' => 59,
+            'name' => 'James',
+            'slug' => 'james',
+            'abbreviation' => 'Jas',
+            'testament' => 'New Testament',
+            'chapters' => 5,
+        ]);
+
+        BibleVerse::create([
+            'bible_book_id' => $james->id,
+            'language' => 'en',
+            'version' => 'KJV',
+            'chapter' => 1,
+            'verse' => 5,
+            'text' => 'If any of you lack wisdom, let him ask of God.',
+        ]);
+
+        Http::fake([
+            'https://bible-api.com/*' => Http::response([
+                'random_verse' => [
+                    'book' => 'Genesis',
+                    'chapter' => 1,
+                    'verse' => 1,
+                    'text' => 'In the beginning.',
+                ],
+                'translation' => ['identifier' => 'web'],
+            ]),
+        ]);
+
+        $this->artisan('mannarise:sync-daily-scripture --force --date=2024-01-01')
+            ->assertSuccessful();
+
+        $this->assertDatabaseHas('daily_scriptures', [
+            'verse_date' => '2024-01-01',
+            'reference' => 'James 1:5',
+            'provider' => 'mannarise_theme',
+            'translation' => 'KJV',
         ]);
     }
 

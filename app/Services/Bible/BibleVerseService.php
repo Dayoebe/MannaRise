@@ -4,6 +4,7 @@ namespace App\Services\Bible;
 
 use App\Models\DailyScripture;
 use App\Models\PlatformSetting;
+use App\Support\DailySpiritualRhythm;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -28,6 +29,42 @@ class BibleVerseService
 
         return Cache::remember($cacheKey, $this->cacheTtl(), function () use ($provider) {
             return $this->fromProviders($this->providerOrder($provider), fn (BibleProviderInterface $provider) => $provider->getDailyVerse());
+        });
+    }
+
+    public function getThemedDailyVerse(?CarbonInterface $date = null, ?string $fallbackProvider = null, bool $force = false): ?BibleVerseData
+    {
+        $date ??= today();
+        $fallbackProvider ??= $this->configuredProvider();
+        $cacheKey = 'bible.themed_daily_verse.'.$date->toDateString().'.'.$fallbackProvider;
+
+        if ($force) {
+            Cache::forget($cacheKey);
+        }
+
+        return Cache::remember($cacheKey, $this->cacheTtl(), function () use ($date, $fallbackProvider, $force) {
+            $verse = DailySpiritualRhythm::verseForDate($date);
+            $affirmation = DailySpiritualRhythm::affirmationForDate($date);
+
+            if ($verse && $verse->book) {
+                return new BibleVerseData(
+                    provider: 'mannarise_theme',
+                    reference: $verse->book->name.' '.$verse->chapter.':'.$verse->verse,
+                    text: $verse->text,
+                    translation: $verse->version,
+                    book: $verse->book->name,
+                    chapter: $verse->chapter,
+                    verse: (string) $verse->verse,
+                    payload: [
+                        'theme' => $affirmation['theme'] ?? null,
+                        'theme_label' => $affirmation['theme_label'] ?? null,
+                        'affirmation_reference' => $affirmation['reference'] ?? null,
+                        'selection' => 'stable_theme_pool',
+                    ],
+                );
+            }
+
+            return $this->getDailyVerse($fallbackProvider, $date, $force);
         });
     }
 
@@ -63,7 +100,7 @@ class BibleVerseService
             return $scripture;
         }
 
-        $verse = $this->getDailyVerse();
+        $verse = $this->getThemedDailyVerse();
 
         if (! $verse) {
             return null;

@@ -27,7 +27,7 @@ class SyncDailyScripture extends Command
         }
 
         try {
-            $verse = $service->getDailyVerse($provider, $date, $force);
+            $verse = $service->getThemedDailyVerse($date, $provider, $force);
         } catch (Throwable $exception) {
             $this->components->error('Daily scripture sync failed: '.$exception->getMessage());
 
