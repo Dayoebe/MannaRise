@@ -20,16 +20,24 @@
 
         <div class="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,25rem)] lg:items-end">
             <div>
-                <p class="app-eyebrow border-emerald-200 bg-emerald-50 text-emerald-900"><x-ui.icon name="star" class="h-4 w-4" /> Public daily devotion</p>
-                <h1 class="mt-3 app-section-title">MannaRise Daily Devotion</h1>
+                <p class="app-eyebrow border-emerald-200 bg-emerald-50 text-emerald-900"><x-ui.icon name="star" class="h-4 w-4" /> {{ $copy['page_eyebrow'] }}</p>
+                <h1 class="mt-3 app-section-title">{{ $copy['page_title'] }}</h1>
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                    Scripture, affirmation, prayer, and a journal prompt for {{ $date->format('F j, Y') }}.
+                    {{ $copy['page_intro'] }}
                 </p>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                    @foreach ($languageOptions as $option)
+                        <a href="{{ $option['url'] }}" class="inline-flex min-h-9 items-center rounded-full border px-3 py-1.5 text-xs font-black {{ $option['current'] ? 'border-emerald-700 bg-emerald-700 text-white' : 'border-emerald-200 bg-white text-emerald-900 hover:bg-emerald-50' }}">
+                            {{ strtoupper($option['code']) }}
+                        </a>
+                    @endforeach
+                </div>
             </div>
 
             <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-                <a href="{{ $previousUrl }}" class="btn-secondary border-emerald-200 hover:bg-emerald-50"><x-ui.icon name="chevron-left" class="h-4 w-4" /> Previous day</a>
-                <a href="{{ $nextUrl }}" class="btn-secondary border-emerald-200 hover:bg-emerald-50">Next day <x-ui.icon name="chevron-right" class="h-4 w-4" /></a>
+                <a href="{{ $previousUrl }}" class="btn-secondary border-emerald-200 hover:bg-emerald-50"><x-ui.icon name="chevron-left" class="h-4 w-4" /> {{ $copy['previous_day'] }}</a>
+                <a href="{{ $nextUrl }}" class="btn-secondary border-emerald-200 hover:bg-emerald-50">{{ $copy['next_day'] }} <x-ui.icon name="chevron-right" class="h-4 w-4" /></a>
             </div>
         </div>
     </section>
@@ -37,32 +45,32 @@
     <section data-daily-devotion-card wire:ignore class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)] lg:items-start">
         <main class="space-y-5">
             <article class="app-panel border-blue-200 bg-blue-50">
-                <p class="app-eyebrow border-blue-200 bg-white text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> Scripture</p>
+                <p class="app-eyebrow border-blue-200 bg-white text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $copy['scripture_label'] }}</p>
                 <blockquote class="mt-4 font-serif text-2xl font-semibold leading-9 text-slate-950">"{{ $scripture['text'] }}"</blockquote>
                 <p class="mt-4 text-sm font-black tracking-normal text-blue-900">{{ $scripture['reference'] }}</p>
 
                 @if ($chapterUrl)
                     <a href="{{ $chapterUrl }}" class="mt-5 btn-secondary border-blue-200 text-blue-900 hover:bg-white">
-                        Read full chapter <x-ui.icon name="chevron-right" class="h-4 w-4" />
+                        {{ $copy['read_chapter'] }} <x-ui.icon name="chevron-right" class="h-4 w-4" />
                     </a>
                 @endif
             </article>
 
             <div class="grid gap-5 md:grid-cols-2">
                 <article class="app-panel border-amber-200 bg-amber-50">
-                    <p class="app-eyebrow border-amber-200 bg-white text-amber-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> Affirmation</p>
+                    <p class="app-eyebrow border-amber-200 bg-white text-amber-900"><x-ui.icon name="sparkles" class="h-4 w-4" /> {{ $copy['affirmation_label'] }}</p>
                     <p class="mt-4 font-serif text-2xl font-semibold leading-9 text-slate-950">{{ $affirmation['text'] }}</p>
                     <p class="mt-4 text-sm font-black tracking-normal text-amber-900">{{ $affirmation['reference'] }}</p>
                 </article>
 
                 <article class="app-panel border-rose-200 bg-rose-50">
-                    <p class="app-eyebrow border-rose-200 bg-white text-rose-900"><x-ui.icon name="heart" class="h-4 w-4" /> Prayer</p>
+                    <p class="app-eyebrow border-rose-200 bg-white text-rose-900"><x-ui.icon name="heart" class="h-4 w-4" /> {{ $copy['prayer_label'] }}</p>
                     <p class="mt-4 text-base font-semibold leading-7 text-slate-800">{{ $reflection['prayer'] }}</p>
                 </article>
             </div>
 
             <article class="app-panel border-violet-200 bg-violet-50">
-                <p class="app-eyebrow border-violet-200 bg-white text-violet-900"><x-ui.icon name="journal" class="h-4 w-4" /> Journal prompt</p>
+                <p class="app-eyebrow border-violet-200 bg-white text-violet-900"><x-ui.icon name="journal" class="h-4 w-4" /> {{ $copy['journal_label'] }}</p>
                 <h2 class="mt-4 text-2xl font-black tracking-normal text-slate-950">{{ $reflection['journal_prompt'] }}</h2>
                 <p class="mt-3 text-sm leading-6 text-slate-600">{{ $reflection['action'] }}</p>
             </article>
@@ -70,14 +78,14 @@
 
         <aside class="space-y-4 lg:sticky lg:top-36">
             <div class="app-panel border-sky-200 bg-sky-50">
-                <h2 class="flex items-center gap-2 font-black tracking-normal text-slate-950"><x-ui.icon name="share-2" class="h-4 w-4 text-sky-900" /> Share daily card</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-600">Public link. No login needed.</p>
+                <h2 class="flex items-center gap-2 font-black tracking-normal text-slate-950"><x-ui.icon name="share-2" class="h-4 w-4 text-sky-900" /> {{ $copy['share_title'] }}</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-600">{{ $copy['share_note'] }}</p>
 
                 <div class="mt-4 grid gap-2">
-                    <button type="button" data-daily-card-action="download" class="btn-primary w-full bg-sky-700 hover:bg-sky-800"><x-ui.icon name="download" class="h-4 w-4" /> Download image</button>
-                    <button type="button" data-daily-card-action="whatsapp" class="btn-secondary w-full border-emerald-200 text-emerald-900 hover:bg-emerald-50"><x-ui.icon name="whatsapp" class="h-4 w-4" /> WhatsApp share</button>
-                    <button type="button" data-daily-card-action="copy" class="btn-secondary w-full border-sky-200 hover:bg-white"><x-ui.icon name="link" class="h-4 w-4" /> Copy link</button>
-                    <button type="button" data-daily-card-action="native" class="btn-secondary w-full border-slate-200 hover:bg-white"><x-ui.icon name="share-2" class="h-4 w-4" /> Device share</button>
+                    <button type="button" data-daily-card-action="download" class="btn-primary w-full bg-sky-700 hover:bg-sky-800"><x-ui.icon name="download" class="h-4 w-4" /> {{ $copy['download_image'] }}</button>
+                    <button type="button" data-daily-card-action="whatsapp" class="btn-secondary w-full border-emerald-200 text-emerald-900 hover:bg-emerald-50"><x-ui.icon name="whatsapp" class="h-4 w-4" /> {{ $copy['whatsapp_share'] }}</button>
+                    <button type="button" data-daily-card-action="copy" class="btn-secondary w-full border-sky-200 hover:bg-white"><x-ui.icon name="link" class="h-4 w-4" /> {{ $copy['copy_link'] }}</button>
+                    <button type="button" data-daily-card-action="native" class="btn-secondary w-full border-slate-200 hover:bg-white"><x-ui.icon name="share-2" class="h-4 w-4" /> {{ $copy['device_share'] }}</button>
                 </div>
 
                 <p data-daily-card-status class="mt-3 min-h-5 text-sm font-bold text-sky-900"></p>
@@ -222,7 +230,7 @@
                 ctx.fillStyle = '#047857';
                 ctx.font = `700 31px ${displayFont}`;
                 ctx.textBaseline = 'top';
-                ctx.fillText('DAILY DEVOTION', panelX + 76, panelY + 56);
+                ctx.fillText(card.labels.daily_devotion, panelX + 76, panelY + 56);
 
                 ctx.fillStyle = '#0f172a';
                 ctx.font = `800 34px ${sansFont}`;
@@ -259,7 +267,7 @@
                 fillRoundRect(panelX + 58, affirmationY - 26, panelWidth - 116, 152, 28, '#fffbeb');
                 ctx.fillStyle = '#92400e';
                 ctx.font = `800 25px ${sansFont}`;
-                ctx.fillText('AFFIRMATION', panelX + 94, affirmationY);
+                ctx.fillText(card.labels.affirmation, panelX + 94, affirmationY);
                 ctx.fillStyle = '#0f172a';
                 ctx.font = `600 34px ${serifFont}`;
                 wrapText(card.affirmation, panelWidth - 188).slice(0, 2).forEach((line, index) => {
@@ -269,7 +277,7 @@
                 const prayerY = affirmationY + 192;
                 ctx.fillStyle = '#be123c';
                 ctx.font = `800 25px ${sansFont}`;
-                ctx.fillText('PRAYER', panelX + 58, prayerY);
+                ctx.fillText(card.labels.prayer, panelX + 58, prayerY);
                 ctx.fillStyle = '#0f172a';
                 ctx.font = `600 32px ${serifFont}`;
                 wrapText(card.prayer, panelWidth - 116).slice(0, 3).forEach((line, index) => {
@@ -279,7 +287,7 @@
                 const journalY = prayerY + 188;
                 ctx.fillStyle = '#6d28d9';
                 ctx.font = `800 25px ${sansFont}`;
-                ctx.fillText('JOURNAL PROMPT', panelX + 58, journalY);
+                ctx.fillText(card.labels.journal_prompt, panelX + 58, journalY);
                 ctx.fillStyle = '#0f172a';
                 ctx.font = `600 32px ${serifFont}`;
                 wrapText(card.journal_prompt, panelWidth - 116).slice(0, 2).forEach((line, index) => {
@@ -294,7 +302,7 @@
                 ctx.fillText('MannaRise', panelX + 58, footerTop + 62);
                 ctx.fillStyle = '#047857';
                 ctx.font = `800 30px ${sansFont}`;
-                ctx.fillText('grow daily', panelX + 58, footerTop + 118);
+                ctx.fillText(card.labels.growth, panelX + 58, footerTop + 118);
                 ctx.font = `800 26px ${sansFont}`;
                 ctx.fillText(card.app_url, panelX + 58, footerTop + 154);
             }
@@ -328,23 +336,23 @@
                 link.download = `mannarise-daily-devotion-${slugify(card.date, 'today')}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                setStatus('Daily card downloaded.');
+                setStatus(card.status.downloaded);
             }
 
             async function copyLink() {
                 if (! navigator.clipboard) {
-                    setStatus('Clipboard copy is not available in this browser.');
+                    setStatus(card.status.copy_unavailable);
                     return;
                 }
 
                 await navigator.clipboard.writeText(card.url);
-                setStatus('Daily devotion link copied.');
+                setStatus(card.status.copied);
             }
 
             async function nativeShare() {
                 if (! navigator.share) {
                     await copyLink();
-                    setStatus('Device sharing is not available, so the link was copied.');
+                    setStatus(card.status.native_unavailable);
                     return;
                 }
 
@@ -358,10 +366,10 @@
                         await navigator.share({ title: card.title, text: shareText(), url: card.url });
                     }
 
-                    setStatus('Share sheet opened.');
+                    setStatus(card.status.shared);
                 } catch (error) {
                     if (error?.name !== 'AbortError') {
-                        setStatus('Sharing was not completed.');
+                        setStatus(card.status.not_completed);
                     }
                 }
             }
@@ -384,7 +392,7 @@
                     }
 
                     window.open(`https://wa.me/?text=${encodeURIComponent(shareText())}`, '_blank', 'noopener,noreferrer,width=720,height=640');
-                    setStatus('WhatsApp share opened.');
+                    setStatus(card.status.whatsapp);
                 });
             });
 

@@ -10,6 +10,7 @@ use App\Models\SpiritualBook;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Str;
+use Throwable;
 
 class Seo
 {
@@ -28,6 +29,7 @@ class Seo
         $image = self::absoluteUrl((string) ($overrides['image'] ?? config('seo.image')));
         $type = $overrides['type'] ?? 'website';
         $breadcrumbs = $overrides['breadcrumbs'] ?? self::homeBreadcrumb();
+        $language = (string) ($overrides['language'] ?? str_replace('_', '-', app()->getLocale()));
 
         return [
             'title' => self::title($rawTitle, $siteName),
@@ -41,7 +43,11 @@ class Seo
             'site_name' => $siteName,
             'twitter_site' => config('seo.twitter_site'),
             'breadcrumbs' => $breadcrumbs,
-            'schema' => $overrides['schema'] ?? self::defaultSchema($canonical, $rawTitle, $description, $breadcrumbs),
+            'schema' => $overrides['schema'] ?? self::defaultSchema($canonical, $rawTitle, $description, $breadcrumbs, language: $language),
+            'language' => $language,
+            'locale_code' => $overrides['locale_code'] ?? $language,
+            'og_locale' => $overrides['og_locale'] ?? str_replace('-', '_', $language),
+            'alternates' => $overrides['alternates'] ?? [],
         ];
     }
 
@@ -58,9 +64,14 @@ class Seo
                 'title' => 'MannaRise | Daily Devotionals, Bible Study, Prayer and Spiritual Growth',
                 'description' => 'MannaRise is a Christian spiritual growth platform for daily Bible-based devotionals, prayer prompts, journaling, testimonies, memory verses, devotional plans, and community prayer.',
                 'canonical' => route('home'),
+                'language' => LanguagePages::language('en')['html_locale'],
+                'locale_code' => 'en',
+                'og_locale' => LanguagePages::language('en')['og_locale'],
+                'alternates' => LanguagePages::homeAlternates(),
                 'breadcrumbs' => self::homeBreadcrumb(),
                 'schema' => self::homeSchema(),
             ],
+            'localized.home' => LanguagePages::homeMeta((string) $route?->parameter('locale')),
             'about' => self::pageMeta(
                 'About MannaRise',
                 'Learn what MannaRise offers: daily devotionals, Bible study, prayer, journaling, testimonies, memory verses, devotional plans, and Christian community tools.',
@@ -265,9 +276,9 @@ class Seo
      * @param  array<int, array{label:string,url:string|null}>  $breadcrumbs
      * @return array<int, array<string, mixed>>
      */
-    public static function defaultSchema(string $canonical, ?string $title = null, ?string $description = null, array $breadcrumbs = [], string $schemaType = 'WebPage'): array
+    public static function defaultSchema(string $canonical, ?string $title = null, ?string $description = null, array $breadcrumbs = [], string $schemaType = 'WebPage', ?string $language = null): array
     {
-        return self::schemaGraph(self::defaultGraphNodes($canonical, $title, $description, $breadcrumbs, $schemaType));
+        return self::schemaGraph(self::defaultGraphNodes($canonical, $title, $description, $breadcrumbs, $schemaType, $language));
     }
 
     private static function pageMeta(string $title, string $description, string $canonical, array $breadcrumbTail, string $schemaType = 'WebPage'): array
@@ -291,8 +302,8 @@ class Seo
     private static function dailyPermalinkMeta(string $date, string $locale = ''): array
     {
         try {
-            $carbonDate = CarbonImmutable::createFromFormat('Y-m-d', $date);
-        } catch (\Throwable) {
+            $carbonDate = CarbonImmutable::createFromFormat('!Y-m-d', $date);
+        } catch (Throwable) {
             return [];
         }
 
@@ -303,18 +314,8 @@ class Seo
         $canonical = $locale !== ''
             ? route('daily.localized.show', ['locale' => $locale, 'date' => $date])
             : route('daily.show', ['date' => $date]);
-        $title = 'MannaRise Daily Devotion for '.$carbonDate->format('F j, Y');
-        $description = 'Read and share the MannaRise daily devotion for '.$carbonDate->format('F j, Y').': scripture, affirmation, prayer, and a journal prompt.';
 
-        return self::pageMeta(
-            $title,
-            $description,
-            $canonical,
-            [
-                ['Daily', route('daily.index')],
-                [$carbonDate->format('F j, Y'), $canonical],
-            ]
-        );
+        return LanguagePages::dailyMeta($locale !== '' ? $locale : 'en', $carbonDate, $canonical);
     }
 
     private static function privateMeta(string $title, string $canonical): array
@@ -650,7 +651,7 @@ class Seo
      * @param  array<int, array{label:string,url:string|null}>  $breadcrumbs
      * @return array<int, array<string, mixed>>
      */
-    private static function defaultGraphNodes(string $canonical, ?string $title, ?string $description, array $breadcrumbs, string $schemaType): array
+    private static function defaultGraphNodes(string $canonical, ?string $title, ?string $description, array $breadcrumbs, string $schemaType, ?string $language = null): array
     {
         $nodes = [
             self::organizationNode(),
@@ -663,7 +664,7 @@ class Seo
                 'description' => $description ?: config('seo.description'),
                 'isPartOf' => ['@id' => self::siteUrl('/#website')],
                 'about' => ['@id' => self::siteUrl('/#organization')],
-                'inLanguage' => str_replace('_', '-', app()->getLocale()),
+                'inLanguage' => $language ?: str_replace('_', '-', app()->getLocale()),
             ],
         ];
 

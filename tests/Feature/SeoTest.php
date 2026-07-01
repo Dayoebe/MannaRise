@@ -17,9 +17,23 @@ class SeoTest extends TestCase
             ->assertOk()
             ->assertSee('<meta name="description"', false)
             ->assertSee('<link rel="canonical"', false)
+            ->assertSee('hreflang="fr"', false)
+            ->assertSee(route('localized.home', ['locale' => 'fr']), false)
             ->assertSee('<meta property="og:title"', false)
             ->assertSee('<meta name="twitter:card" content="summary_large_image">', false)
             ->assertSee('application/ld+json', false);
+    }
+
+    public function test_localized_landing_page_renders_language_seo(): void
+    {
+        $this->get(route('localized.home', ['locale' => 'fr']))
+            ->assertOk()
+            ->assertSee('<html lang="fr"', false)
+            ->assertSee('MannaRise en français')
+            ->assertSee('<meta property="og:locale" content="fr_FR">', false)
+            ->assertSee('hreflang="x-default"', false)
+            ->assertSee('hreflang="yo"', false)
+            ->assertSee(route('localized.home', ['locale' => 'yo']), false);
     }
 
     public function test_robots_txt_is_available(): void
@@ -59,8 +73,13 @@ class SeoTest extends TestCase
         $this->get(route('seo.sitemap.pages'))
             ->assertOk()
             ->assertSee('<urlset', false)
+            ->assertSee('xmlns:xhtml="http://www.w3.org/1999/xhtml"', false)
             ->assertSee(route('home'), false)
+            ->assertSee(route('localized.home', ['locale' => 'fr']), false)
+            ->assertSee('hreflang="fr"', false)
+            ->assertSee('hreflang="x-default"', false)
             ->assertSee(route('daily.show', ['date' => now()->toDateString()]), false)
+            ->assertSee(route('daily.localized.show', ['locale' => 'fr', 'date' => now()->toDateString()]), false)
             ->assertSee(route('prayer-invites.show'), false);
 
         $this->get(route('seo.sitemap.devotionals'))

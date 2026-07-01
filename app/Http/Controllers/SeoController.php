@@ -8,6 +8,7 @@ use App\Models\PrayerRoom;
 use App\Models\ResourceItem;
 use App\Models\SpiritualBook;
 use App\Support\DevotionalPlans;
+use App\Support\LanguagePages;
 use App\Support\Seo;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -193,6 +194,16 @@ class SeoController extends Controller
                 'lastmod' => $this->latestTimestamp(),
                 'changefreq' => $item['changefreq'] ?? 'weekly',
                 'priority' => $item['priority'] ?? '0.7',
+                'alternates' => $item['route'] === 'home' ? LanguagePages::homeAlternates() : [],
+            ]);
+
+        $localizedHomes = collect(LanguagePages::codes())
+            ->map(fn (string $locale): array => [
+                'loc' => route('localized.home', ['locale' => $locale]),
+                'lastmod' => $this->latestTimestamp(),
+                'changefreq' => 'daily',
+                'priority' => $locale === 'en' ? '0.95' : '0.85',
+                'alternates' => LanguagePages::homeAlternates(),
             ]);
 
         $plans = collect(DevotionalPlans::all())
@@ -213,14 +224,28 @@ class SeoController extends Controller
 
         $dailyPermalinks = collect(range(0, 14))
             ->map(fn (int $daysAgo): Carbon => Carbon::today()->subDays($daysAgo))
-            ->map(fn (Carbon $date): array => [
-                'loc' => route('daily.show', ['date' => $date->toDateString()]),
-                'lastmod' => $date->isToday() ? $this->latestTimestamp() : $date->endOfDay()->toAtomString(),
-                'changefreq' => $date->isToday() ? 'daily' : 'weekly',
-                'priority' => $date->isToday() ? '0.9' : '0.6',
-            ]);
+            ->flatMap(function (Carbon $date): Collection {
+                $lastmod = $date->isToday() ? $this->latestTimestamp() : $date->copy()->endOfDay()->toAtomString();
+                $alternates = LanguagePages::dailyAlternates($date);
+                $entries = collect([[
+                    'loc' => route('daily.show', ['date' => $date->toDateString()]),
+                    'lastmod' => $lastmod,
+                    'changefreq' => $date->isToday() ? 'daily' : 'weekly',
+                    'priority' => $date->isToday() ? '0.9' : '0.6',
+                    'alternates' => $alternates,
+                ]]);
+
+                return $entries->merge(collect(LanguagePages::codes())->map(fn (string $locale): array => [
+                    'loc' => route('daily.localized.show', ['locale' => $locale, 'date' => $date->toDateString()]),
+                    'lastmod' => $lastmod,
+                    'changefreq' => $date->isToday() ? 'daily' : 'weekly',
+                    'priority' => $date->isToday() ? '0.85' : '0.55',
+                    'alternates' => $alternates,
+                ]));
+            });
 
         return $static
+            ->merge($localizedHomes)
             ->merge($dailyPermalinks)
             ->merge($plans)
             ->merge($rooms)

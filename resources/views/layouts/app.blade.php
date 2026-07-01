@@ -3,7 +3,7 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ $seo['language'] }}" class="h-full">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -20,8 +20,11 @@
 
         <title>{{ $seo['title'] }}</title>
         <link rel="canonical" href="{{ $seo['canonical'] }}">
+        @foreach ($seo['alternates'] as $hreflang => $href)
+            <link rel="alternate" hreflang="{{ $hreflang }}" href="{{ $href }}">
+        @endforeach
 
-        <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}">
+        <meta property="og:locale" content="{{ $seo['og_locale'] }}">
         <meta property="og:site_name" content="{{ $seo['site_name'] }}">
         <meta property="og:type" content="{{ $seo['type'] }}">
         <meta property="og:title" content="{{ $seo['title'] }}">
@@ -423,6 +426,9 @@
                     <a href="{{ route('seo.sitemap') }}" class="font-bold text-slate-600 hover:text-emerald-800">Sitemap</a>
                     <a href="{{ route('seo.llms') }}" class="font-bold text-slate-600 hover:text-emerald-800">llms.txt</a>
                     <a href="{{ route('seo.feed') }}" class="font-bold text-slate-600 hover:text-emerald-800">RSS</a>
+                    @foreach (\App\Support\LanguagePages::homeOptions($seo['locale_code'] ?? 'en') as $languageOption)
+                        <a href="{{ $languageOption['url'] }}" class="font-bold {{ $languageOption['current'] ? 'text-emerald-800' : 'text-slate-600 hover:text-emerald-800' }}">{{ strtoupper($languageOption['code']) }}</a>
+                    @endforeach
                     <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
                     <span class="h-3 w-3 rounded-full bg-sky-400"></span>
                     <span class="h-3 w-3 rounded-full bg-amber-400"></span>

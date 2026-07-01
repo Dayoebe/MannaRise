@@ -4,6 +4,7 @@ namespace App\Livewire\Daily;
 
 use App\Models\DailyScripture;
 use App\Support\DailySpiritualRhythm;
+use App\Support\LanguagePages;
 use Carbon\CarbonImmutable;
 use Throwable;
 use Livewire\Component;
@@ -16,6 +17,8 @@ class Show extends Component
 
     public function mount(string $date, ?string $locale = null): void
     {
+        abort_unless($locale === null || LanguagePages::isSupported($locale), 404);
+
         try {
             $parsedDate = CarbonImmutable::createFromFormat('!Y-m-d', $date);
         } catch (Throwable) {
@@ -33,8 +36,19 @@ class Show extends Component
         $date = $this->date();
         $dailyRhythm = DailySpiritualRhythm::forDate($date);
         $scripture = $this->scripture($dailyRhythm, $date);
-        $affirmation = $dailyRhythm['affirmation'];
-        $reflection = $dailyRhythm['reflection'];
+        $copy = LanguagePages::dailyCopy($this->locale ?: 'en', $dailyRhythm, $date);
+        $affirmation = [
+            ...$dailyRhythm['affirmation'],
+            'text' => $copy['affirmation_text'],
+            'reference' => $copy['affirmation_reference'],
+        ];
+        $reflection = [
+            ...$dailyRhythm['reflection'],
+            'prayer' => $copy['prayer'],
+            'journal_prompt' => $copy['journal_prompt'],
+            'action' => $copy['action'],
+            'theme_label' => $copy['theme_label'],
+        ];
         $permalink = $this->locale
             ? route('daily.localized.show', ['locale' => $this->locale, 'date' => $date->toDateString()])
             : route('daily.show', ['date' => $date->toDateString()]);
@@ -47,9 +61,11 @@ class Show extends Component
             'reflection' => $reflection,
             'permalink' => $permalink,
             'defaultPermalink' => route('daily.show', ['date' => $date->toDateString()]),
+            'copy' => $copy,
+            'languageOptions' => LanguagePages::dailyOptions($this->locale ?: 'en', $date),
             'card' => [
-                'title' => 'MannaRise Daily Devotion',
-                'date' => $date->format('F j, Y'),
+                'title' => $copy['page_title'],
+                'date' => $copy['date_label'],
                 'scripture_text' => $scripture['text'],
                 'scripture_reference' => $scripture['reference'],
                 'affirmation' => $affirmation['text'],
@@ -59,6 +75,22 @@ class Show extends Component
                 'theme' => $reflection['theme_label'],
                 'url' => $permalink,
                 'app_url' => rtrim((string) config('app.url'), '/') ?: 'MannaRise',
+                'labels' => [
+                    'daily_devotion' => $copy['card_devotion_label'],
+                    'affirmation' => mb_strtoupper($copy['affirmation_label']),
+                    'prayer' => mb_strtoupper($copy['prayer_label']),
+                    'journal_prompt' => mb_strtoupper($copy['journal_label']),
+                    'growth' => $copy['card_growth_label'],
+                ],
+                'status' => [
+                    'downloaded' => $copy['status_downloaded'],
+                    'copy_unavailable' => $copy['status_copy_unavailable'],
+                    'copied' => $copy['status_copied'],
+                    'native_unavailable' => $copy['status_native_unavailable'],
+                    'shared' => $copy['status_shared'],
+                    'not_completed' => $copy['status_not_completed'],
+                    'whatsapp' => $copy['status_whatsapp'],
+                ],
             ],
         ]);
     }
@@ -95,37 +127,14 @@ class Show extends Component
         }
 
         $affirmation = $dailyRhythm['affirmation'] ?? [];
+        $fallback = DailySpiritualRhythm::fallbackScriptureForTheme((string) ($affirmation['theme'] ?? 'peace'));
 
         return [
-            ...$this->fallbackScripture((string) ($affirmation['theme'] ?? 'peace')),
+            'text' => $fallback['text'],
+            'reference' => $fallback['reference'],
             'book_slug' => null,
             'chapter' => null,
         ];
-    }
-
-    /**
-     * @return array{text:string,reference:string}
-     */
-    private function fallbackScripture(string $theme): array
-    {
-        $fallbacks = [
-            'wisdom' => ['reference' => 'James 1:5 KJV', 'text' => 'If any of you lack wisdom, let him ask of God, that giveth to all men liberally, and upbraideth not; and it shall be given him.'],
-            'peace' => ['reference' => 'John 14:27 KJV', 'text' => 'Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you.'],
-            'strength' => ['reference' => 'Isaiah 41:10 KJV', 'text' => 'Fear thou not; for I am with thee: be not dismayed; for I am thy God.'],
-            'fruit' => ['reference' => 'Galatians 5:22-23 KJV', 'text' => 'The fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, meekness, temperance.'],
-            'renewal' => ['reference' => 'Isaiah 40:31 KJV', 'text' => 'They that wait upon the Lord shall renew their strength; they shall mount up with wings as eagles.'],
-            'anxiety' => ['reference' => 'Philippians 4:6-7 KJV', 'text' => 'Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.'],
-            'purpose' => ['reference' => 'Ephesians 2:10 KJV', 'text' => 'For we are his workmanship, created in Christ Jesus unto good works.'],
-            'word' => ['reference' => 'Psalm 119:105 KJV', 'text' => 'Thy word is a lamp unto my feet, and a light unto my path.'],
-            'steadfast' => ['reference' => '1 Corinthians 15:58 KJV', 'text' => 'Be ye stedfast, unmoveable, always abounding in the work of the Lord.'],
-            'mercy' => ['reference' => 'Lamentations 3:22-23 KJV', 'text' => 'It is of the Lord\'s mercies that we are not consumed, because his compassions fail not.'],
-            'courage' => ['reference' => 'Joshua 1:9 KJV', 'text' => 'Be strong and of a good courage; be not afraid, neither be thou dismayed.'],
-            'endurance' => ['reference' => 'Philippians 4:13 KJV', 'text' => 'I can do all things through Christ which strengtheneth me.'],
-            'growth' => ['reference' => 'Colossians 2:7 KJV', 'text' => 'Rooted and built up in him, and stablished in the faith, as ye have been taught.'],
-            'provision' => ['reference' => 'Psalm 23:1 KJV', 'text' => 'The Lord is my shepherd; I shall not want.'],
-        ];
-
-        return $fallbacks[$theme] ?? $fallbacks['peace'];
     }
 
     private function date(): CarbonImmutable

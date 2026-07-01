@@ -42,9 +42,16 @@ class MannaRisePagesTest extends TestCase
             'is_approved' => true,
         ]);
 
-        foreach (['/', '/about', '/contact', '/daily', '/daily/2026-07-01', '/en/daily/2026-07-01', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/pray-with-me', '/pray-with-me/faith-for-today', '/audio-devotionals', '/resources', '/resources/devotion', '/resources/books', '/resources/videos', '/resources/audio', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
+        foreach (['/', '/en', '/fr', '/es', '/pt', '/sw', '/yo', '/ha', '/ig', '/about', '/contact', '/daily', '/daily/2026-07-01', '/en/daily/2026-07-01', '/fr/daily/2026-07-01', '/yo/daily/2026-07-01', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/pray-with-me', '/pray-with-me/faith-for-today', '/audio-devotionals', '/resources', '/resources/devotion', '/resources/books', '/resources/videos', '/resources/audio', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
             $this->get($path)->assertOk();
         }
+
+        $this->get('/fr')
+            ->assertOk()
+            ->assertSee('MannaRise en français')
+            ->assertSee('Prière')
+            ->assertSee('/fr/daily/', false)
+            ->assertSee('hreflang="fr"', false);
 
         $this->get('/daily/2026-07-01')
             ->assertOk()
@@ -53,6 +60,13 @@ class MannaRisePagesTest extends TestCase
             ->assertSee('Download image')
             ->assertSee('WhatsApp share')
             ->assertSee('data-daily-card-canvas', false);
+
+        $this->get('/es/daily/2026-07-01')
+            ->assertOk()
+            ->assertSee('Devocional para el 1 de julio de 2026')
+            ->assertSee('Oración')
+            ->assertSee('Copiar enlace')
+            ->assertSee('hreflang="es"', false);
 
         $this->get('/scripture-cards')
             ->assertOk()
