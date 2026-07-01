@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
+use App\Support\GrowthAnalytics;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
@@ -27,9 +28,13 @@ class Register extends Component
 
         $user = User::create($validated);
 
+        GrowthAnalytics::trackSignup(request(), $user);
+
         Auth::login($user);
 
-        request()->session()->regenerate();
+        if (request()->hasSession()) {
+            request()->session()->regenerate();
+        }
 
         return redirect()->route('onboarding');
     }

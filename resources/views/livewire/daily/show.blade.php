@@ -319,8 +319,39 @@
                     `${card.title} - ${card.date}`,
                     card.scripture_reference,
                     card.affirmation,
-                    card.url,
+                    card.share_url,
                 ].filter(Boolean).join('\n\n');
+            }
+
+            function trackCardAction(action) {
+                const payload = {
+                    language: card.analytics.language,
+                    daily_date: card.analytics.daily_date,
+                    share_id: card.analytics.share_id,
+                    share_channel: action,
+                    source: 'daily_card',
+                    medium: 'share',
+                    campaign: 'daily-devotion',
+                    url: card.url,
+                    path: window.location.pathname,
+                };
+
+                if (window.mannaRiseTrackGrowth) {
+                    window.mannaRiseTrackGrowth('shared_card_click', payload);
+                    return;
+                }
+
+                window.fetch(card.analytics.endpoint, {
+                    method: 'POST',
+                    keepalive: true,
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': card.analytics.csrf,
+                    },
+                    body: JSON.stringify({ event_type: 'shared_card_click', ...payload }),
+                }).catch(() => {});
             }
 
             function canvasBlob() {
@@ -330,6 +361,7 @@
             }
 
             function downloadImage() {
+                trackCardAction('download');
                 drawCard();
 
                 const link = document.createElement('a');
@@ -345,7 +377,8 @@
                     return;
                 }
 
-                await navigator.clipboard.writeText(card.url);
+                trackCardAction('copy');
+                await navigator.clipboard.writeText(card.share_url);
                 setStatus(card.status.copied);
             }
 
@@ -356,14 +389,16 @@
                     return;
                 }
 
+                trackCardAction('native');
+
                 const blob = await canvasBlob();
                 const file = blob ? new File([blob], `mannarise-daily-${slugify(card.date, 'today')}.png`, { type: 'image/png' }) : null;
 
                 try {
                     if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({ title: card.title, text: shareText(), url: card.url, files: [file] });
+                        await navigator.share({ title: card.title, text: shareText(), url: card.share_url, files: [file] });
                     } else {
-                        await navigator.share({ title: card.title, text: shareText(), url: card.url });
+                        await navigator.share({ title: card.title, text: shareText(), url: card.share_url });
                     }
 
                     setStatus(card.status.shared);
@@ -391,6 +426,7 @@
                         return;
                     }
 
+                    trackCardAction('whatsapp');
                     window.open(`https://wa.me/?text=${encodeURIComponent(shareText())}`, '_blank', 'noopener,noreferrer,width=720,height=640');
                     setStatus(card.status.whatsapp);
                 });

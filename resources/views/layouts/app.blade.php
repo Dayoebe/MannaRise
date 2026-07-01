@@ -17,6 +17,8 @@
         <meta name="robots" content="{{ $seo['robots'] }}">
         <meta name="description" content="{{ $seo['description'] }}">
         <meta name="author" content="{{ $seo['site_name'] }}">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="growth-analytics-endpoint" content="{{ route('analytics.events') }}">
 
         <title>{{ $seo['title'] }}</title>
         <link rel="canonical" href="{{ $seo['canonical'] }}">

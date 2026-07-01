@@ -4,6 +4,7 @@ namespace App\Livewire\Daily;
 
 use App\Models\DailyScripture;
 use App\Support\DailySpiritualRhythm;
+use App\Support\GrowthAnalytics;
 use App\Support\LanguagePages;
 use Carbon\CarbonImmutable;
 use Throwable;
@@ -29,6 +30,13 @@ class Show extends Component
 
         $this->dailyDate = $parsedDate->toDateString();
         $this->locale = $locale;
+
+        GrowthAnalytics::trackDailyPageView(
+            request(),
+            $parsedDate,
+            $this->language(),
+            $this->shareId($parsedDate),
+        );
     }
 
     public function render()
@@ -37,6 +45,7 @@ class Show extends Component
         $dailyRhythm = DailySpiritualRhythm::forDate($date);
         $scripture = $this->scripture($dailyRhythm, $date);
         $copy = LanguagePages::dailyCopy($this->locale ?: 'en', $dailyRhythm, $date);
+        $language = $this->language();
         $affirmation = [
             ...$dailyRhythm['affirmation'],
             'text' => $copy['affirmation_text'],
@@ -52,6 +61,8 @@ class Show extends Component
         $permalink = $this->locale
             ? route('daily.localized.show', ['locale' => $this->locale, 'date' => $date->toDateString()])
             : route('daily.show', ['date' => $date->toDateString()]);
+        $shareId = $this->shareId($date);
+        $trackedShareUrl = GrowthAnalytics::trackedShareUrl($permalink, $language, $date, $shareId);
 
         return view('livewire.daily.show', [
             'date' => $date,
@@ -74,7 +85,15 @@ class Show extends Component
                 'journal_prompt' => $reflection['journal_prompt'],
                 'theme' => $reflection['theme_label'],
                 'url' => $permalink,
+                'share_url' => $trackedShareUrl,
                 'app_url' => rtrim((string) config('app.url'), '/') ?: 'MannaRise',
+                'analytics' => [
+                    'language' => $language,
+                    'daily_date' => $date->toDateString(),
+                    'share_id' => $shareId,
+                    'endpoint' => route('analytics.events'),
+                    'csrf' => csrf_token(),
+                ],
                 'labels' => [
                     'daily_devotion' => $copy['card_devotion_label'],
                     'affirmation' => mb_strtoupper($copy['affirmation_label']),
@@ -140,5 +159,15 @@ class Show extends Component
     private function date(): CarbonImmutable
     {
         return CarbonImmutable::createFromFormat('!Y-m-d', $this->dailyDate);
+    }
+
+    private function language(): string
+    {
+        return $this->locale ?: 'en';
+    }
+
+    private function shareId(CarbonImmutable $date): string
+    {
+        return GrowthAnalytics::makeShareId('daily|'.$this->language().'|'.$date->toDateString());
     }
 }

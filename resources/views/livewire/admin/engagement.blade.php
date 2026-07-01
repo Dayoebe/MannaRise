@@ -20,6 +20,58 @@
         </div>
     </div>
 
+    <section class="app-panel border-emerald-200 bg-emerald-50">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <p class="app-eyebrow border-emerald-200 bg-white text-emerald-900"><x-ui.icon name="globe" class="h-4 w-4" /> Growth tracking</p>
+                <h2 class="mt-3 app-section-title">Public growth signals</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-700">Country, language, shared card actions, daily views, installs, and shared-link signups for {{ strtolower($growthWindowLabel) }}.</p>
+            </div>
+            <div class="rounded-xl border border-white bg-white px-4 py-3 text-sm font-black text-emerald-900 shadow-sm">
+                {{ $growthSummary['countries'] }} countries · {{ $growthSummary['languages'] }} languages
+            </div>
+        </div>
+
+        <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            @foreach ([
+                ['Daily views', $growthSummary['daily_page_views'], 'book-open', 'border-blue-200 bg-blue-50 text-blue-900'],
+                ['Shared card clicks', $growthSummary['shared_card_clicks'], 'share-2', 'border-emerald-200 bg-white text-emerald-900'],
+                ['Installs', $growthSummary['installs'], 'download', 'border-violet-200 bg-violet-50 text-violet-900'],
+                ['Install taps', $growthSummary['install_prompt_clicks'], 'sparkles', 'border-amber-200 bg-amber-50 text-amber-900'],
+                ['Shared signups', $growthSummary['signups_from_shared_links'], 'users', 'border-rose-200 bg-rose-50 text-rose-900'],
+            ] as [$label, $value, $icon, $classes])
+                <article class="rounded-xl border p-4 {{ $classes }}">
+                    <p class="flex items-center gap-2 text-xs font-black uppercase tracking-normal"><x-ui.icon :name="$icon" class="h-4 w-4" /> {{ $label }}</p>
+                    <p class="mt-3 text-3xl font-black tracking-normal text-slate-950">{{ $value }}</p>
+                </article>
+            @endforeach
+        </div>
+
+        <div class="mt-5 grid gap-4 lg:grid-cols-3">
+            @foreach ([
+                ['Top countries', $growthCountries, 'country_code'],
+                ['Top languages', $growthLanguages, 'language'],
+                ['Shared card actions', $growthShareChannels, 'share_channel'],
+            ] as [$title, $rows, $column])
+                <div class="overflow-hidden rounded-xl border border-emerald-100 bg-white">
+                    <div class="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
+                        <h3 class="font-black tracking-normal text-slate-950">{{ $title }}</h3>
+                    </div>
+                    <div class="divide-y divide-emerald-100">
+                        @forelse ($rows as $row)
+                            <div class="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                                <span class="font-black tracking-normal text-slate-800">{{ strtoupper((string) $row->{$column}) }}</span>
+                                <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900">{{ $row->total }}</span>
+                            </div>
+                        @empty
+                            <p class="px-4 py-5 text-sm text-slate-600">No growth events yet.</p>
+                        @endforelse
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </section>
+
     <section class="app-panel border-amber-200 bg-amber-50">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>

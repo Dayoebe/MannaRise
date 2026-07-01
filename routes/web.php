@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\SeoController;
+use App\Http\Controllers\GrowthAnalyticsController;
 use App\Livewire\Admin\AudioDevotionals as AdminAudioDevotionals;
 use App\Livewire\Admin\Categories as AdminCategories;
 use App\Livewire\Admin\DailyDevotions as AdminDailyDevotions;
@@ -81,6 +82,7 @@ Route::get('/feed.atom', [SeoController::class, 'atom'])->name('seo.feed.atom');
 Route::get('/llms.txt', [SeoController::class, 'llms'])->name('seo.llms');
 Route::get('/llms-full.txt', [SeoController::class, 'llmsFull'])->name('seo.llms-full');
 Route::get('/ai.txt', [SeoController::class, 'ai'])->name('seo.ai');
+Route::post('/analytics/events', [GrowthAnalyticsController::class, 'store'])->name('analytics.events');
 
 Route::get('/', Home::class)->name('home');
 Route::get('/about', About::class)->name('about');

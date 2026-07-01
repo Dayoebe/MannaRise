@@ -5,10 +5,12 @@ namespace App\Livewire\Admin;
 use App\Models\Devotional;
 use App\Models\DevotionalCategory;
 use App\Models\DevotionalCompletion;
+use App\Models\GrowthEvent;
 use App\Models\NotificationDeliveryLog;
 use App\Models\User;
 use App\Support\ContentPlanningIntelligence;
 use App\Support\Toast;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -51,6 +53,9 @@ class Engagement extends Component
 
     public function render()
     {
+        $growthWindowStart = now()->subDays(30);
+        $growthEvents = GrowthEvent::query()->where('created_at', '>=', $growthWindowStart);
+
         return view('livewire.admin.engagement', [
             'users' => User::query()
                 ->withCount([
@@ -77,6 +82,19 @@ class Engagement extends Component
                 'push_ready' => NotificationDeliveryLog::where('channel', 'database')->where('created_at', '>=', now()->subDays(7))->count(),
             ],
             'deliveryLogs' => NotificationDeliveryLog::with('user')->latest()->take(10)->get(),
+            'growthWindowLabel' => 'Last 30 days',
+            'growthSummary' => [
+                'daily_page_views' => (clone $growthEvents)->where('event_type', 'daily_page_view')->count(),
+                'shared_card_clicks' => (clone $growthEvents)->where('event_type', 'shared_card_click')->count(),
+                'installs' => (clone $growthEvents)->where('event_type', 'pwa_install')->count(),
+                'install_prompt_clicks' => (clone $growthEvents)->where('event_type', 'install_prompt_click')->count(),
+                'signups_from_shared_links' => (clone $growthEvents)->where('event_type', 'signup')->where('source', 'shared_link')->count(),
+                'countries' => (clone $growthEvents)->whereNotNull('country_code')->distinct()->count('country_code'),
+                'languages' => (clone $growthEvents)->whereNotNull('language')->distinct()->count('language'),
+            ],
+            'growthCountries' => $this->growthBreakdown('country_code', $growthWindowStart),
+            'growthLanguages' => $this->growthBreakdown('language', $growthWindowStart),
+            'growthShareChannels' => $this->growthBreakdown('share_channel', $growthWindowStart, 'shared_card_click'),
         ]);
     }
 
@@ -92,5 +110,18 @@ class Engagement extends Component
         }
 
         return $slug;
+    }
+
+    private function growthBreakdown(string $column, $windowStart, ?string $eventType = null)
+    {
+        return GrowthEvent::query()
+            ->select($column, DB::raw('count(*) as total'))
+            ->where('created_at', '>=', $windowStart)
+            ->when($eventType, fn ($query) => $query->where('event_type', $eventType))
+            ->whereNotNull($column)
+            ->groupBy($column)
+            ->orderByDesc('total')
+            ->take(6)
+            ->get();
     }
 }

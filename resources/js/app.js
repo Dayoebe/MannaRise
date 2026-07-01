@@ -63,6 +63,39 @@ window.addEventListener('mannarise-toast', (event) => {
     showMannaRiseToast(event.detail?.message ?? event.detail?.[0] ?? event.detail);
 });
 
+function trackMannaRiseGrowth(eventType, payload = {}) {
+    const endpoint = document.querySelector('meta[name="growth-analytics-endpoint"]')?.content;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    if (! endpoint || ! csrfToken || ! eventType) {
+        return;
+    }
+
+    window.fetch(endpoint, {
+        method: 'POST',
+        keepalive: true,
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+        },
+        body: JSON.stringify({
+            event_type: eventType,
+            url: window.location.href,
+            path: window.location.pathname,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            screen: {
+                width: window.screen?.width,
+                height: window.screen?.height,
+            },
+            ...payload,
+        }),
+    }).catch(() => {});
+}
+
+window.mannaRiseTrackGrowth = trackMannaRiseGrowth;
+
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-mannarise-toast]').forEach((source) => {
         showMannaRiseToast(source.dataset.mannariseToast);
@@ -116,6 +149,10 @@ window.addEventListener('appinstalled', () => {
     installPromptEvent = null;
     document.documentElement.classList.add('is-installed');
     document.querySelector('[data-install-banner]')?.classList.add('hidden');
+    trackMannaRiseGrowth('pwa_install', {
+        standalone: true,
+        display_mode: 'standalone',
+    });
 });
 
 window.addEventListener('click', async (event) => {
@@ -127,6 +164,11 @@ window.addEventListener('click', async (event) => {
 
     if (event.target.closest('[data-install-now]')) {
         const installed = await window.mannaRiseInstall();
+
+        trackMannaRiseGrowth('install_prompt_click', {
+            install_outcome: installed ? 'accepted' : 'dismissed',
+            standalone: installed,
+        });
 
         if (! installed) {
             document.querySelector('[data-install-banner]')?.classList.add('hidden');
