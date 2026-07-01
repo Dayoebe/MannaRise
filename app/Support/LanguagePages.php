@@ -741,7 +741,7 @@ class LanguagePages
             'language_switcher' => $language['language_switcher'],
             'language_options' => self::homeOptions($locale),
             'daily_url' => route('daily.localized.show', ['locale' => $locale, 'date' => $date->toDateString()]),
-            'bible_url' => route('bible'),
+            'bible_url' => BibleTranslations::readerUrl(language: $locale),
             'prayer_url' => route('prayer-requests.submit'),
         ];
     }

@@ -3,11 +3,9 @@
 namespace App\Support;
 
 use App\Models\Devotional;
-use App\Models\DevotionalCategory;
 use App\Models\JournalEntry;
 use App\Models\PrayerRequest;
 use App\Models\PrayerRoom;
-use App\Models\PrayerRoomPrayer;
 use App\Models\UserBibleVerseEngagement;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

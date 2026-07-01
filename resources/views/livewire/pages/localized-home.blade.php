@@ -1,7 +1,7 @@
 <div class="space-y-7 sm:space-y-9">
     @php
         $daily = $content['daily'];
-        $chapterUrl = $scripture['book_slug'] && $scripture['chapter'] ? route('bible', ['book' => $scripture['book_slug'], 'chapter' => $scripture['chapter']]) : null;
+        $chapterUrl = $scripture['reader_url'] ?? null;
     @endphp
 
     <section class="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.85fr)] lg:items-stretch">

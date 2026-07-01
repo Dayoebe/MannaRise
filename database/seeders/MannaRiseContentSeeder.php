@@ -12,7 +12,6 @@ use App\Models\PrayerRequestUpdate;
 use App\Models\PrayerRoom;
 use App\Models\Testimony;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 

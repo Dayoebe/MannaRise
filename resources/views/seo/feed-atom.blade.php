@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+@php echo '<'.'?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL; @endphp
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title>{{ config('seo.site_name') }}</title>
     <id>{{ route('home') }}</id>

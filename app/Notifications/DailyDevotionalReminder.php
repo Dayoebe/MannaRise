@@ -15,9 +15,7 @@ class DailyDevotionalReminder extends Notification
      * @param  array<string, string>  $reminder
      * @param  array<int, string>  $channels
      */
-    public function __construct(public array $reminder, public array $channels = ['mail', 'database'])
-    {
-    }
+    public function __construct(public array $reminder, public array $channels = ['mail', 'database']) {}
 
     public function via(object $notifiable): array
     {

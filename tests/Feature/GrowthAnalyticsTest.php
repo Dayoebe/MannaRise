@@ -112,7 +112,7 @@ class GrowthAnalyticsTest extends TestCase
             'share_channel' => 'copy',
         ]);
 
-        $admin = \App\Models\User::factory()->create(['is_admin' => true]);
+        $admin = User::factory()->create(['is_admin' => true]);
 
         $this->actingAs($admin)
             ->get(route('admin.engagement'))

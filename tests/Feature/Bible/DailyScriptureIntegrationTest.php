@@ -273,6 +273,54 @@ class DailyScriptureIntegrationTest extends TestCase
             ->assertSee('For God so loved the world.');
     }
 
+    public function test_localized_daily_page_uses_matching_bible_translation_for_scripture_and_card(): void
+    {
+        $john = BibleBook::create([
+            'book_order' => 43,
+            'name' => 'John',
+            'slug' => 'john',
+            'abbreviation' => 'John',
+            'testament' => 'New Testament',
+            'chapters' => 21,
+        ]);
+
+        DailyScripture::create([
+            'provider' => 'mannarise_theme',
+            'reference' => 'John 3:16',
+            'book' => 'John',
+            'chapter' => 3,
+            'verse' => '16',
+            'translation' => 'KJV',
+            'text' => 'For God so loved the world.',
+            'verse_date' => '2026-07-01',
+            'is_active' => true,
+            'fetched_at' => now(),
+        ]);
+
+        BibleVerse::create([
+            'bible_book_id' => $john->id,
+            'language' => 'fr',
+            'version' => 'OSTV',
+            'chapter' => 3,
+            'verse' => 16,
+            'text' => 'Car Dieu a tant aimé le monde.',
+        ]);
+
+        $readerUrl = route('bible', [
+            'book' => 'john',
+            'chapter' => 3,
+            'language' => 'fr',
+            'version' => 'OSTV',
+        ]);
+
+        $this->get('/fr/daily/2026-07-01')
+            ->assertOk()
+            ->assertSee('Car Dieu a tant aimé le monde.')
+            ->assertSee('John 3:16 OSTV')
+            ->assertSee(e($readerUrl), false)
+            ->assertDontSee('For God so loved the world.');
+    }
+
     public function test_authenticated_user_can_save_daily_scripture_to_memory_verses(): void
     {
         $user = User::factory()->create();

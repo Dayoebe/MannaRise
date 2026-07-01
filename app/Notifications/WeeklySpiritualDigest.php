@@ -15,9 +15,7 @@ class WeeklySpiritualDigest extends Notification
      * @param  array<string, mixed>  $digest
      * @param  array<int, string>  $channels
      */
-    public function __construct(public array $digest, public array $channels = ['mail', 'database'])
-    {
-    }
+    public function __construct(public array $digest, public array $channels = ['mail', 'database']) {}
 
     public function via(object $notifiable): array
     {

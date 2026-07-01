@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\SeoController;
 use App\Http\Controllers\GrowthAnalyticsController;
+use App\Http\Controllers\SeoController;
 use App\Livewire\Admin\AudioDevotionals as AdminAudioDevotionals;
 use App\Livewire\Admin\Categories as AdminCategories;
 use App\Livewire\Admin\DailyDevotions as AdminDailyDevotions;
