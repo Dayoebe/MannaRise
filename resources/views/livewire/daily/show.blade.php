@@ -4,7 +4,7 @@
         $nextDate = $date->addDay()->toDateString();
         $previousUrl = $locale ? route('daily.localized.show', ['locale' => $locale, 'date' => $previousDate]) : route('daily.show', ['date' => $previousDate]);
         $nextUrl = $locale ? route('daily.localized.show', ['locale' => $locale, 'date' => $nextDate]) : route('daily.show', ['date' => $nextDate]);
-        $chapterUrl = $scripture['book_slug'] && $scripture['chapter'] ? route('bible', ['book' => $scripture['book_slug'], 'chapter' => $scripture['chapter']]) : null;
+        $chapterUrl = $scripture['reader_url'] ?? null;
     @endphp
 
     <section class="app-panel overflow-hidden border-emerald-200 p-0 sm:p-0">

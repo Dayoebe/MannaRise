@@ -6,6 +6,7 @@ use App\Models\Devotional;
 use App\Models\DevotionalCompletion;
 use App\Models\DevotionalFavorite;
 use App\Models\JournalEntry;
+use App\Support\Seo;
 use App\Support\Toast;
 use Livewire\Component;
 
@@ -113,7 +114,7 @@ class Show extends Component
         return view('livewire.devotionals.show', [
             'isFavorited' => $isFavorited,
             'completedToday' => $completedToday,
-            'summary' => \App\Support\Seo::summarize($this->devotional->content),
+            'summary' => Seo::summarize($this->devotional->content),
             'shareCard' => $this->shareCard(),
             'relatedDevotionals' => Devotional::query()
                 ->with('category')
@@ -131,7 +132,7 @@ class Show extends Component
      */
     private function shareCard(): array
     {
-        $summary = \App\Support\Seo::summarize($this->devotional->content, 36);
+        $summary = Seo::summarize($this->devotional->content, 36);
 
         return [
             'title' => $this->devotional->title,
