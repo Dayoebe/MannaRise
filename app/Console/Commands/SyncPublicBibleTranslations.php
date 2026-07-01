@@ -48,6 +48,11 @@ class SyncPublicBibleTranslations extends Command
             'format' => 'osis',
             'url' => 'https://raw.githubusercontent.com/seven1m/open-bibles/master/swa-swahili.osis.xml',
         ],
+        'ALMEIDA' => [
+            'language' => 'pt',
+            'format' => 'usfx',
+            'url' => 'https://raw.githubusercontent.com/seven1m/open-bibles/master/por-almeida.usfx.xml',
+        ],
     ];
 
     public function handle(): int
@@ -143,7 +148,7 @@ class SyncPublicBibleTranslations extends Command
 
     private function importUsfx(string $path, $books, string $language, string $version): int
     {
-        $reader = new XMLReader();
+        $reader = new XMLReader;
         $reader->open($path, null, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING);
 
         $bookMap = $this->bookMap();
@@ -252,7 +257,7 @@ class SyncPublicBibleTranslations extends Command
 
     private function importOsis(string $path, $books, string $language, string $version): int
     {
-        $reader = new XMLReader();
+        $reader = new XMLReader;
         $reader->open($path, null, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING);
 
         $bookMap = $this->bookMap();
