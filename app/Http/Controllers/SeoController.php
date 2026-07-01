@@ -211,7 +211,17 @@ class SeoController extends Controller
                 'priority' => '0.6',
             ]);
 
+        $dailyPermalinks = collect(range(0, 14))
+            ->map(fn (int $daysAgo): Carbon => Carbon::today()->subDays($daysAgo))
+            ->map(fn (Carbon $date): array => [
+                'loc' => route('daily.show', ['date' => $date->toDateString()]),
+                'lastmod' => $date->isToday() ? $this->latestTimestamp() : $date->endOfDay()->toAtomString(),
+                'changefreq' => $date->isToday() ? 'daily' : 'weekly',
+                'priority' => $date->isToday() ? '0.9' : '0.6',
+            ]);
+
         return $static
+            ->merge($dailyPermalinks)
             ->merge($plans)
             ->merge($rooms)
             ->unique('loc')

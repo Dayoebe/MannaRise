@@ -172,7 +172,7 @@
                         <p class="mt-3 text-xs font-bold text-fuchsia-800">{{ $testimony->is_anonymous ? 'Anonymous' : ($testimony->name ?: 'MannaRise reader') }}</p>
                     </article>
                 @empty
-                    <p class="app-panel border-dashed border-slate-300 text-sm text-slate-600">Approved testimonies will appear here.</p>
+                    <p class="app-panel border-dashed border-slate-300 text-sm text-slate-600">No approved testimonies yet.</p>
                 @endforelse
             </div>
         </div>

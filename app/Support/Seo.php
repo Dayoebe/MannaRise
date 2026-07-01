@@ -7,6 +7,7 @@ use App\Models\Devotional;
 use App\Models\PrayerRoom;
 use App\Models\ResourceItem;
 use App\Models\SpiritualBook;
+use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Str;
 
@@ -79,6 +80,7 @@ class Seo
                 route('daily.index'),
                 [['Daily', route('daily.index')]]
             ),
+            'daily.show', 'daily.localized.show' => self::dailyPermalinkMeta((string) $route?->parameter('date'), (string) $route?->parameter('locale')),
             'devotionals.index' => self::collectionMeta(
                 'Christian Devotionals for Daily Faith and Growth',
                 'Read practical Christian devotionals with Bible references, reflection questions, prayer points, and declarations for daily spiritual growth.',
@@ -284,6 +286,35 @@ class Seo
     private static function collectionMeta(string $title, string $description, string $canonical, array $breadcrumbTail): array
     {
         return self::pageMeta($title, $description, $canonical, $breadcrumbTail, 'CollectionPage');
+    }
+
+    private static function dailyPermalinkMeta(string $date, string $locale = ''): array
+    {
+        try {
+            $carbonDate = CarbonImmutable::createFromFormat('Y-m-d', $date);
+        } catch (\Throwable) {
+            return [];
+        }
+
+        if (! $carbonDate || $carbonDate->format('Y-m-d') !== $date) {
+            return [];
+        }
+
+        $canonical = $locale !== ''
+            ? route('daily.localized.show', ['locale' => $locale, 'date' => $date])
+            : route('daily.show', ['date' => $date]);
+        $title = 'MannaRise Daily Devotion for '.$carbonDate->format('F j, Y');
+        $description = 'Read and share the MannaRise daily devotion for '.$carbonDate->format('F j, Y').': scripture, affirmation, prayer, and a journal prompt.';
+
+        return self::pageMeta(
+            $title,
+            $description,
+            $canonical,
+            [
+                ['Daily', route('daily.index')],
+                [$carbonDate->format('F j, Y'), $canonical],
+            ]
+        );
     }
 
     private static function privateMeta(string $title, string $canonical): array

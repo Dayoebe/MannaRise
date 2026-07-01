@@ -115,6 +115,7 @@ class Index extends Component
             'upcomingPlans' => DailySpiritualRhythm::challengePreview($today, 7),
             'catchUpPlan' => $catchUpPlan,
             'checkIn' => auth()->check() ? $this->checkIn(false) : null,
+            'publicDailyUrl' => route('daily.show', ['date' => $today->toDateString()]),
         ]);
     }
 

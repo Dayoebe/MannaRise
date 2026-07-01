@@ -60,6 +60,7 @@ class SeoTest extends TestCase
             ->assertOk()
             ->assertSee('<urlset', false)
             ->assertSee(route('home'), false)
+            ->assertSee(route('daily.show', ['date' => now()->toDateString()]), false)
             ->assertSee(route('prayer-invites.show'), false);
 
         $this->get(route('seo.sitemap.devotionals'))

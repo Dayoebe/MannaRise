@@ -42,9 +42,17 @@ class MannaRisePagesTest extends TestCase
             'is_approved' => true,
         ]);
 
-        foreach (['/', '/about', '/contact', '/daily', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/pray-with-me', '/pray-with-me/faith-for-today', '/audio-devotionals', '/resources', '/resources/devotion', '/resources/books', '/resources/videos', '/resources/audio', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
+        foreach (['/', '/about', '/contact', '/daily', '/daily/2026-07-01', '/en/daily/2026-07-01', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/pray-with-me', '/pray-with-me/faith-for-today', '/audio-devotionals', '/resources', '/resources/devotion', '/resources/books', '/resources/videos', '/resources/audio', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
             $this->get($path)->assertOk();
         }
+
+        $this->get('/daily/2026-07-01')
+            ->assertOk()
+            ->assertSee('MannaRise Daily Devotion')
+            ->assertSee('Journal prompt')
+            ->assertSee('Download image')
+            ->assertSee('WhatsApp share')
+            ->assertSee('data-daily-card-canvas', false);
 
         $this->get('/scripture-cards')
             ->assertOk()

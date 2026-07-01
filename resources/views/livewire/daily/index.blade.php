@@ -29,6 +29,7 @@
             </div>
 
             <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+                <a href="{{ $publicDailyUrl }}" class="btn-primary w-full"><x-ui.icon name="share-2" class="h-4 w-4" /> Share today&apos;s devotion</a>
                 <a href="{{ route('bible') }}" class="btn-primary w-full"><x-ui.icon name="book-open" class="h-4 w-4" /> Open Bible</a>
                 @if ($firstReading)
                     <a href="{{ route('bible', ['book' => $firstReading['slug'], 'chapter' => $firstReading['chapter']]) }}" class="btn-warm w-full">

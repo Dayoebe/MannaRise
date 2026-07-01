@@ -145,6 +145,79 @@ class DailySpiritualRhythm
         'Philippians 4:13',
     ];
 
+    private const REFLECTIONS = [
+        'wisdom' => [
+            'prayer' => 'Father, give me wisdom for the decisions before me and make Your word clear for the next step.',
+            'journal_prompt' => 'Where do I need God\'s wisdom before I move today?',
+            'action' => 'Pause before one decision and ask God for wisdom without rushing.',
+        ],
+        'peace' => [
+            'prayer' => 'Lord, let the peace of Christ rule my heart and quiet every fear that tries to lead me.',
+            'journal_prompt' => 'What worry do I need to surrender to the peace of Christ today?',
+            'action' => 'Take three quiet minutes to breathe, pray, and release one concern.',
+        ],
+        'strength' => [
+            'prayer' => 'Faithful God, strengthen me for today\'s assignment and establish my heart in You.',
+            'journal_prompt' => 'Where do I need God\'s strength instead of my own effort?',
+            'action' => 'Name one task and invite God into it before you begin.',
+        ],
+        'fruit' => [
+            'prayer' => 'Holy Spirit, form love, patience, kindness, and self-control in the way I respond today.',
+            'journal_prompt' => 'Which fruit of the Spirit do I need to practice most today?',
+            'action' => 'Choose one gentle response where impatience would be easier.',
+        ],
+        'renewal' => [
+            'prayer' => 'Lord, renew my strength as I wait on You and restore what has grown tired in me.',
+            'journal_prompt' => 'What part of my heart needs renewal and rest today?',
+            'action' => 'Create one quiet space for rest instead of pushing past weariness.',
+        ],
+        'anxiety' => [
+            'prayer' => 'God of peace, guard my heart and mind as I bring every concern to You with thanksgiving.',
+            'journal_prompt' => 'What concern can I turn into prayer and thanksgiving today?',
+            'action' => 'Write one worry as a prayer and one thanksgiving beside it.',
+        ],
+        'purpose' => [
+            'prayer' => 'Father, align my work, gifts, and decisions with the good works You prepared for me.',
+            'journal_prompt' => 'Which gift or responsibility needs faithful stewardship today?',
+            'action' => 'Serve one assignment with excellence and humility.',
+        ],
+        'word' => [
+            'prayer' => 'Lord, let Your word become light for my path and correction for my next step.',
+            'journal_prompt' => 'What word from God do I need to obey today?',
+            'action' => 'Keep today\'s scripture visible and return to it before evening.',
+        ],
+        'steadfast' => [
+            'prayer' => 'Lord, make me steadfast and encouraged, knowing that labor in You is never wasted.',
+            'journal_prompt' => 'Where am I tempted to quit before the fruit appears?',
+            'action' => 'Take one faithful step in an area where consistency matters.',
+        ],
+        'mercy' => [
+            'prayer' => 'Merciful Father, let Your compassion meet me today and teach me to walk in grace.',
+            'journal_prompt' => 'Where do I need to receive or extend mercy today?',
+            'action' => 'Speak with mercy in one conversation where judgment would be easy.',
+        ],
+        'courage' => [
+            'prayer' => 'Lord, make me strong and courageous because You are with me wherever I go.',
+            'journal_prompt' => 'Where is obedience asking me for courage today?',
+            'action' => 'Take one courageous step you have delayed.',
+        ],
+        'endurance' => [
+            'prayer' => 'Christ, strengthen me for obedience, service, and endurance in the work before me.',
+            'journal_prompt' => 'What do I need grace to endure with faith today?',
+            'action' => 'Ask for help, then continue one important responsibility.',
+        ],
+        'growth' => [
+            'prayer' => 'Lord, root me in Your love and grow me into maturity, fruitfulness, and steady faith.',
+            'journal_prompt' => 'What habit is helping or hindering my spiritual growth?',
+            'action' => 'Practice one small rhythm that keeps you abiding in Christ.',
+        ],
+        'provision' => [
+            'prayer' => 'Lord my Shepherd, help me trust Your provision and follow Your care today.',
+            'journal_prompt' => 'Where do I need to trust God as Shepherd and Provider?',
+            'action' => 'Thank God for one provision before asking for the next one.',
+        ],
+    ];
+
     public static function forDate(?CarbonInterface $date = null): array
     {
         $date = self::normalizeDate($date);
@@ -154,6 +227,7 @@ class DailySpiritualRhythm
             'date' => $date,
             'verse' => self::verseOfTheDay($date, $affirmation),
             'affirmation' => $affirmation,
+            'reflection' => self::reflectionForAffirmation($affirmation),
             'challenge' => self::readingPlanForDate($date),
         ];
     }
@@ -171,6 +245,23 @@ class DailySpiritualRhythm
         $date = self::normalizeDate($date);
 
         return self::verseOfTheDay($date, self::affirmationForDate($date));
+    }
+
+    public static function reflectionForDate(?CarbonInterface $date = null): array
+    {
+        return self::reflectionForAffirmation(self::affirmationForDate($date));
+    }
+
+    public static function reflectionForAffirmation(array $affirmation): array
+    {
+        $theme = $affirmation['theme'] ?? 'peace';
+        $reflection = self::REFLECTIONS[$theme] ?? self::REFLECTIONS['peace'];
+
+        return [
+            ...$reflection,
+            'theme' => $theme,
+            'theme_label' => $affirmation['theme_label'] ?? Str::headline($theme),
+        ];
     }
 
     public static function challengePreview(?CarbonInterface $date = null, int $days = 7): Collection
