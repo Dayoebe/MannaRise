@@ -114,6 +114,7 @@ class Show extends Component
             'isFavorited' => $isFavorited,
             'completedToday' => $completedToday,
             'summary' => \App\Support\Seo::summarize($this->devotional->content),
+            'shareCard' => $this->shareCard(),
             'relatedDevotionals' => Devotional::query()
                 ->with('category')
                 ->published()
@@ -123,5 +124,24 @@ class Show extends Component
                 ->take(3)
                 ->get(),
         ]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function shareCard(): array
+    {
+        $summary = \App\Support\Seo::summarize($this->devotional->content, 36);
+
+        return [
+            'title' => $this->devotional->title,
+            'text' => $this->devotional->bible_text ?: $summary,
+            'summary' => $summary,
+            'reference' => $this->devotional->bible_reference ?: 'MannaRise devotional',
+            'date' => ($this->devotional->published_at ?: $this->devotional->created_at)->format('F j, Y'),
+            'url' => route('devotionals.show', $this->devotional->slug),
+            'invite_url' => route('prayer-invites.show', ['devotionalSlug' => $this->devotional->slug]),
+            'app_url' => rtrim((string) config('app.url'), '/') ?: 'MannaRise',
+        ];
     }
 }

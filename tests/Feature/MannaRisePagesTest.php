@@ -42,15 +42,30 @@ class MannaRisePagesTest extends TestCase
             'is_approved' => true,
         ]);
 
-        foreach (['/', '/about', '/contact', '/daily', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/audio-devotionals', '/resources', '/resources/devotion', '/resources/books', '/resources/videos', '/resources/audio', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
+        foreach (['/', '/about', '/contact', '/daily', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/pray-with-me', '/pray-with-me/faith-for-today', '/audio-devotionals', '/resources', '/resources/devotion', '/resources/books', '/resources/videos', '/resources/audio', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
             $this->get($path)->assertOk();
         }
 
         $this->get('/scripture-cards')
             ->assertOk()
             ->assertSee('Note card')
+            ->assertSee('Invite prayer')
             ->assertSee('data-note-body', false)
             ->assertSee('Shareable Scripture and note cards');
+
+        $this->get('/devotionals/faith-for-today')
+            ->assertOk()
+            ->assertSee('Share this devotion')
+            ->assertSee('WhatsApp share')
+            ->assertSee('Copy link')
+            ->assertSee('Download image')
+            ->assertSee('Invite someone to pray with you');
+
+        $this->get('/pray-with-me/faith-for-today')
+            ->assertOk()
+            ->assertSee('Pray through this devotion together')
+            ->assertSee('Start guided prayer')
+            ->assertSee('data-prayer-invite-share', false);
     }
 
     public function test_authenticated_pages_render(): void

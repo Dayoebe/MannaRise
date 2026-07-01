@@ -67,6 +67,15 @@
             <path d="m7 10 5 5 5-5" />
             <path d="M5 21h14" />
             @break
+        @case('copy')
+            <rect x="8" y="8" width="12" height="12" rx="2" />
+            <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+            @break
+        @case('image')
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <circle cx="8.5" cy="10.5" r="1.5" />
+            <path d="m21 15-5-5L5 21" />
+            @break
         @case('search')
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />

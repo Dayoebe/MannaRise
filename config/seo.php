@@ -56,6 +56,7 @@ return [
             ['route' => 'memory-verses.index', 'priority' => '0.7', 'changefreq' => 'weekly'],
             ['route' => 'scripture-cards.index', 'priority' => '0.7', 'changefreq' => 'weekly'],
             ['route' => 'prayer-sessions.index', 'priority' => '0.7', 'changefreq' => 'weekly'],
+            ['route' => 'prayer-invites.show', 'priority' => '0.7', 'changefreq' => 'weekly'],
             ['route' => 'audio-devotionals.index', 'priority' => '0.7', 'changefreq' => 'weekly'],
             ['route' => 'prayer-rooms.index', 'priority' => '0.7', 'changefreq' => 'weekly'],
             ['route' => 'prayer-requests.wall', 'priority' => '0.7', 'changefreq' => 'daily'],

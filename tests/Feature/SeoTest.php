@@ -59,7 +59,8 @@ class SeoTest extends TestCase
         $this->get(route('seo.sitemap.pages'))
             ->assertOk()
             ->assertSee('<urlset', false)
-            ->assertSee(route('home'), false);
+            ->assertSee(route('home'), false)
+            ->assertSee(route('prayer-invites.show'), false);
 
         $this->get(route('seo.sitemap.devotionals'))
             ->assertOk()

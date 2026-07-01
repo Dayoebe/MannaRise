@@ -139,7 +139,7 @@
                         ['label' => 'Devotionals', 'route' => 'devotionals.index', 'icon' => 'sparkles', 'active' => ['devotionals.*']],
                         ['label' => 'Bible', 'route' => 'bible', 'icon' => 'book-open', 'active' => ['bible']],
                         ['label' => 'Resources', 'route' => 'resources.index', 'icon' => 'library', 'active' => ['resources.*']],
-                        ['label' => 'Prayer', 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*', 'prayer-rooms.*', 'prayer-requests.*']],
+                        ['label' => 'Prayer', 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*', 'prayer-invites.*', 'prayer-rooms.*', 'prayer-requests.*']],
                     ];
 
                     if ($user) {
@@ -213,7 +213,7 @@
                     $mobileMoreGroups = [
                         ['label' => 'Explore', 'links' => $exploreLinks],
                         ['label' => 'Prayer', 'links' => [
-                            ['label' => 'Guided Prayer', 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*']],
+                            ['label' => 'Guided Prayer', 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*', 'prayer-invites.*']],
                             ['label' => 'Prayer Rooms', 'route' => 'prayer-rooms.index', 'icon' => 'users', 'active' => ['prayer-rooms.*']],
                             ['label' => 'Prayer Wall', 'route' => 'prayer-requests.wall', 'icon' => 'heart', 'active' => ['prayer-requests.wall']],
                             ['label' => 'Request Prayer', 'route' => 'prayer-requests.submit', 'icon' => 'send', 'active' => ['prayer-requests.submit']],

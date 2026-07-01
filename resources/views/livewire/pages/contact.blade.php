@@ -17,7 +17,7 @@
         <div class="app-panel border-emerald-200 bg-emerald-50">
             <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="mail" class="h-5 w-5 text-emerald-800" /> Public contact</h2>
             @if ($contactEmail)
-                <p class="mt-3 text-sm leading-6 text-slate-700">The configured public email for MannaRise is:</p>
+                <p class="mt-3 text-sm leading-6 text-slate-700">Send us a mail on:</p>
                 <a href="mailto:{{ $contactEmail }}" class="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2.5 text-sm font-black text-emerald-900 hover:bg-emerald-100">
                     <x-ui.icon name="mail" class="h-4 w-4" /> {{ $contactEmail }}
                 </a>

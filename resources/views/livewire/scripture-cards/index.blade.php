@@ -87,7 +87,7 @@
                 </div>
 
                 <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-                    <button type="button" data-card-download class="btn-primary w-full bg-sky-700 hover:bg-sky-800"><x-ui.icon name="download" class="h-4 w-4" /> Download PNG</button>
+                    <button type="button" data-card-download class="btn-primary w-full bg-sky-700 hover:bg-sky-800"><x-ui.icon name="download" class="h-4 w-4" /> Download image</button>
                     <button type="button" data-card-copy class="btn-secondary w-full border-sky-200 hover:bg-white"><x-ui.icon name="copy" class="h-4 w-4" /> Copy image</button>
                 </div>
 
@@ -105,6 +105,7 @@
                         <button type="button" data-card-share="twitter" class="btn-secondary w-full border-slate-300 px-3 hover:bg-slate-50"><x-ui.icon name="x-twitter" class="h-4 w-4" /> X</button>
                         <button type="button" data-card-share="linkedin" class="btn-secondary w-full border-sky-200 px-3 text-sky-900 hover:bg-sky-50"><x-ui.icon name="linkedin" class="h-4 w-4" /> LinkedIn</button>
                         <button type="button" data-card-share="copy-link" class="btn-secondary w-full border-amber-200 px-3 text-amber-900 hover:bg-amber-50"><x-ui.icon name="link" class="h-4 w-4" /> Copy link</button>
+                        <a href="{{ route('prayer-invites.show') }}" class="btn-secondary w-full border-rose-200 px-3 text-rose-900 hover:bg-rose-50 xl:col-span-2"><x-ui.icon name="heart" class="h-4 w-4" /> Invite prayer</a>
                     </div>
                 </details>
 

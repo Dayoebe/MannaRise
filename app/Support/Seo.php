@@ -163,6 +163,7 @@ class Seo
                 [['Prayer Rooms', route('prayer-rooms.index')]]
             ),
             'prayer-rooms.show' => self::prayerRoomMeta((string) $route?->parameter('room')),
+            'prayer-invites.show' => self::prayerInviteMeta((string) $route?->parameter('devotionalSlug')),
             'prayer-requests.wall' => self::collectionMeta(
                 'Prayer Wall',
                 'Pray with others, submit prayer requests, and stand in faith with a growing Christian prayer community.',
@@ -349,6 +350,40 @@ class Seo
             'breadcrumbs' => $breadcrumbs,
             'schema' => self::schemaGraph($nodes),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function prayerInviteMeta(string $slug = ''): array
+    {
+        $devotional = $slug !== ''
+            ? Devotional::query()->published()->where('slug', $slug)->first()
+            : null;
+
+        if (! $devotional) {
+            return self::pageMeta(
+                'Pray With Me',
+                'Invite someone to pray with you through a public MannaRise prayer page with guided prayer, Scripture, and prayer request actions.',
+                route('prayer-invites.show'),
+                [['Pray With Me', route('prayer-invites.show')]]
+            );
+        }
+
+        $title = 'Pray With Me: '.$devotional->title;
+        $description = 'Pray through '.$devotional->title.' with a shared MannaRise page for guided prayer, Scripture, and encouragement.';
+        $canonical = route('prayer-invites.show', ['devotionalSlug' => $devotional->slug]);
+
+        return self::pageMeta(
+            $title,
+            $description,
+            $canonical,
+            [
+                ['Devotionals', route('devotionals.index')],
+                [$devotional->title, route('devotionals.show', $devotional->slug)],
+                ['Pray With Me', $canonical],
+            ]
+        );
     }
 
     /**
