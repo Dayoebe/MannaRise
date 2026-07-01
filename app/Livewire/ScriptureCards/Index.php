@@ -23,6 +23,7 @@ class Index extends Component
                 'devotional' => $this->devotionalCards(),
                 'prayer' => $this->prayerCards(),
                 'testimony' => $this->testimonyCards(),
+                'note' => $this->noteCards(),
             ],
         ]);
     }
@@ -162,6 +163,21 @@ class Index extends Component
             'reference' => 'MannaRise testimony',
             'date' => now()->format('F j, Y'),
             'kind' => 'Testimony',
+        ]];
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    private function noteCards(): array
+    {
+        return [[
+            'label' => 'Note card',
+            'title' => 'Personal note',
+            'text' => 'Write what is on your heart, then download it as a MannaRise card.',
+            'reference' => 'MannaRise note',
+            'date' => now()->format('F j, Y'),
+            'kind' => 'Note',
         ]];
     }
 

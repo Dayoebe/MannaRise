@@ -10,13 +10,13 @@
         </div>
         <div class="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,24rem)] lg:items-end">
             <div>
-                <p class="app-eyebrow border-sky-200 bg-sky-50 text-sky-900"><x-ui.icon name="image" class="h-4 w-4" /> Scripture cards</p>
-                <h1 class="mt-3 app-section-title">Shareable Scripture cards</h1>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Generate image cards for the verse of the day, affirmations, devotionals, prayers, and testimonies.</p>
+                <p class="app-eyebrow border-sky-200 bg-sky-50 text-sky-900"><x-ui.icon name="image" class="h-4 w-4" /> Scripture and note cards</p>
+                <h1 class="mt-3 app-section-title">Shareable Scripture and note cards</h1>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Generate image cards for the verse of the day, affirmations, devotionals, prayers, testimonies, and personal notes.</p>
             </div>
             <div class="app-surface grid grid-cols-3 gap-3 border-emerald-200 bg-emerald-50 p-4 text-center">
                 <div>
-                    <p class="text-2xl font-black tracking-normal text-slate-950">5</p>
+                    <p class="text-2xl font-black tracking-normal text-slate-950">6</p>
                     <p class="text-xs font-bold uppercase tracking-normal text-emerald-900">Sources</p>
                 </div>
                 <div>
@@ -44,13 +44,26 @@
                         <option value="devotional">Devotional</option>
                         <option value="prayer">Prayer</option>
                         <option value="testimony">Testimony</option>
+                        <option value="note">Note card</option>
                     </select>
                 </label>
 
-                <label class="block">
+                <label data-card-item-wrap class="block">
                     <span class="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="bookmark" class="h-4 w-4 text-sky-900" /> Content</span>
                     <select data-card-item class="field-input border-sky-300 focus:border-sky-600 focus:ring-sky-100"></select>
                 </label>
+
+                <div data-note-fields class="hidden space-y-3 rounded-2xl border border-sky-200 bg-white p-3 shadow-sm">
+                    <label class="block">
+                        <span class="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="bookmark" class="h-4 w-4 text-sky-900" /> Note title</span>
+                        <input type="text" data-note-title maxlength="54" value="Personal note" class="field-input border-sky-300 focus:border-sky-600 focus:ring-sky-100">
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700"><x-ui.icon name="journal" class="h-4 w-4 text-sky-900" /> What is on your mind?</span>
+                        <textarea data-note-body rows="7" maxlength="420" placeholder="Type your note here..." class="field-input resize-y border-sky-300 focus:border-sky-600 focus:ring-sky-100"></textarea>
+                    </label>
+                </div>
 
                 <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                     <label class="block">
@@ -118,7 +131,11 @@
 
             const cards = @json($cards);
             const typeSelect = root.querySelector('[data-card-type]');
+            const itemField = root.querySelector('[data-card-item-wrap]');
             const itemSelect = root.querySelector('[data-card-item]');
+            const noteFields = root.querySelector('[data-note-fields]');
+            const noteTitleInput = root.querySelector('[data-note-title]');
+            const noteBodyInput = root.querySelector('[data-note-body]');
             const sizeSelect = root.querySelector('[data-card-size]');
             const styleSelect = root.querySelector('[data-card-style]');
             const canvas = root.querySelector('[data-card-canvas]');
@@ -190,14 +207,38 @@
                 },
             };
 
+            function displayDate() {
+                return new Date().toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+
+            function noteCard() {
+                const base = (cards.note || [])[0] || {};
+                const title = String(noteTitleInput?.value || '').trim() || 'Personal note';
+                const text = String(noteBodyInput?.value || '').trim();
+
+                return {
+                    ...base,
+                    label: 'Note card',
+                    title,
+                    text: text || base.text || 'Type what is on your mind, then download your MannaRise note card.',
+                    reference: 'MannaRise note',
+                    date: displayDate(),
+                    kind: 'Note',
+                };
+            }
+
             function currentCard() {
+                if (typeSelect.value === 'note') {
+                    return noteCard();
+                }
+
                 const list = cards[typeSelect.value] || [];
 
                 return list[Number(itemSelect.value)] || list[0] || {
                     title: 'MannaRise',
                     text: 'The word of God gives light for the next step.',
                     reference: 'Psalm 119:105',
-                    date: new Date().toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }),
+                    date: displayDate(),
                     kind: 'Card',
                 };
             }
@@ -268,12 +309,46 @@
                 });
             }
 
+            function syncSourceControls() {
+                const isNote = typeSelect.value === 'note';
+
+                itemField?.classList.toggle('hidden', isNote);
+                noteFields?.classList.toggle('hidden', ! isNote);
+            }
+
             function wrapText(text, maxWidth) {
                 const words = String(text || '').split(/\s+/).filter(Boolean);
                 const lines = [];
                 let line = '';
 
                 words.forEach((word) => {
+                    if (ctx.measureText(word).width > maxWidth) {
+                        if (line) {
+                            lines.push(line);
+                            line = '';
+                        }
+
+                        let chunk = '';
+
+                        Array.from(word).forEach((char) => {
+                            const candidate = `${chunk}${char}`;
+
+                            if (ctx.measureText(candidate).width <= maxWidth || ! chunk) {
+                                chunk = candidate;
+                                return;
+                            }
+
+                            lines.push(chunk);
+                            chunk = char;
+                        });
+
+                        if (chunk) {
+                            line = chunk;
+                        }
+
+                        return;
+                    }
+
                     const candidate = line ? `${line} ${word}` : word;
 
                     if (ctx.measureText(candidate).width <= maxWidth || ! line) {
@@ -330,7 +405,12 @@
                 const height = dims.height;
                 const margin = Math.round(width * 0.07);
                 const innerWidth = width - margin * 2;
-                const maxBodyLines = height > 1500 ? 10 : height > 1200 ? 6 : 3;
+                const isNoteCard = String(card.kind || '').toLowerCase() === 'note';
+                const maxBodyLines = isNoteCard
+                    ? (height > 1500 ? 12 : height > 1200 ? 8 : 5)
+                    : (height > 1500 ? 10 : height > 1200 ? 6 : 3);
+                const bodyStartSize = isNoteCard ? (height > 1500 ? 58 : 52) : (height > 1500 ? 62 : 58);
+                const bodyMinSize = isNoteCard ? 34 : 40;
                 const panelX = margin + 42;
                 const panelY = margin + 84;
                 const panelWidth = innerWidth - 84;
@@ -374,7 +454,7 @@
 
                 const titleLineCount = wrapText(card.title || 'MannaRise', innerWidth - 160).slice(0, 2).length;
                 const bodyStart = panelY + 188 + titleLineCount * 72;
-                const fitted = fitLines(card.text, panelWidth - 172, maxBodyLines, height > 1500 ? 62 : 58, 40);
+                const fitted = fitLines(card.text, panelWidth - 172, maxBodyLines, bodyStartSize, bodyMinSize);
                 const lineHeight = Math.round(fitted.size * 1.42);
 
                 ctx.fillStyle = palette.line;
@@ -421,11 +501,33 @@
                 }, 3000);
             }
 
+            function validateCardReady() {
+                if (typeSelect.value !== 'note' || String(noteBodyInput?.value || '').trim()) {
+                    return true;
+                }
+
+                setStatus('Type a note before exporting.');
+                noteBodyInput?.focus();
+
+                return false;
+            }
+
+            function slugify(value, fallback) {
+                return String(value || fallback)
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-|-$/g, '') || fallback;
+            }
+
             function download() {
+                if (! validateCardReady()) {
+                    return;
+                }
+
                 const link = document.createElement('a');
                 const card = currentCard();
-                const filename = String(card.title || 'mannarise-card').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'mannarise-card';
-                const dateSlug = String(card.date || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                const filename = slugify(card.title, 'mannarise-card');
+                const dateSlug = slugify(card.date, '');
 
                 link.download = `${filename}${dateSlug ? `-${dateSlug}` : ''}.png`;
                 link.href = canvas.toDataURL('image/png');
@@ -434,6 +536,10 @@
             }
 
             async function copyImage() {
+                if (! validateCardReady()) {
+                    return;
+                }
+
                 if (! navigator.clipboard || ! window.ClipboardItem) {
                     setStatus('Clipboard image copy is not available in this browser.');
                     return;
@@ -469,6 +575,10 @@
             }
 
             async function shareNative() {
+                if (! validateCardReady()) {
+                    return;
+                }
+
                 const card = currentCard();
                 const title = String(card.title || 'MannaRise Scripture card');
                 const text = cardShareText();
@@ -480,7 +590,7 @@
                 }
 
                 const blob = await canvasBlob();
-                const file = blob ? new File([blob], 'mannarise-scripture-card.png', { type: 'image/png' }) : null;
+                const file = blob ? new File([blob], `${slugify(card.title, 'mannarise-card')}.png`, { type: 'image/png' }) : null;
                 const payloadWithFile = file ? { title, text, url: shareUrl, files: [file] } : null;
 
                 try {
@@ -499,6 +609,10 @@
             }
 
             async function copyShareLink() {
+                if (! validateCardReady()) {
+                    return;
+                }
+
                 const text = `${cardShareText()}\n\n${shareUrl}`;
 
                 if (! navigator.clipboard) {
@@ -546,10 +660,15 @@
                 control.addEventListener('change', () => {
                     if (control === typeSelect) {
                         populateItems();
+                        syncSourceControls();
                     }
 
                     draw();
                 });
+            });
+
+            [noteTitleInput, noteBodyInput].forEach((control) => {
+                control?.addEventListener('input', draw);
             });
 
             downloadButton.addEventListener('click', download);
@@ -559,6 +678,7 @@
             });
 
             populateItems();
+            syncSourceControls();
             draw();
         })();
     </script>

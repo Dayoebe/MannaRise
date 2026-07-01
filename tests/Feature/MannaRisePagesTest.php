@@ -45,6 +45,12 @@ class MannaRisePagesTest extends TestCase
         foreach (['/', '/about', '/contact', '/daily', '/bible', '/library', '/devotionals', '/devotionals/faith-for-today', '/plans', '/memory-verses', '/scripture-cards', '/guided-prayer', '/audio-devotionals', '/resources', '/resources/devotion', '/resources/books', '/resources/videos', '/resources/audio', '/prayer-rooms', '/prayer-rooms/healing', '/prayer-wall', '/prayer-request', '/testimonies', '/testimony', '/login', '/register'] as $path) {
             $this->get($path)->assertOk();
         }
+
+        $this->get('/scripture-cards')
+            ->assertOk()
+            ->assertSee('Note card')
+            ->assertSee('data-note-body', false)
+            ->assertSee('Shareable Scripture and note cards');
     }
 
     public function test_authenticated_pages_render(): void
