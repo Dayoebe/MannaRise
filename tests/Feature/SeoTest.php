@@ -36,6 +36,38 @@ class SeoTest extends TestCase
             ->assertSee(route('localized.home', ['locale' => 'yo']), false);
     }
 
+    public function test_daily_permalink_renders_dynamic_open_graph_image_tags(): void
+    {
+        $date = '2026-07-01';
+        $imageUrl = route('daily.og-image', ['locale' => 'es', 'date' => $date]);
+
+        $this->get(route('daily.localized.show', ['locale' => 'es', 'date' => $date]))
+            ->assertOk()
+            ->assertSee('<meta property="og:image" content="'.$imageUrl.'">', false)
+            ->assertSee('<meta property="og:image:width" content="1200">', false)
+            ->assertSee('<meta property="og:image:height" content="630">', false)
+            ->assertSee('<meta name="twitter:image" content="'.$imageUrl.'">', false);
+    }
+
+    public function test_daily_open_graph_image_endpoint_returns_png(): void
+    {
+        $response = $this->get(route('daily.og-image', ['locale' => 'fr', 'date' => '2026-07-01']));
+
+        $response
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/png');
+
+        $content = $response->getContent();
+        $this->assertIsString($content);
+        $this->assertStringStartsWith("\x89PNG\r\n\x1a\n", $content);
+
+        $image = imagecreatefromstring($content);
+        $this->assertNotFalse($image);
+        $this->assertSame(1200, imagesx($image));
+        $this->assertSame(630, imagesy($image));
+        imagedestroy($image);
+    }
+
     public function test_robots_txt_is_available(): void
     {
         $this->get(route('seo.robots'))

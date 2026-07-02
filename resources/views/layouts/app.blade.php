@@ -41,8 +41,8 @@
         <meta property="og:url" content="{{ $seo['canonical'] }}">
         <meta property="og:image" content="{{ $seo['image'] }}">
         <meta property="og:image:alt" content="{{ $seo['image_alt'] }}">
-        <meta property="og:image:width" content="512">
-        <meta property="og:image:height" content="512">
+        <meta property="og:image:width" content="{{ $seo['image_width'] }}">
+        <meta property="og:image:height" content="{{ $seo['image_height'] }}">
 
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="{{ $seo['title'] }}">

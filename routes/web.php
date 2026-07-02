@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DailyOpenGraphImageController;
 use App\Http\Controllers\GrowthAnalyticsController;
 use App\Http\Controllers\SeoController;
 use App\Livewire\Admin\AudioDevotionals as AdminAudioDevotionals;
@@ -100,6 +101,7 @@ Route::get('/{locale}', LocalizedHome::class)->where('locale', LanguagePages::ro
 Route::get('/daily', DailyIndex::class)->name('daily.index');
 Route::get('/daily/{date}', DailyShow::class)->where('date', '\d{4}-\d{2}-\d{2}')->name('daily.show');
 Route::get('/{locale}/daily/{date}', DailyShow::class)->where(['locale' => LanguagePages::routePattern(), 'date' => '\d{4}-\d{2}-\d{2}'])->name('daily.localized.show');
+Route::get('/og/daily/{locale}/{date}.png', DailyOpenGraphImageController::class)->where(['locale' => LanguagePages::routePattern(), 'date' => '\d{4}-\d{2}-\d{2}'])->name('daily.og-image');
 Route::get('/bible/{book?}/{chapter?}', BibleReader::class)->name('bible');
 Route::get('/library', LibraryIndex::class)->name('library.index');
 Route::get('/library/{slug}/{chapter?}', LibraryShow::class)->name('library.show');

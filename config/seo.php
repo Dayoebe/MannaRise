@@ -12,6 +12,10 @@ return [
 
     'image' => env('SEO_IMAGE', '/icons/icon-512.png'),
 
+    'image_width' => (int) env('SEO_IMAGE_WIDTH', 512),
+
+    'image_height' => (int) env('SEO_IMAGE_HEIGHT', 512),
+
     'theme_color' => env('SEO_THEME_COLOR', '#047857'),
 
     'twitter_site' => env('SEO_TWITTER_SITE'),

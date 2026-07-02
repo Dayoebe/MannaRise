@@ -27,6 +27,8 @@ class Seo
         $description = self::plainText((string) ($overrides['description'] ?? config('seo.description')));
         $canonical = self::absoluteUrl((string) ($overrides['canonical'] ?? self::canonicalUrl()));
         $image = self::absoluteUrl((string) ($overrides['image'] ?? config('seo.image')));
+        $imageWidth = (int) ($overrides['image_width'] ?? config('seo.image_width', 512));
+        $imageHeight = (int) ($overrides['image_height'] ?? config('seo.image_height', 512));
         $type = $overrides['type'] ?? 'website';
         $breadcrumbs = $overrides['breadcrumbs'] ?? self::homeBreadcrumb();
         $language = (string) ($overrides['language'] ?? str_replace('_', '-', app()->getLocale()));
@@ -39,6 +41,8 @@ class Seo
             'type' => $type,
             'image' => $image,
             'image_alt' => $overrides['image_alt'] ?? $rawTitle,
+            'image_width' => $imageWidth,
+            'image_height' => $imageHeight,
             'robots' => $overrides['robots'] ?? self::robots(),
             'site_name' => $siteName,
             'twitter_site' => config('seo.twitter_site'),
