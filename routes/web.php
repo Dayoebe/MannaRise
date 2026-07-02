@@ -66,6 +66,7 @@ use App\Models\CommunityGroupMembership;
 use App\Models\DevotionalReminder;
 use App\Models\User;
 use App\Support\LanguagePages;
+use App\Support\LanguagePreference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -83,6 +84,14 @@ Route::get('/llms.txt', [SeoController::class, 'llms'])->name('seo.llms');
 Route::get('/llms-full.txt', [SeoController::class, 'llmsFull'])->name('seo.llms-full');
 Route::get('/ai.txt', [SeoController::class, 'ai'])->name('seo.ai');
 Route::post('/analytics/events', [GrowthAnalyticsController::class, 'store'])->name('analytics.events');
+Route::get('/language/{locale}', function (Request $request, string $locale) {
+    abort_unless(LanguagePages::isSupported($locale), 404);
+
+    $request->session()->put(LanguagePreference::SESSION_KEY, $locale);
+    $target = LanguagePreference::safeRedirectUrl($request->query('redirect'), $locale, $request);
+
+    return redirect()->to($target)->withCookie(cookie(LanguagePreference::COOKIE_KEY, $locale, 60 * 24 * 365));
+})->where('locale', LanguagePages::routePattern())->name('language.switch');
 
 Route::get('/', Home::class)->name('home');
 Route::get('/about', About::class)->name('about');

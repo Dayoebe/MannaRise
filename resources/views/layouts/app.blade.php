@@ -1,9 +1,16 @@
 @php
     $seo = \App\Support\Seo::meta($seo ?? []);
+    $activeLocale = \App\Support\LanguagePreference::current();
+    $activeLanguage = \App\Support\LanguagePages::language($activeLocale);
+    $navCopy = \App\Support\LanguagePreference::navCopy($activeLocale);
+    $languageOptions = \App\Support\LanguagePreference::options();
+    $homeUrl = \App\Support\LanguagePreference::homeUrl($activeLocale);
+    $dailyUrl = \App\Support\LanguagePreference::dailyUrl($activeLocale);
+    $bibleUrl = \App\Support\LanguagePreference::bibleUrl($activeLocale);
 @endphp
 
 <!DOCTYPE html>
-<html lang="{{ $seo['language'] }}" class="h-full">
+<html lang="{{ $activeLanguage['html_locale'] ?? $seo['language'] }}" class="h-full">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -93,69 +100,97 @@
 
             <div class="app-topbar-inner mx-auto flex max-w-7xl flex-col gap-3 px-3 py-3 sm:px-5 lg:px-8">
                 <div class="flex items-center justify-between gap-3">
-                    <a href="{{ route('home') }}" class="app-brand group inline-flex min-h-12 items-center gap-3 rounded-2xl border border-emerald-200 bg-white px-3 py-2 shadow-sm transition hover:border-emerald-300">
+                    <a href="{{ $homeUrl }}" class="app-brand group inline-flex min-h-12 items-center gap-3 rounded-2xl border border-emerald-200 bg-white px-3 py-2 shadow-sm transition hover:border-emerald-300">
                         <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-700 text-white">
                             <x-ui.icon name="sparkles" class="h-5 w-5" />
                         </span>
                         <span>
                             <span class="block font-display text-lg font-bold tracking-normal text-emerald-900">MannaRise</span>
-                            <span class="block text-xs font-semibold text-slate-500">grow daily</span>
+                            <span class="block text-xs font-semibold text-slate-500">{{ $navCopy['grow_daily'] }}</span>
                         </span>
                     </a>
 
                     <div class="flex shrink-0 items-center gap-2">
+                        <details class="language-switcher">
+                            <summary aria-label="{{ $navCopy['choose_language'] }}">
+                                <x-ui.icon name="globe" class="h-4 w-4" />
+                                <span class="hidden max-w-28 truncate sm:inline">{{ $activeLanguage['native_name'] }}</span>
+                                <span class="sm:hidden">{{ strtoupper($activeLocale) }}</span>
+                                <x-ui.icon name="chevron-right" class="h-3.5 w-3.5 language-switcher-icon" />
+                            </summary>
+
+                            <div class="language-menu-panel">
+                                <p>{{ $navCopy['choose_language'] }}</p>
+
+                                <div class="mt-2 grid gap-1">
+                                    @foreach ($languageOptions as $option)
+                                        <a href="{{ $option['switch_url'] }}" class="language-menu-link {{ $option['current'] ? 'language-menu-link-active' : '' }}">
+                                            <span>{{ strtoupper($option['code']) }}</span>
+                                            <strong>{{ $option['native_name'] }}</strong>
+                                            <small>{{ $option['name'] }}</small>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </details>
+
                         @auth
                             <livewire:notifications.center />
                             @unless ($usesAccountSidebar)
                                 <a href="{{ route('dashboard') }}" class="btn-secondary px-3" title="Dashboard">
                                     <x-ui.icon name="layout-dashboard" class="h-4 w-4" />
-                                    <span class="hidden sm:inline">Dashboard</span>
+                                    <span class="hidden sm:inline">{{ $navCopy['dashboard'] }}</span>
                                 </a>
                             @endunless
                             @if (auth()->user()->hasAdminAccess())
                                 <a href="{{ route('admin.dashboard') }}" class="btn-secondary px-3" title="Admin">
                                     <x-ui.icon name="shield" class="h-4 w-4" />
-                                    <span class="hidden sm:inline">{{ auth()->user()->is_super_admin ? 'Super Admin' : 'Admin' }}</span>
+                                    <span class="hidden sm:inline">{{ auth()->user()->is_super_admin ? $navCopy['super_admin'] : $navCopy['admin'] }}</span>
                                 </a>
                             @endif
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="btn-secondary px-3" title="Log out">
+                                <button type="submit" class="btn-secondary px-3" title="{{ $navCopy['log_out'] }}">
                                     <x-ui.icon name="log-out" class="h-4 w-4" />
-                                    <span class="hidden sm:inline">Log out</span>
+                                    <span class="hidden sm:inline">{{ $navCopy['log_out'] }}</span>
                                 </button>
                             </form>
                         @else
                             <a href="{{ route('login') }}" class="btn-secondary px-3">
                                 <x-ui.icon name="log-in" class="h-4 w-4" />
-                                <span class="hidden sm:inline">Log in</span>
+                                <span class="hidden sm:inline">{{ $navCopy['log_in'] }}</span>
                             </a>
                             <a href="{{ route('register') }}" class="btn-primary px-3">
                                 <x-ui.icon name="sparkles" class="h-4 w-4" />
-                                <span class="hidden sm:inline">Join</span>
+                                <span class="hidden sm:inline">{{ $navCopy['join'] }}</span>
                             </a>
                         @endauth
                     </div>
                 </div>
 
                 @php
-                    $mainLinks = [
-                        ['label' => 'Daily', 'route' => 'daily.index', 'icon' => 'star', 'active' => ['daily.*']],
-                        ['label' => 'Devotionals', 'route' => 'devotionals.index', 'icon' => 'sparkles', 'active' => ['devotionals.*']],
-                        ['label' => 'Bible', 'route' => 'bible', 'icon' => 'book-open', 'active' => ['bible']],
-                        ['label' => 'Resources', 'route' => 'resources.index', 'icon' => 'library', 'active' => ['resources.*']],
-                        ['label' => 'Prayer', 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*', 'prayer-invites.*', 'prayer-rooms.*', 'prayer-requests.*']],
+                    $primaryNavLinks = [
+                        ['label' => $navCopy['home'], 'url' => $homeUrl, 'icon' => 'sparkles', 'active' => ['home', 'localized.home']],
+                        ['label' => $navCopy['daily'], 'url' => $dailyUrl, 'icon' => 'star', 'active' => ['daily.*']],
+                        ['label' => $navCopy['bible'], 'url' => $bibleUrl, 'icon' => 'book-open', 'active' => ['bible']],
+                        ['label' => $navCopy['devotionals'], 'route' => 'devotionals.index', 'icon' => 'sparkles', 'active' => ['devotionals.*']],
+                        ['label' => $navCopy['prayer'], 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*', 'prayer-invites.*', 'prayer-rooms.*', 'prayer-requests.*']],
                     ];
 
                     if ($user) {
-                        $mainLinks[] = ['label' => 'Journal', 'route' => 'journal.index', 'icon' => 'journal', 'active' => ['journal.*']];
+                        $primaryNavLinks[] = ['label' => $navCopy['journal'], 'route' => 'journal.index', 'icon' => 'journal', 'active' => ['journal.*']];
                     }
 
                     $exploreLinks = [
+                        ['label' => $navCopy['resources'], 'route' => 'resources.index', 'icon' => 'library', 'active' => ['resources.index', 'resources.show']],
                         ['label' => 'Plans', 'route' => 'devotional-plans.index', 'icon' => 'route', 'active' => ['devotional-plans.*']],
                         ['label' => 'Library', 'route' => 'library.index', 'icon' => 'library', 'active' => ['library.*']],
                         ['label' => 'Hub Books', 'route' => 'resources.books', 'icon' => 'library', 'active' => ['resources.books']],
                         ['label' => 'Hub Audio', 'route' => 'resources.audio', 'icon' => 'headphones', 'active' => ['resources.audio']],
+                        ['label' => 'Videos', 'route' => 'resources.videos', 'icon' => 'play', 'active' => ['resources.videos']],
+                    ];
+
+                    $moreLinks = [
                         ['label' => 'Memory', 'route' => 'memory-verses.index', 'icon' => 'bookmark', 'active' => ['memory-verses.*']],
                         ['label' => 'Cards', 'route' => 'scripture-cards.index', 'icon' => 'book-open', 'active' => ['scripture-cards.*']],
                         ['label' => 'Audio', 'route' => 'audio-devotionals.index', 'icon' => 'headphones', 'active' => ['audio-devotionals.*']],
@@ -163,7 +198,7 @@
                     ];
 
                     if ($user) {
-                        $exploreLinks[] = ['label' => 'Groups', 'route' => 'community-groups.index', 'icon' => 'users', 'active' => ['community-groups.*']];
+                        $moreLinks[] = ['label' => 'Groups', 'route' => 'community-groups.index', 'icon' => 'users', 'active' => ['community-groups.*']];
                     }
 
                     $accountLinks = [];
@@ -208,29 +243,30 @@
                         }
                     }
 
-                    $desktopNavGroups = array_filter([
-                        ['label' => 'Main', 'links' => $mainLinks],
-                        ['label' => 'Explore', 'links' => $exploreLinks],
-                        ['label' => 'My Space', 'links' => $accountLinks],
-                        ['label' => 'Admin', 'links' => $adminLinks],
+                    $desktopNavMenus = array_filter([
+                        ['label' => $navCopy['explore'], 'icon' => 'library', 'links' => $exploreLinks],
+                        ['label' => $navCopy['more'], 'icon' => 'more-horizontal', 'links' => $moreLinks],
+                        ['label' => $navCopy['my_space'], 'icon' => 'layout-dashboard', 'links' => $accountLinks],
+                        ['label' => $navCopy['admin'], 'icon' => 'shield', 'links' => $adminLinks],
                     ], fn (array $group) => count($group['links']) > 0);
 
                     $mobileMoreGroups = [
-                        ['label' => 'Explore', 'links' => $exploreLinks],
-                        ['label' => 'Prayer', 'links' => [
-                            ['label' => 'Guided Prayer', 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*', 'prayer-invites.*']],
-                            ['label' => 'Prayer Rooms', 'route' => 'prayer-rooms.index', 'icon' => 'users', 'active' => ['prayer-rooms.*']],
-                            ['label' => 'Prayer Wall', 'route' => 'prayer-requests.wall', 'icon' => 'heart', 'active' => ['prayer-requests.wall']],
-                            ['label' => 'Request Prayer', 'route' => 'prayer-requests.submit', 'icon' => 'send', 'active' => ['prayer-requests.submit']],
+                        ['label' => $navCopy['explore'], 'links' => $exploreLinks],
+                        ['label' => $navCopy['more'], 'links' => $moreLinks],
+                        ['label' => $navCopy['prayer'], 'links' => [
+                            ['label' => $navCopy['guided_prayer'], 'route' => 'prayer-sessions.index', 'icon' => 'heart', 'active' => ['prayer-sessions.*', 'prayer-invites.*']],
+                            ['label' => $navCopy['prayer_rooms'], 'route' => 'prayer-rooms.index', 'icon' => 'users', 'active' => ['prayer-rooms.*']],
+                            ['label' => $navCopy['prayer_wall'], 'route' => 'prayer-requests.wall', 'icon' => 'heart', 'active' => ['prayer-requests.wall']],
+                            ['label' => $navCopy['request_prayer'], 'route' => 'prayer-requests.submit', 'icon' => 'send', 'active' => ['prayer-requests.submit']],
                         ]],
                     ];
 
                     if ($user) {
-                        $mobileMoreGroups[] = ['label' => 'My Space', 'links' => $accountLinks];
+                        $mobileMoreGroups[] = ['label' => $navCopy['my_space'], 'links' => $accountLinks];
                     }
 
                     if ($user?->hasAdminAccess()) {
-                        $mobileMoreGroups[] = ['label' => 'Admin', 'links' => $adminLinks];
+                        $mobileMoreGroups[] = ['label' => $navCopy['admin'], 'links' => $adminLinks];
                     }
 
                     $mobileMoreActiveRoutes = collect($mobileMoreGroups)
@@ -238,21 +274,40 @@
                         ->all();
                 @endphp
 
-                @unless ($usesAccountSidebar)
-                    <nav class="hidden flex-col gap-2 text-sm lg:flex">
-                        @foreach ($desktopNavGroups as $group)
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="min-w-16 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{{ $group['label'] }}</span>
-
-                                @foreach ($group['links'] as $link)
-                                    <a href="{{ route($link['route']) }}" class="nav-pill {{ request()->routeIs(...$link['active']) ? 'nav-pill-active' : '' }}">
-                                        <x-ui.icon :name="$link['icon']" class="h-4 w-4" /> {{ $link['label'] }}
-                                    </a>
-                                @endforeach
-                            </div>
+                <nav class="desktop-navbar hidden items-center gap-2 text-sm lg:flex" aria-label="Primary navigation">
+                    <div class="desktop-nav-primary">
+                        @foreach ($primaryNavLinks as $link)
+                            <a href="{{ $link['url'] ?? route($link['route']) }}" class="nav-pill {{ request()->routeIs(...$link['active']) ? 'nav-pill-active' : '' }}">
+                                <x-ui.icon :name="$link['icon']" class="h-4 w-4" /> {{ $link['label'] }}
+                            </a>
                         @endforeach
-                    </nav>
-                @endunless
+                    </div>
+
+                    <div class="desktop-nav-menus">
+                        @foreach ($desktopNavMenus as $group)
+                            @php
+                                $isMenuActive = collect($group['links'])->contains(fn (array $link): bool => request()->routeIs(...$link['active']));
+                            @endphp
+
+                            <details class="desktop-nav-menu">
+                                <summary class="desktop-nav-summary {{ $isMenuActive ? 'desktop-nav-summary-active' : '' }}">
+                                    <x-ui.icon :name="$group['icon']" class="h-4 w-4" />
+                                    {{ $group['label'] }}
+                                    <x-ui.icon name="chevron-right" class="desktop-nav-summary-icon h-3.5 w-3.5" />
+                                </summary>
+
+                                <div class="desktop-nav-panel">
+                                    @foreach ($group['links'] as $link)
+                                        <a href="{{ $link['url'] ?? route($link['route']) }}" class="desktop-nav-link {{ request()->routeIs(...$link['active']) ? 'desktop-nav-link-active' : '' }}">
+                                            <x-ui.icon :name="$link['icon']" class="h-4 w-4" />
+                                            <span>{{ $link['label'] }}</span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </details>
+                        @endforeach
+                    </div>
+                </nav>
             </div>
         </header>
 
@@ -347,32 +402,32 @@
                 @auth
                     <a href="{{ route('dashboard') }}" class="mobile-tab {{ request()->routeIs('dashboard') ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="layout-dashboard" />
-                        <span>Home</span>
+                        <span>{{ $navCopy['dashboard'] }}</span>
                     </a>
-                    <a href="{{ route('bible') }}" class="mobile-tab {{ request()->routeIs('bible') ? 'mobile-tab-active' : '' }}">
+                    <a href="{{ $bibleUrl }}" class="mobile-tab {{ request()->routeIs('bible') ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="book-open" />
-                        <span>Bible</span>
+                        <span>{{ $navCopy['bible'] }}</span>
                     </a>
-                    <a href="{{ route('daily.index') }}" class="mobile-tab {{ request()->routeIs('daily.*') ? 'mobile-tab-active' : '' }}">
+                    <a href="{{ $dailyUrl }}" class="mobile-tab {{ request()->routeIs('daily.*') ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="star" />
-                        <span>Daily</span>
+                        <span>{{ $navCopy['daily'] }}</span>
                     </a>
                     <a href="{{ route('journal.index') }}" class="mobile-tab {{ request()->routeIs('journal.*') ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="journal" />
-                        <span>Journal</span>
+                        <span>{{ $navCopy['journal'] }}</span>
                     </a>
                 @else
                     <a href="{{ route('devotionals.index') }}" class="mobile-tab {{ request()->routeIs('devotionals.*') ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="sparkles" />
-                        <span>Devotion</span>
+                        <span>{{ $navCopy['devotionals'] }}</span>
                     </a>
-                    <a href="{{ route('bible') }}" class="mobile-tab {{ request()->routeIs('bible') ? 'mobile-tab-active' : '' }}">
+                    <a href="{{ $bibleUrl }}" class="mobile-tab {{ request()->routeIs('bible') ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="book-open" />
-                        <span>Bible</span>
+                        <span>{{ $navCopy['bible'] }}</span>
                     </a>
-                    <a href="{{ route('daily.index') }}" class="mobile-tab {{ request()->routeIs('daily.*') ? 'mobile-tab-active' : '' }}">
+                    <a href="{{ $dailyUrl }}" class="mobile-tab {{ request()->routeIs('daily.*') ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="star" />
-                        <span>Daily</span>
+                        <span>{{ $navCopy['daily'] }}</span>
                     </a>
                     <a href="{{ route('library.index') }}" class="mobile-tab {{ request()->routeIs('library.*') ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="library" />
@@ -382,7 +437,7 @@
                 <details class="relative">
                     <summary class="mobile-tab list-none cursor-pointer [&::-webkit-details-marker]:hidden {{ request()->routeIs(...$mobileMoreActiveRoutes) ? 'mobile-tab-active' : '' }}">
                         <x-ui.icon name="more-horizontal" />
-                        <span>More</span>
+                        <span>{{ $navCopy['more'] }}</span>
                     </summary>
 
                     <div class="mobile-more-panel">
@@ -392,7 +447,7 @@
 
                                 <div class="space-y-1">
                                     @foreach ($group['links'] as $link)
-                                        <a href="{{ route($link['route']) }}" class="mobile-more-link {{ request()->routeIs(...$link['active']) ? 'mobile-more-link-active' : '' }}">
+                                        <a href="{{ $link['url'] ?? route($link['route']) }}" class="mobile-more-link {{ request()->routeIs(...$link['active']) ? 'mobile-more-link-active' : '' }}">
                                             <x-ui.icon :name="$link['icon']" class="h-4 w-4" />
                                             <span>{{ $link['label'] }}</span>
                                         </a>
@@ -419,31 +474,83 @@
             </div>
         </div>
 
-        <footer class="app-footer border-t border-slate-200 bg-white">
-            <div class="mx-auto flex max-w-7xl flex-col gap-4 px-3 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-5 lg:px-8">
-                <span class="inline-flex items-center gap-2 font-semibold text-slate-700"><x-ui.icon name="sparkles" class="h-4 w-4 text-emerald-800" /> MannaRise devotional and spiritual growth platform.</span>
-                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <a href="{{ route('about') }}" class="font-bold text-slate-600 hover:text-emerald-800">About</a>
-                    <a href="{{ route('contact') }}" class="font-bold text-slate-600 hover:text-emerald-800">Contact</a>
-                    <a href="{{ route('seo.sitemap') }}" class="font-bold text-slate-600 hover:text-emerald-800">Sitemap</a>
-                    <a href="{{ route('seo.llms') }}" class="font-bold text-slate-600 hover:text-emerald-800">llms.txt</a>
-                    <a href="{{ route('seo.feed') }}" class="font-bold text-slate-600 hover:text-emerald-800">RSS</a>
-                    @foreach (\App\Support\LanguagePages::homeOptions($seo['locale_code'] ?? 'en') as $languageOption)
-                        <a href="{{ $languageOption['url'] }}" class="font-bold {{ $languageOption['current'] ? 'text-emerald-800' : 'text-slate-600 hover:text-emerald-800' }}">{{ strtoupper($languageOption['code']) }}</a>
-                    @endforeach
-                    <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-sky-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-amber-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-rose-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-violet-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-teal-400"></span>
-                    <span class="h-3 w-3 rounded-full bg-pink-400"></span>
+        <footer class="app-footer">
+            @php
+                $footerGroups = [
+                    [
+                        'label' => 'MannaRise',
+                        'links' => [
+                            ['label' => 'About', 'url' => route('about')],
+                            ['label' => 'Contact', 'url' => route('contact')],
+                            ['label' => $navCopy['daily'], 'url' => $dailyUrl],
+                            ['label' => $navCopy['bible'], 'url' => $bibleUrl],
+                        ],
+                    ],
+                    [
+                        'label' => $navCopy['explore'],
+                        'links' => [
+                            ['label' => 'Resources', 'url' => route('resources.index')],
+                            ['label' => 'Plans', 'url' => route('devotional-plans.index')],
+                            ['label' => 'Library', 'url' => route('library.index')],
+                            ['label' => 'Cards', 'url' => route('scripture-cards.index')],
+                        ],
+                    ],
+                    [
+                        'label' => $navCopy['prayer'],
+                        'links' => [
+                            ['label' => $navCopy['guided_prayer'], 'url' => route('prayer-sessions.index')],
+                            ['label' => $navCopy['prayer_rooms'], 'url' => route('prayer-rooms.index')],
+                            ['label' => $navCopy['prayer_wall'], 'url' => route('prayer-requests.wall')],
+                            ['label' => $navCopy['request_prayer'], 'url' => route('prayer-requests.submit')],
+                        ],
+                    ],
+                    [
+                        'label' => 'Discovery',
+                        'links' => [
+                            ['label' => 'Sitemap', 'url' => route('seo.sitemap')],
+                            ['label' => 'llms.txt', 'url' => route('seo.llms')],
+                            ['label' => 'RSS', 'url' => route('seo.feed')],
+                            ['label' => 'AI', 'url' => route('seo.ai')],
+                        ],
+                    ],
+                ];
+            @endphp
 
-                    <span class="inline-flex items-center gap-1 text-rose-500"> &copy;
-                        <span class="ml-1">{{ now()->year }}</span>
-                    </span>
-                    <a href="https://dayoebe.github.io" target="_blank" class="text-sky-500 hover:text-sky-700">Wireless Terminal</a> <x-ui.icon name="heart" class="h-3 w-3" />
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <a href="{{ $homeUrl }}" class="footer-brand-mark">
+                        <span><x-ui.icon name="sparkles" class="h-5 w-5" /></span>
+                        <strong>MannaRise</strong>
+                    </a>
+                    <p>MannaRise devotional and spiritual growth platform.</p>
+                    <div class="footer-language-list" aria-label="{{ $navCopy['choose_language'] }}">
+                        @foreach ($languageOptions as $languageOption)
+                            <a href="{{ $languageOption['switch_url'] }}" class="footer-language-link {{ $languageOption['current'] ? 'footer-language-link-active' : '' }}">
+                                {{ strtoupper($languageOption['code']) }}
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
+
+                <div class="footer-link-grid">
+                    @foreach ($footerGroups as $group)
+                        <section class="footer-link-group">
+                            <h2>{{ $group['label'] }}</h2>
+
+                            <div>
+                                @foreach ($group['links'] as $link)
+                                    <a href="{{ $link['url'] }}">{{ $link['label'] }}</a>
+                                @endforeach
+                            </div>
+                        </section>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <span>&copy; {{ now()->year }} MannaRise</span>
+                <span>{{ $activeLanguage['native_name'] }} · {{ strtoupper($activeLocale) }}</span>
+                <a href="https://dayoebe.github.io" target="_blank" rel="noopener">Wireless Terminal</a>
             </div>
         </footer>
 
