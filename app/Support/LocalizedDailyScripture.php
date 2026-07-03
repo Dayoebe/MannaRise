@@ -14,28 +14,46 @@ class LocalizedDailyScripture
      */
     public static function forDate(array $dailyRhythm, CarbonImmutable $date, string $language): array
     {
+        $theme = (string) (($dailyRhythm['affirmation'] ?? [])['theme'] ?? 'peace');
         $stored = DailyScripture::query()
             ->active()
             ->whereDate('verse_date', $date->toDateString())
             ->first();
 
         if ($stored) {
-            return self::fromStored($stored, $language);
+            $scripture = self::fromStored($stored, $language);
+
+            return $scripture['is_localized']
+                ? $scripture
+                : (self::localizedFallback($stored->reference, $theme, $language) ?? $scripture);
         }
 
         $verse = $dailyRhythm['verse'] ?? null;
 
         if ($verse instanceof BibleVerse) {
-            return self::fromBibleVerse($verse, $language);
+            $scripture = self::fromBibleVerse($verse, $language);
+
+            return $scripture['is_localized']
+                ? $scripture
+                : (self::localizedFallback($scripture['reference'], $theme, $language) ?? $scripture);
         }
 
-        $affirmation = $dailyRhythm['affirmation'] ?? [];
-        $fallback = DailySpiritualRhythm::fallbackScriptureForTheme((string) ($affirmation['theme'] ?? 'peace'));
+        $fallback = DailySpiritualRhythm::fallbackScriptureForTheme($theme);
         $localized = BibleTranslations::verseFromReference($fallback['reference'], $language);
         $english = BibleTranslations::verseFromReference($fallback['reference'], 'en');
 
-        if ($localized || $english) {
-            return self::fromResolvedVerse($localized ?: $english, $language);
+        if ($localized) {
+            return self::fromResolvedVerse($localized, $language);
+        }
+
+        $fallbackScripture = self::localizedFallback($fallback['reference'], $theme, $language);
+
+        if ($fallbackScripture) {
+            return $fallbackScripture;
+        }
+
+        if ($english) {
+            return self::fromResolvedVerse($english, $language);
         }
 
         return [
@@ -47,6 +65,34 @@ class LocalizedDailyScripture
             'version' => null,
             'is_localized' => $language === 'en',
             'reader_url' => null,
+        ];
+    }
+
+    /**
+     * @return array{text:string,reference:string,book_slug:string|null,chapter:string|null,language:string,version:string|null,is_localized:bool,reader_url:string|null}|null
+     */
+    private static function localizedFallback(?string $reference, string $theme, string $language): ?array
+    {
+        $scripture = $reference
+            ? LocalizedDailyContent::scriptureForReference($reference, $language)
+            : null;
+        $scripture ??= LocalizedDailyContent::scriptureForTheme($theme, $language);
+
+        if (! $scripture) {
+            return null;
+        }
+
+        return [
+            'text' => $scripture['text'],
+            'reference' => $scripture['reference'],
+            'book_slug' => $scripture['book_slug'],
+            'chapter' => $scripture['chapter'] ? (string) $scripture['chapter'] : null,
+            'language' => $scripture['language'],
+            'version' => $scripture['version'],
+            'is_localized' => true,
+            'reader_url' => $scripture['book_slug'] && $scripture['chapter']
+                ? BibleTranslations::readerUrl($scripture['book_slug'], $scripture['chapter'], $language)
+                : null,
         ];
     }
 

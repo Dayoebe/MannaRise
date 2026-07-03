@@ -146,6 +146,7 @@
             const shareButtons = root.querySelectorAll('[data-card-share]');
             const ctx = canvas.getContext('2d');
             const appUrl = @json($appUrl);
+            const cardFooter = @json($cardFooter);
             const shareUrl = window.location.href.split('#')[0];
             const sansFont = '"Source Sans 3", Arial, sans-serif';
             const serifFont = 'Lora, Georgia, serif';
@@ -482,7 +483,7 @@
                 ctx.fillText('MannaRise', panelX + 58, footerTop + 62);
                 ctx.fillStyle = palette.muted;
                 ctx.font = `800 34px ${sansFont}`;
-                ctx.fillText('grow daily', panelX + 58, footerTop + 118);
+                ctx.fillText(cardFooter || 'grow daily', panelX + 58, footerTop + 118);
                 ctx.font = `800 28px ${sansFont}`;
                 ctx.fillText(appUrl, panelX + 58, footerTop + 158);
 

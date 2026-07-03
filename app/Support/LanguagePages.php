@@ -705,14 +705,17 @@ class LanguagePages
     public static function dailyMeta(string $locale, CarbonInterface $date, string $canonical): array
     {
         $language = self::language($locale);
+        $dailyRhythm = DailySpiritualRhythm::forDate($date);
+        $copy = self::dailyCopy($locale, $dailyRhythm, $date);
+        $scripture = LocalizedDailyScripture::forDate($dailyRhythm, $date->toImmutable(), $locale);
         $dateLabel = self::dateLabel($locale, $date);
 
         return [
-            'title' => self::fill($language['daily_seo_title'], [':date' => $dateLabel]),
-            'description' => self::fill($language['daily_seo_description'], [':date' => $dateLabel]),
+            'title' => LocalizedDailyContent::seoTitle($locale, $dateLabel, $copy['theme_label'], $scripture['reference']),
+            'description' => LocalizedDailyContent::seoDescription($locale, $copy['affirmation_text'], $scripture['reference']),
             'canonical' => $canonical,
             'image' => route('daily.og-image', ['locale' => $locale, 'date' => $date->toDateString()]),
-            'image_alt' => 'MannaRise daily devotion card for '.$dateLabel,
+            'image_alt' => $copy['page_title'].' with '.$scripture['reference'],
             'image_width' => DailyOpenGraphCard::WIDTH,
             'image_height' => DailyOpenGraphCard::HEIGHT,
             'language' => $language['html_locale'],
@@ -770,14 +773,15 @@ class LanguagePages
         $theme = (string) ($sourceAffirmation['theme'] ?? 'peace');
         $themeLabel = self::themeLabel($locale, $theme);
         $dateLabel = self::dateLabel($locale, $date);
+        $localizedContent = LocalizedDailyContent::themeCopy($locale, $theme);
 
         $affirmationText = $locale === 'en'
-            ? (string) ($sourceAffirmation['text'] ?? self::fill($language['affirmation_template'], [':theme' => $themeLabel]))
-            : self::fill($language['affirmation_template'], [':theme' => $themeLabel]);
+            ? ($localizedContent['affirmation'] ?? (string) ($sourceAffirmation['text'] ?? self::fill($language['affirmation_template'], [':theme' => $themeLabel])))
+            : ($localizedContent['affirmation'] ?? self::fill($language['affirmation_template'], [':theme' => $themeLabel]));
 
         $prayer = $locale === 'en'
-            ? (string) ($sourceReflection['prayer'] ?? self::fill($language['prayer_template'], [':theme' => $themeLabel]))
-            : self::fill($language['prayer_template'], [':theme' => $themeLabel]);
+            ? ($localizedContent['prayer'] ?? (string) ($sourceReflection['prayer'] ?? self::fill($language['prayer_template'], [':theme' => $themeLabel])))
+            : ($localizedContent['prayer'] ?? self::fill($language['prayer_template'], [':theme' => $themeLabel]));
 
         $journalPrompt = $locale === 'en'
             ? (string) ($sourceReflection['journal_prompt'] ?? self::fill($language['journal_template'], [':theme' => $themeLabel]))

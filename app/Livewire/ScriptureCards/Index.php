@@ -6,6 +6,10 @@ use App\Models\Devotional;
 use App\Models\PrayerRequest;
 use App\Models\Testimony;
 use App\Support\DailySpiritualRhythm;
+use App\Support\LanguagePages;
+use App\Support\LanguagePreference;
+use App\Support\LocalizedDailyScripture;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -14,16 +18,21 @@ class Index extends Component
     public function render()
     {
         $dailyRhythm = DailySpiritualRhythm::forDate();
+        $language = LanguagePreference::current();
+        $date = $this->dailyDate($dailyRhythm);
+        $copy = LanguagePages::dailyCopy($language, $dailyRhythm, $date);
+        $navCopy = LanguagePreference::navCopy($language);
 
         return view('livewire.scripture-cards.index', [
             'appUrl' => $this->appUrl(),
+            'cardFooter' => $navCopy['grow_daily'],
             'cards' => [
-                'verse' => $this->verseCards($dailyRhythm),
-                'affirmation' => $this->affirmationCards($dailyRhythm),
-                'devotional' => $this->devotionalCards(),
-                'prayer' => $this->prayerCards(),
+                'verse' => $this->verseCards($dailyRhythm, $language, $date, $copy),
+                'affirmation' => $this->affirmationCards($dailyRhythm, $copy),
+                'devotional' => $this->devotionalCards($copy),
+                'prayer' => $this->prayerCards($copy),
                 'testimony' => $this->testimonyCards(),
-                'note' => $this->noteCards(),
+                'note' => $this->noteCards($date),
             ],
         ]);
     }
@@ -32,28 +41,17 @@ class Index extends Component
      * @param  array<string, mixed>  $dailyRhythm
      * @return array<int, array<string, string>>
      */
-    private function verseCards(array $dailyRhythm): array
+    private function verseCards(array $dailyRhythm, string $language, CarbonImmutable $date, array $copy): array
     {
-        $verse = $dailyRhythm['verse'] ?? null;
-
-        if (! $verse) {
-            return [[
-                'label' => 'Verse of the day',
-                'title' => 'Verse of the day',
-                'text' => 'Thy word is a lamp unto my feet, and a light unto my path.',
-                'reference' => 'Psalm 119:105 KJV',
-                'date' => now()->format('F j, Y'),
-                'kind' => 'Verse',
-            ]];
-        }
+        $scripture = LocalizedDailyScripture::forDate($dailyRhythm, $date, $language);
 
         return [[
-            'label' => 'Verse of the day',
-            'title' => 'Verse of the day',
-            'text' => $verse->text,
-            'reference' => "{$verse->book->name} {$verse->chapter}:{$verse->verse} KJV",
-            'date' => $dailyRhythm['date']->format('F j, Y'),
-            'kind' => 'Verse',
+            'label' => $copy['scripture_label'],
+            'title' => $copy['scripture_label'],
+            'text' => $scripture['text'],
+            'reference' => $scripture['reference'],
+            'date' => $copy['date_label'],
+            'kind' => $copy['scripture_label'],
         ]];
     }
 
@@ -61,24 +59,24 @@ class Index extends Component
      * @param  array<string, mixed>  $dailyRhythm
      * @return array<int, array<string, string>>
      */
-    private function affirmationCards(array $dailyRhythm): array
+    private function affirmationCards(array $dailyRhythm, array $copy): array
     {
         $affirmation = $dailyRhythm['affirmation'];
 
         return [[
-            'label' => 'Daily affirmation',
-            'title' => 'Daily affirmation',
-            'text' => $affirmation['text'],
+            'label' => $copy['affirmation_label'],
+            'title' => $copy['affirmation_label'],
+            'text' => $copy['affirmation_text'],
             'reference' => $affirmation['reference'],
-            'date' => $dailyRhythm['date']->format('F j, Y'),
-            'kind' => 'Affirmation',
+            'date' => $copy['date_label'],
+            'kind' => $copy['affirmation_label'],
         ]];
     }
 
     /**
      * @return array<int, array<string, string>>
      */
-    private function devotionalCards(): array
+    private function devotionalCards(array $copy): array
     {
         $cards = Devotional::query()
             ->published()
@@ -96,19 +94,19 @@ class Index extends Component
             ->all();
 
         return $cards ?: [[
-            'label' => 'Devotional',
-            'title' => 'Today with God',
-            'text' => 'Let this truth become practical today. Pause, listen, and choose one faithful act of obedience.',
-            'reference' => 'MannaRise devotional',
-            'date' => now()->format('F j, Y'),
-            'kind' => 'Devotional',
+            'label' => $copy['page_eyebrow'],
+            'title' => $copy['page_title'],
+            'text' => $copy['page_intro'],
+            'reference' => 'MannaRise',
+            'date' => $copy['date_label'],
+            'kind' => $copy['card_devotion_label'],
         ]];
     }
 
     /**
      * @return array<int, array<string, string>>
      */
-    private function prayerCards(): array
+    private function prayerCards(array $copy): array
     {
         $cards = PrayerRequest::query()
             ->where('is_public', true)
@@ -127,12 +125,12 @@ class Index extends Component
             ->all();
 
         return $cards ?: [[
-            'label' => 'Prayer',
-            'title' => 'Prayer',
-            'text' => 'Lord, let Your peace guard every heart that is waiting, healing, rebuilding, or believing for breakthrough.',
-            'reference' => 'MannaRise prayer',
-            'date' => now()->format('F j, Y'),
-            'kind' => 'Prayer',
+            'label' => $copy['prayer_label'],
+            'title' => $copy['prayer_label'],
+            'text' => $copy['prayer'],
+            'reference' => 'MannaRise',
+            'date' => $copy['date_label'],
+            'kind' => $copy['prayer_label'],
         ]];
     }
 
@@ -169,16 +167,28 @@ class Index extends Component
     /**
      * @return array<int, array<string, string>>
      */
-    private function noteCards(): array
+    private function noteCards(CarbonImmutable $date): array
     {
         return [[
             'label' => 'Note card',
             'title' => 'Personal note',
             'text' => 'Write what is on your heart, then download it as a MannaRise card.',
             'reference' => 'MannaRise note',
-            'date' => now()->format('F j, Y'),
+            'date' => LanguagePages::dateLabel(LanguagePreference::current(), $date),
             'kind' => 'Note',
         ]];
+    }
+
+    /**
+     * @param  array<string, mixed>  $dailyRhythm
+     */
+    private function dailyDate(array $dailyRhythm): CarbonImmutable
+    {
+        $date = $dailyRhythm['date'] ?? now();
+
+        return $date instanceof CarbonImmutable
+            ? $date
+            : CarbonImmutable::parse($date);
     }
 
     private function cardText(?string $text): string

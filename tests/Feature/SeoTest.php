@@ -4,6 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Devotional;
 use App\Models\DevotionalCategory;
+use App\Support\DailySpiritualRhythm;
+use App\Support\LanguagePages;
+use App\Support\LocalizedDailyContent;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -47,6 +51,29 @@ class SeoTest extends TestCase
             ->assertSee('<meta property="og:image:width" content="1200">', false)
             ->assertSee('<meta property="og:image:height" content="630">', false)
             ->assertSee('<meta name="twitter:image" content="'.$imageUrl.'">', false);
+    }
+
+    public function test_daily_permalink_renders_language_specific_content_seo(): void
+    {
+        $date = CarbonImmutable::parse('2026-07-01');
+        $rhythm = DailySpiritualRhythm::forDate($date);
+        $theme = $rhythm['affirmation']['theme'];
+        $dateLabel = LanguagePages::dateLabel('pt', $date);
+        $themeLabel = LanguagePages::themeLabel('pt', $theme);
+        $copy = LocalizedDailyContent::themeCopy('pt', $theme);
+        $scripture = LocalizedDailyContent::scriptureForTheme($theme, 'pt');
+        $title = LocalizedDailyContent::seoTitle('pt', $dateLabel, $themeLabel, $scripture['reference']);
+        $description = LocalizedDailyContent::seoDescription('pt', $copy['affirmation'], $scripture['reference']);
+
+        $this->get(route('daily.localized.show', ['locale' => 'pt', 'date' => '2026-07-01']))
+            ->assertOk()
+            ->assertSee('<title>'.$title.'</title>', false)
+            ->assertSee('<meta name="description" content="'.e($description).'"', false)
+            ->assertSee($copy['affirmation'])
+            ->assertSee($copy['prayer'])
+            ->assertSee($scripture['text'])
+            ->assertSee('hreflang="pt"', false)
+            ->assertSee(route('daily.localized.show', ['locale' => 'pt', 'date' => '2026-07-01']), false);
     }
 
     public function test_daily_open_graph_image_endpoint_returns_png(): void

@@ -14,6 +14,8 @@ use App\Services\Bible\BibleVerseData;
 use App\Services\Bible\BibleVerseService;
 use App\Services\Bible\OurMannaProvider;
 use App\Support\DailySpiritualRhythm;
+use App\Support\LanguagePages;
+use App\Support\LocalizedDailyContent;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -319,6 +321,31 @@ class DailyScriptureIntegrationTest extends TestCase
             ->assertSee('John 3:16 OSTV')
             ->assertSee(e($readerUrl), false)
             ->assertDontSee('For God so loved the world.');
+    }
+
+    public function test_each_language_daily_page_uses_real_localized_content_without_translation_seed(): void
+    {
+        $date = CarbonImmutable::parse('2026-07-01');
+        $rhythm = DailySpiritualRhythm::forDate($date);
+        $theme = $rhythm['affirmation']['theme'];
+
+        foreach (LanguagePages::codes() as $locale) {
+            $copy = LocalizedDailyContent::themeCopy($locale, $theme);
+            $scripture = LocalizedDailyContent::scriptureForTheme($theme, $locale);
+
+            $response = $this->get(route('daily.localized.show', ['locale' => $locale, 'date' => '2026-07-01']))
+                ->assertOk()
+                ->assertSee($copy['affirmation'])
+                ->assertSee($copy['prayer'])
+                ->assertSee($scripture['text'])
+                ->assertSee($scripture['reference']);
+
+            if ($locale !== 'en') {
+                $response
+                    ->assertDontSee('Today I receive')
+                    ->assertDontSee('Lord, let Your');
+            }
+        }
     }
 
     public function test_authenticated_user_can_save_daily_scripture_to_memory_verses(): void

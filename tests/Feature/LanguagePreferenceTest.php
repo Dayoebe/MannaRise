@@ -4,7 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\BibleBook;
 use App\Models\BibleVerse;
+use App\Support\DailySpiritualRhythm;
+use App\Support\LanguagePages;
 use App\Support\LanguagePreference;
+use App\Support\LocalizedDailyContent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -61,5 +64,24 @@ class LanguagePreferenceTest extends TestCase
             ->assertSee(route('localized.home', ['locale' => 'pt']), false)
             ->assertSee(route('daily.localized.show', ['locale' => 'pt', 'date' => today()->toDateString()]), false)
             ->assertSee('language=pt&amp;version=ALMEIDA', false);
+    }
+
+    public function test_scripture_cards_use_selected_language_for_daily_card_content(): void
+    {
+        $rhythm = DailySpiritualRhythm::forDate();
+        $theme = $rhythm['affirmation']['theme'];
+        $copy = LocalizedDailyContent::themeCopy('sw', $theme);
+        $scripture = LocalizedDailyContent::scriptureForTheme($theme, 'sw');
+        $dateLabel = LanguagePages::dateLabel('sw', $rhythm['date']);
+
+        $this->withSession([LanguagePreference::SESSION_KEY => 'sw'])
+            ->get('/scripture-cards')
+            ->assertOk()
+            ->assertSee($copy['affirmation'])
+            ->assertSee($copy['prayer'])
+            ->assertSee($scripture['text'])
+            ->assertSee($scripture['reference'])
+            ->assertSee($dateLabel)
+            ->assertSee('kua kila siku');
     }
 }
