@@ -116,21 +116,163 @@ if ('serviceWorker' in navigator) {
 }
 
 let installPromptEvent = null;
+const installValueKey = 'mannarise-install-value-ready';
+const installValueReasonKey = 'mannarise-install-value-reason';
+const installDailyPagesKey = 'mannarise-install-daily-pages';
+const installDismissedUntilKey = 'mannarise-install-dismissed-until';
+const installDailyPageThreshold = 2;
+const installDismissSnoozeMs = 7 * 24 * 60 * 60 * 1000;
+
+function getStoredValue(key) {
+    try {
+        return window.localStorage.getItem(key);
+    } catch (error) {
+        return null;
+    }
+}
+
+function setStoredValue(key, value) {
+    try {
+        window.localStorage.setItem(key, value);
+    } catch (error) {
+        // Ignore storage failures so install handling never breaks the page.
+    }
+}
+
+function removeStoredValue(key) {
+    try {
+        window.localStorage.removeItem(key);
+    } catch (error) {
+        // Ignore storage failures so install handling never breaks the page.
+    }
+}
+
+function getStoredJson(key, fallback) {
+    try {
+        const value = getStoredValue(key);
+
+        return value ? JSON.parse(value) : fallback;
+    } catch (error) {
+        return fallback;
+    }
+}
+
+function setStoredJson(key, value) {
+    try {
+        setStoredValue(key, JSON.stringify(value));
+    } catch (error) {
+        // Ignore storage failures so install handling never breaks the page.
+    }
+}
+
+function isInstallDismissed() {
+    const dismissedUntil = Number(getStoredValue(installDismissedUntilKey) || 0);
+
+    if (! dismissedUntil) {
+        return false;
+    }
+
+    if (Date.now() < dismissedUntil) {
+        return true;
+    }
+
+    removeStoredValue(installDismissedUntilKey);
+
+    return false;
+}
+
+function hasInstallValue() {
+    if (getStoredValue(installValueKey) === 'yes') {
+        return true;
+    }
+
+    return getStoredJson(installDailyPagesKey, []).length >= installDailyPageThreshold;
+}
+
+function hideInstallBanner() {
+    document.querySelector('[data-install-banner]')?.classList.add('hidden');
+}
+
+function maybeShowInstallBanner() {
+    const banner = document.querySelector('[data-install-banner]');
+
+    if (! banner || standalone || ! installPromptEvent || ! hasInstallValue() || isInstallDismissed()) {
+        hideInstallBanner();
+        return false;
+    }
+
+    banner.classList.remove('hidden');
+
+    return true;
+}
+
+function recordInstallValue(reason, detail = {}) {
+    if (! reason) {
+        return;
+    }
+
+    setStoredValue(installValueKey, 'yes');
+    setStoredValue(installValueReasonKey, reason);
+
+    window.dispatchEvent(new CustomEvent('mannarise-install-value-ready', {
+        detail: { reason, ...detail },
+    }));
+
+    maybeShowInstallBanner();
+}
+
+function recordDailyInstallVisit() {
+    const dailyCard = document.querySelector('[data-daily-devotion-card]');
+
+    if (! dailyCard) {
+        return;
+    }
+
+    const dailyKey = dailyCard.dataset.dailyDate || window.location.pathname;
+    const pages = getStoredJson(installDailyPagesKey, []);
+    const nextPages = pages.includes(dailyKey)
+        ? pages
+        : [...pages, dailyKey].slice(-10);
+
+    setStoredJson(installDailyPagesKey, nextPages);
+
+    if (nextPages.length >= installDailyPageThreshold) {
+        recordInstallValue('daily_pages', {
+            count: nextPages.length,
+        });
+    }
+}
+
+function recordInstallValueFromClick(event) {
+    const dailyAction = event.target.closest('[data-daily-card-action]');
+    const devotionalAction = event.target.closest('[data-devotional-share-action]');
+    const inviteAction = event.target.closest('[data-invite-share]');
+    const valueActions = ['copy', 'download', 'native', 'whatsapp'];
+    const action = dailyAction?.dataset.dailyCardAction ||
+        devotionalAction?.dataset.devotionalShareAction ||
+        inviteAction?.dataset.inviteShare;
+
+    if (! valueActions.includes(action)) {
+        return;
+    }
+
+    recordInstallValue('card_action', { action });
+}
+
+window.mannaRiseRecordInstallValue = recordInstallValue;
 
 window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
     installPromptEvent = event;
-    window.dispatchEvent(new CustomEvent('mannarise-install-ready'));
+    maybeShowInstallBanner();
 });
 
 window.addEventListener('mannarise-install-ready', () => {
-    const banner = document.querySelector('[data-install-banner]');
+    maybeShowInstallBanner();
+});
 
-    if (! banner || window.localStorage.getItem('mannarise-install-dismissed') === 'yes') {
-        return;
-    }
-
-    banner.classList.remove('hidden');
+window.addEventListener('mannarise-install-value-ready', () => {
+    maybeShowInstallBanner();
 });
 
 window.mannaRiseInstall = async () => {
@@ -148,7 +290,8 @@ window.mannaRiseInstall = async () => {
 window.addEventListener('appinstalled', () => {
     installPromptEvent = null;
     document.documentElement.classList.add('is-installed');
-    document.querySelector('[data-install-banner]')?.classList.add('hidden');
+    hideInstallBanner();
+    setStoredValue(installValueKey, 'yes');
     trackMannaRiseGrowth('pwa_install', {
         standalone: true,
         display_mode: 'standalone',
@@ -156,9 +299,11 @@ window.addEventListener('appinstalled', () => {
 });
 
 window.addEventListener('click', async (event) => {
+    recordInstallValueFromClick(event);
+
     if (event.target.closest('[data-install-dismiss]')) {
-        window.localStorage.setItem('mannarise-install-dismissed', 'yes');
-        document.querySelector('[data-install-banner]')?.classList.add('hidden');
+        setStoredValue(installDismissedUntilKey, String(Date.now() + installDismissSnoozeMs));
+        hideInstallBanner();
         return;
     }
 
@@ -171,7 +316,13 @@ window.addEventListener('click', async (event) => {
         });
 
         if (! installed) {
-            document.querySelector('[data-install-banner]')?.classList.add('hidden');
+            setStoredValue(installDismissedUntilKey, String(Date.now() + installDismissSnoozeMs));
+            hideInstallBanner();
         }
     }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    recordDailyInstallVisit();
+    maybeShowInstallBanner();
 });

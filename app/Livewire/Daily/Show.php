@@ -63,6 +63,10 @@ class Show extends Component
             : route('daily.show', ['date' => $date->toDateString()]);
         $shareId = $this->shareId($date);
         $trackedShareUrl = GrowthAnalytics::trackedShareUrl($permalink, $language, $date, $shareId);
+        $inviteUrl = GrowthAnalytics::trackedReferralUrl(route('prayer-invites.show'), 'pray_with_me', $language, $date, $shareId, [
+            'utm_campaign' => 'daily-prayer-invite',
+            'utm_content' => $date->toDateString(),
+        ]);
 
         return view('livewire.daily.show', [
             'date' => $date,
@@ -86,6 +90,7 @@ class Show extends Component
                 'theme' => $reflection['theme_label'],
                 'url' => $permalink,
                 'share_url' => $trackedShareUrl,
+                'invite_url' => $inviteUrl,
                 'app_url' => rtrim((string) config('app.url'), '/') ?: 'MannaRise',
                 'analytics' => [
                     'language' => $language,

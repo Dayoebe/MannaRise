@@ -32,11 +32,13 @@
             </div>
         </div>
 
-        <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-7">
             @foreach ([
                 ['Daily views', $growthSummary['daily_page_views'], 'book-open', 'border-blue-200 bg-blue-50 text-blue-900'],
                 ['Shared card clicks', $growthSummary['shared_card_clicks'], 'share-2', 'border-emerald-200 bg-white text-emerald-900'],
+                ['Pray clicks', $growthSummary['pray_with_me_clicks'], 'heart', 'border-rose-200 bg-white text-rose-900'],
                 ['Installs', $growthSummary['installs'], 'download', 'border-violet-200 bg-violet-50 text-violet-900'],
+                ['Shared installs', $growthSummary['installs_from_shared_links'], 'download', 'border-cyan-200 bg-cyan-50 text-cyan-900'],
                 ['Install taps', $growthSummary['install_prompt_clicks'], 'sparkles', 'border-amber-200 bg-amber-50 text-amber-900'],
                 ['Shared signups', $growthSummary['signups_from_shared_links'], 'users', 'border-rose-200 bg-rose-50 text-rose-900'],
             ] as [$label, $value, $icon, $classes])

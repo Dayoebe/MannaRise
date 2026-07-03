@@ -12,15 +12,15 @@
             <div>
                 <p class="app-eyebrow border-rose-200 bg-rose-50 text-rose-900"><x-ui.icon name="heart" class="h-4 w-4" /> Pray with me</p>
                 <h1 class="mt-3 app-section-title">
-                    {{ $devotional ? 'Pray through this devotion together' : 'Invite someone into prayer' }}
+                    {{ $devotional ? 'Pray through this devotion together' : 'Invite someone to pray with you today' }}
                 </h1>
                 <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-                    {{ $devotional ? 'This public prayer page helps two people share the same devotion, pray, and keep the moment easy to join.' : 'Use this public page when you want someone to pause, pray, and start a guided MannaRise prayer session with you.' }}
+                    {{ $devotional ? 'This public prayer room helps two people share the same devotion, pray, and keep the moment easy to join.' : 'Use this public prayer room when you want someone to pause, pray, and start a guided MannaRise moment with you.' }}
                 </p>
             </div>
 
             <div data-prayer-invite-share data-invite-url="{{ $inviteUrl }}" class="app-surface border-rose-200 bg-rose-50 p-4">
-                <p class="text-sm font-black uppercase tracking-normal text-rose-900">Share invite</p>
+                <p class="text-sm font-black uppercase tracking-normal text-rose-900">Share prayer room</p>
                 <div class="mt-3 grid gap-2">
                     <button type="button" data-invite-share="whatsapp" class="btn-secondary w-full border-emerald-200 text-emerald-900 hover:bg-emerald-50"><x-ui.icon name="whatsapp" class="h-4 w-4" /> WhatsApp</button>
                     <button type="button" data-invite-share="copy" class="btn-secondary w-full border-rose-200 hover:bg-white"><x-ui.icon name="link" class="h-4 w-4" /> Copy link</button>
@@ -67,6 +67,12 @@
 
             <section class="app-panel border-emerald-200 bg-emerald-50">
                 <h2 class="flex items-center gap-2 text-xl font-black tracking-normal text-slate-950"><x-ui.icon name="route" class="h-5 w-5 text-emerald-800" /> Start together</h2>
+                <div class="mt-4 rounded-2xl border border-emerald-200 bg-white p-4">
+                    <p class="text-sm font-black uppercase tracking-normal text-emerald-900">Public prayer room</p>
+                    <h3 class="mt-2 text-lg font-black tracking-normal text-slate-950">Invite someone to pray with you today</h3>
+                    <p class="mt-2 text-sm leading-6 text-slate-700">A room has been created for this shared moment. Anyone with the link can read, pray, and mark that they prayed without logging in.</p>
+                    <a href="{{ $partnerRoomUrl }}" class="btn-primary mt-4 w-full sm:w-auto"><x-ui.icon name="users" class="h-4 w-4" /> Open prayer partner page</a>
+                </div>
                 <div class="mt-4 grid gap-3 sm:grid-cols-2">
                     <a href="{{ route('prayer-sessions.index') }}" class="btn-primary w-full"><x-ui.icon name="heart" class="h-4 w-4" /> Start guided prayer</a>
                     <a href="{{ route('prayer-requests.submit') }}" class="btn-secondary w-full border-emerald-200 hover:bg-white"><x-ui.icon name="send" class="h-4 w-4" /> Submit prayer request</a>
@@ -101,6 +107,55 @@
             const inviteText = @json($shareText);
             const inviteUrl = root.dataset.inviteUrl || window.location.href;
 
+            function referralUrl(url, refCode) {
+                try {
+                    const target = new URL(url, window.location.origin);
+                    target.searchParams.set('ref', refCode);
+
+                    return target.toString();
+                } catch (error) {
+                    const separator = String(url).includes('?') ? '&' : '?';
+
+                    return `${url}${separator}ref=${encodeURIComponent(refCode)}`;
+                }
+            }
+
+            function inviteUrlFor(action) {
+                return referralUrl(inviteUrl, `share_${action}`);
+            }
+
+            function trackInviteShare(action) {
+                if (! window.mannaRiseTrackGrowth) {
+                    return;
+                }
+
+                const targetUrl = inviteUrlFor(action);
+
+                try {
+                    const target = new URL(targetUrl, window.location.origin);
+                    window.mannaRiseTrackGrowth('shared_card_click', {
+                        language: target.searchParams.get('lang'),
+                        daily_date: target.searchParams.get('daily_date'),
+                        share_id: target.searchParams.get('sid'),
+                        share_channel: action,
+                        ref: `share_${action}`,
+                        medium: 'share',
+                        campaign: 'prayer-partner-room',
+                        url: target.toString(),
+                        path: window.location.pathname,
+                    });
+                } catch (error) {
+                    window.mannaRiseTrackGrowth('shared_card_click', {
+                        share_channel: action,
+                        ref: `share_${action}`,
+                        medium: 'share',
+                        campaign: 'prayer-partner-room',
+                        url: targetUrl,
+                        path: window.location.pathname,
+                    });
+                }
+            }
+
             function setStatus(message) {
                 status.textContent = message;
                 window.setTimeout(() => {
@@ -111,15 +166,16 @@
             }
 
             async function copyInvite() {
-                const text = `${inviteText}\n\n${inviteUrl}`.trim();
+                const text = `${inviteText}\n\n${inviteUrlFor('copy')}`.trim();
 
                 if (! navigator.clipboard) {
                     setStatus('Clipboard copy is not available in this browser.');
                     return;
                 }
 
+                trackInviteShare('copy');
                 await navigator.clipboard.writeText(text);
-                setStatus('Invite link copied.');
+                setStatus('Prayer room link copied.');
             }
 
             root.querySelectorAll('[data-invite-share]').forEach((button) => {
@@ -129,7 +185,8 @@
                         return;
                     }
 
-                    window.open(`https://wa.me/?text=${encodeURIComponent(`${inviteText}\n\n${inviteUrl}`)}`, '_blank', 'noopener,noreferrer,width=720,height=640');
+                    trackInviteShare('whatsapp');
+                    window.open(`https://wa.me/?text=${encodeURIComponent(`${inviteText}\n\n${inviteUrlFor('whatsapp')}`)}`, '_blank', 'noopener,noreferrer,width=720,height=640');
                     setStatus('WhatsApp invite opened.');
                 });
             });

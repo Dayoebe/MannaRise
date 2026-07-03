@@ -3,6 +3,9 @@
 namespace App\Livewire\PrayerInvites;
 
 use App\Models\Devotional;
+use App\Models\PrayerPartnerRoom;
+use App\Support\GrowthAnalytics;
+use App\Support\LanguagePreference;
 use App\Support\Seo;
 use Livewire\Component;
 
@@ -12,6 +15,8 @@ class Show extends Component
 
     public function mount(?string $devotionalSlug = null): void
     {
+        $this->trackReferralView();
+
         if (! $devotionalSlug) {
             return;
         }
@@ -21,13 +26,21 @@ class Show extends Component
             ->published()
             ->where('slug', $devotionalSlug)
             ->firstOrFail();
+
     }
 
     public function render()
     {
-        $inviteUrl = $this->devotional
-            ? route('prayer-invites.show', ['devotionalSlug' => $this->devotional->slug])
-            : route('prayer-invites.show');
+        $partnerRoom = PrayerPartnerRoom::fromInvite($this->devotional, request());
+        $baseInviteUrl = route('prayer-partners.show', ['token' => $partnerRoom->token]);
+        $shareId = is_string(request()->query('sid'))
+            ? request()->query('sid')
+            : ($partnerRoom->share_id ?: GrowthAnalytics::makeShareId('prayer-invite|'.($this->devotional?->slug ?: 'general')));
+        $inviteUrl = GrowthAnalytics::trackedReferralUrl($baseInviteUrl, 'share_link', $partnerRoom->language ?: LanguagePreference::current(), $partnerRoom->dailyDate(), $shareId, [
+            'share' => 'prayer-partner-room',
+            'utm_campaign' => 'prayer-partner-room',
+            'utm_content' => $partnerRoom->source_key ?: 'general',
+        ]);
 
         $summary = $this->devotional
             ? Seo::summarize($this->devotional->content, 36)
@@ -35,6 +48,8 @@ class Show extends Component
 
         return view('livewire.prayer-invites.show', [
             'inviteUrl' => $inviteUrl,
+            'partnerRoom' => $partnerRoom,
+            'partnerRoomUrl' => $baseInviteUrl,
             'summary' => $summary,
             'shareText' => $this->shareText($summary),
         ]);
@@ -47,5 +62,16 @@ class Show extends Component
             : 'Pray with me on MannaRise';
 
         return trim("{$title}\n\n{$summary}");
+    }
+
+    private function trackReferralView(): void
+    {
+        if (! GrowthAnalytics::isReferralRequest(request())) {
+            return;
+        }
+
+        GrowthAnalytics::track('prayer_invite_view', request(), [
+            'language' => is_string(request()->query('lang')) ? request()->query('lang') : LanguagePreference::current(),
+        ]);
     }
 }

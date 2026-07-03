@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Livewire\PrayerRooms\Show as PrayerRoomShow;
+use App\Livewire\PrayerPartners\Show as PrayerPartnerShow;
 use App\Models\Devotional;
 use App\Models\DevotionalCategory;
+use App\Models\PrayerPartnerRoom;
 use App\Models\PrayerRequest;
 use App\Models\PrayerRoom;
 use App\Models\Testimony;
@@ -59,6 +61,8 @@ class MannaRisePagesTest extends TestCase
             ->assertSee('Journal prompt')
             ->assertSee('Download image')
             ->assertSee('WhatsApp share')
+            ->assertSee('Invite someone to pray with you')
+            ->assertSee('data-daily-date="2026-07-01"', false)
             ->assertSee('data-daily-card-canvas', false);
 
         $this->get('/es/daily/2026-07-01')
@@ -86,8 +90,40 @@ class MannaRisePagesTest extends TestCase
         $this->get('/pray-with-me/faith-for-today')
             ->assertOk()
             ->assertSee('Pray through this devotion together')
-            ->assertSee('Start guided prayer')
+            ->assertSee('Invite someone to pray with you today')
+            ->assertSee('Open prayer partner page')
             ->assertSee('data-prayer-invite-share', false);
+
+        $this->get('/pray-with-me/faith-for-today?ref=pray_with_me&sid=partner-share&lang=en&utm_medium=share')
+            ->assertOk()
+            ->assertSee('/pray-together/', false)
+            ->assertSee('sid=partner-share', false)
+            ->assertSee('prayer-partner-room', false);
+
+        $partnerRoom = PrayerPartnerRoom::query()
+            ->where('source_type', 'devotional')
+            ->where('source_key', 'faith-for-today')
+            ->where('share_id', 'partner-share')
+            ->firstOrFail();
+
+        $this->get(route('prayer-partners.show', ['token' => $partnerRoom->token]).'?ref=share_whatsapp&sid=partner-share&lang=en&utm_medium=share')
+            ->assertOk()
+            ->assertSee('Prayer partner room')
+            ->assertSee('Invite someone to pray with you today')
+            ->assertSee('I prayed with you')
+            ->assertSee('data-prayer-partner-share', false);
+
+        Livewire::test(PrayerPartnerShow::class, ['token' => $partnerRoom->token])
+            ->call('markPrayed')
+            ->assertSet('prayed', true);
+
+        $this->assertDatabaseHas('prayer_partner_rooms', [
+            'id' => $partnerRoom->id,
+            'source_type' => 'devotional',
+            'source_key' => 'faith-for-today',
+            'share_id' => 'partner-share',
+            'prayed_count' => 1,
+        ]);
     }
 
     public function test_authenticated_pages_render(): void
@@ -177,8 +213,16 @@ class MannaRisePagesTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('/manifest.webmanifest', false)
+            ->assertSee('data-install-gate="after-value"', false)
             ->assertSee('apple-mobile-web-app-capable', false)
             ->assertSee('/icons/apple-touch-icon.png', false);
+
+        $installSource = file_get_contents(resource_path('js/app.js'));
+
+        $this->assertStringContainsString('installDailyPageThreshold = 2', $installSource);
+        $this->assertStringContainsString('recordDailyInstallVisit', $installSource);
+        $this->assertStringContainsString('recordInstallValueFromClick', $installSource);
+        $this->assertStringContainsString('beforeinstallprompt', $installSource);
 
         $manifest = json_decode(file_get_contents(public_path('manifest.webmanifest')), true, 512, JSON_THROW_ON_ERROR);
 

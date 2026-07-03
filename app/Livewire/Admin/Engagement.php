@@ -86,7 +86,9 @@ class Engagement extends Component
             'growthSummary' => [
                 'daily_page_views' => (clone $growthEvents)->where('event_type', 'daily_page_view')->count(),
                 'shared_card_clicks' => (clone $growthEvents)->where('event_type', 'shared_card_click')->count(),
+                'pray_with_me_clicks' => (clone $growthEvents)->where('event_type', 'pray_with_me_click')->count(),
                 'installs' => (clone $growthEvents)->where('event_type', 'pwa_install')->count(),
+                'installs_from_shared_links' => (clone $growthEvents)->where('event_type', 'pwa_install')->where('source', 'shared_link')->count(),
                 'install_prompt_clicks' => (clone $growthEvents)->where('event_type', 'install_prompt_click')->count(),
                 'signups_from_shared_links' => (clone $growthEvents)->where('event_type', 'signup')->where('source', 'shared_link')->count(),
                 'countries' => (clone $growthEvents)->whereNotNull('country_code')->distinct()->count('country_code'),

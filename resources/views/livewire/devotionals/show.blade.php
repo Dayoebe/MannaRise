@@ -109,7 +109,7 @@
                 <button type="button" data-devotional-share-action="whatsapp" class="btn-secondary w-full border-emerald-200 text-emerald-900 hover:bg-emerald-50"><x-ui.icon name="whatsapp" class="h-4 w-4" /> WhatsApp share</button>
                 <button type="button" data-devotional-share-action="copy" class="btn-secondary w-full border-sky-200 hover:bg-white"><x-ui.icon name="link" class="h-4 w-4" /> Copy link</button>
                 <button type="button" data-devotional-share-action="download" class="btn-secondary w-full border-amber-200 text-amber-900 hover:bg-amber-50"><x-ui.icon name="download" class="h-4 w-4" /> Download image</button>
-                <a href="{{ $shareCard['invite_url'] }}" class="btn-primary w-full bg-rose-700 hover:bg-rose-800"><x-ui.icon name="heart" class="h-4 w-4" /> Invite someone to pray with you</a>
+                <a href="{{ $shareCard['invite_url'] }}" data-devotional-share-action="pray" class="btn-primary w-full bg-rose-700 hover:bg-rose-800"><x-ui.icon name="heart" class="h-4 w-4" /> Invite someone to pray with you today</a>
             </div>
 
             <p data-devotional-share-status class="mt-3 min-h-5 text-sm font-bold text-sky-900"></p>
@@ -180,6 +180,55 @@
 
             function shareText() {
                 return [share.title, share.summary, 'Shared from MannaRise'].filter(Boolean).join('\n\n');
+            }
+
+            function referralUrl(url, refCode) {
+                try {
+                    const target = new URL(url, window.location.origin);
+                    target.searchParams.set('ref', refCode);
+
+                    return target.toString();
+                } catch (error) {
+                    const separator = String(url).includes('?') ? '&' : '?';
+
+                    return `${url}${separator}ref=${encodeURIComponent(refCode)}`;
+                }
+            }
+
+            function shareUrlFor(action) {
+                return referralUrl(share.url, `share_${action}`);
+            }
+
+            function trackShareAction(action, eventType = 'shared_card_click') {
+                const refCode = action === 'pray' ? 'pray_with_me' : `share_${action}`;
+                const targetUrl = action === 'pray' ? share.invite_url : shareUrlFor(action);
+                const payload = {
+                    language: share.language,
+                    share_id: share.share_id,
+                    share_channel: action,
+                    ref: refCode,
+                    medium: 'share',
+                    campaign: 'devotional-share',
+                    url: targetUrl,
+                    path: window.location.pathname,
+                };
+
+                if (window.mannaRiseTrackGrowth) {
+                    window.mannaRiseTrackGrowth(eventType, payload);
+                    return;
+                }
+
+                window.fetch(share.analytics_endpoint, {
+                    method: 'POST',
+                    keepalive: true,
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': share.csrf,
+                    },
+                    body: JSON.stringify({ event_type: eventType, ...payload }),
+                }).catch(() => {});
             }
 
             function slugify(value, fallback) {
@@ -334,11 +383,13 @@
                     return;
                 }
 
-                await navigator.clipboard.writeText(`${shareText()}\n\n${share.url}`);
+                trackShareAction('copy');
+                await navigator.clipboard.writeText(`${shareText()}\n\n${shareUrlFor('copy')}`);
                 setStatus('Devotional link copied.');
             }
 
             function downloadImage() {
+                trackShareAction('download');
                 drawImage();
 
                 const link = document.createElement('a');
@@ -349,7 +400,7 @@
             }
 
             root.querySelectorAll('[data-devotional-share-action]').forEach((button) => {
-                button.addEventListener('click', async () => {
+                button.addEventListener('click', async (event) => {
                     if (button.dataset.devotionalShareAction === 'copy') {
                         await copyLink();
                         return;
@@ -360,7 +411,15 @@
                         return;
                     }
 
-                    window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText()}\n\n${share.url}`)}`, '_blank', 'noopener,noreferrer,width=720,height=640');
+                    if (button.dataset.devotionalShareAction === 'pray') {
+                        event.preventDefault();
+                        trackShareAction('pray', 'pray_with_me_click');
+                        window.location.href = button.href;
+                        return;
+                    }
+
+                    trackShareAction('whatsapp');
+                    window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText()}\n\n${shareUrlFor('whatsapp')}`)}`, '_blank', 'noopener,noreferrer,width=720,height=640');
                     setStatus('WhatsApp share opened.');
                 });
             });

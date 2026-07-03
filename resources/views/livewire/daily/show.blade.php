@@ -42,7 +42,7 @@
         </div>
     </section>
 
-    <section data-daily-devotion-card wire:ignore class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)] lg:items-start">
+    <section data-daily-devotion-card data-daily-date="{{ $date->toDateString() }}" wire:ignore class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)] lg:items-start">
         <main class="space-y-5">
             <article class="app-panel border-blue-200 bg-blue-50">
                 <p class="app-eyebrow border-blue-200 bg-white text-blue-900"><x-ui.icon name="book-open" class="h-4 w-4" /> {{ $copy['scripture_label'] }}</p>
@@ -86,6 +86,7 @@
                     <button type="button" data-daily-card-action="whatsapp" class="btn-secondary w-full border-emerald-200 text-emerald-900 hover:bg-emerald-50"><x-ui.icon name="whatsapp" class="h-4 w-4" /> {{ $copy['whatsapp_share'] }}</button>
                     <button type="button" data-daily-card-action="copy" class="btn-secondary w-full border-sky-200 hover:bg-white"><x-ui.icon name="link" class="h-4 w-4" /> {{ $copy['copy_link'] }}</button>
                     <button type="button" data-daily-card-action="native" class="btn-secondary w-full border-slate-200 hover:bg-white"><x-ui.icon name="share-2" class="h-4 w-4" /> {{ $copy['device_share'] }}</button>
+                    <a href="{{ $card['invite_url'] }}" data-daily-card-action="pray" class="btn-primary w-full bg-rose-700 hover:bg-rose-800"><x-ui.icon name="heart" class="h-4 w-4" /> {{ $copy['invite_prayer'] }}</a>
                 </div>
 
                 <p data-daily-card-status class="mt-3 min-h-5 text-sm font-bold text-sky-900"></p>
@@ -314,30 +315,49 @@
                     .replace(/^-|-$/g, '') || fallback;
             }
 
-            function shareText() {
+            function referralUrl(url, refCode) {
+                try {
+                    const target = new URL(url, window.location.origin);
+                    target.searchParams.set('ref', refCode);
+
+                    return target.toString();
+                } catch (error) {
+                    const separator = String(url).includes('?') ? '&' : '?';
+
+                    return `${url}${separator}ref=${encodeURIComponent(refCode)}`;
+                }
+            }
+
+            function shareUrlFor(action) {
+                return referralUrl(card.share_url, `share_${action}`);
+            }
+
+            function shareText(action = 'link') {
                 return [
                     `${card.title} - ${card.date}`,
                     card.scripture_reference,
                     card.affirmation,
-                    card.share_url,
+                    shareUrlFor(action),
                 ].filter(Boolean).join('\n\n');
             }
 
-            function trackCardAction(action) {
+            function trackCardAction(action, eventType = 'shared_card_click') {
+                const refCode = action === 'pray' ? 'pray_with_me' : `share_${action}`;
+                const targetUrl = action === 'pray' ? card.invite_url : shareUrlFor(action);
                 const payload = {
                     language: card.analytics.language,
                     daily_date: card.analytics.daily_date,
                     share_id: card.analytics.share_id,
                     share_channel: action,
-                    source: 'daily_card',
+                    ref: refCode,
                     medium: 'share',
                     campaign: 'daily-devotion',
-                    url: card.url,
+                    url: targetUrl,
                     path: window.location.pathname,
                 };
 
                 if (window.mannaRiseTrackGrowth) {
-                    window.mannaRiseTrackGrowth('shared_card_click', payload);
+                    window.mannaRiseTrackGrowth(eventType, payload);
                     return;
                 }
 
@@ -350,7 +370,7 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': card.analytics.csrf,
                     },
-                    body: JSON.stringify({ event_type: 'shared_card_click', ...payload }),
+                    body: JSON.stringify({ event_type: eventType, ...payload }),
                 }).catch(() => {});
             }
 
@@ -378,7 +398,7 @@
                 }
 
                 trackCardAction('copy');
-                await navigator.clipboard.writeText(card.share_url);
+                await navigator.clipboard.writeText(shareUrlFor('copy'));
                 setStatus(card.status.copied);
             }
 
@@ -396,9 +416,9 @@
 
                 try {
                     if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({ title: card.title, text: shareText(), url: card.share_url, files: [file] });
+                        await navigator.share({ title: card.title, text: shareText('native'), url: shareUrlFor('native'), files: [file] });
                     } else {
-                        await navigator.share({ title: card.title, text: shareText(), url: card.share_url });
+                        await navigator.share({ title: card.title, text: shareText('native'), url: shareUrlFor('native') });
                     }
 
                     setStatus(card.status.shared);
@@ -410,9 +430,16 @@
             }
 
             root.querySelectorAll('[data-daily-card-action]').forEach((button) => {
-                button.addEventListener('click', async () => {
+                button.addEventListener('click', async (event) => {
                     if (button.dataset.dailyCardAction === 'download') {
                         downloadImage();
+                        return;
+                    }
+
+                    if (button.dataset.dailyCardAction === 'pray') {
+                        event.preventDefault();
+                        trackCardAction('pray', 'pray_with_me_click');
+                        window.location.href = button.href;
                         return;
                     }
 
@@ -427,7 +454,7 @@
                     }
 
                     trackCardAction('whatsapp');
-                    window.open(`https://wa.me/?text=${encodeURIComponent(shareText())}`, '_blank', 'noopener,noreferrer,width=720,height=640');
+                    window.open(`https://wa.me/?text=${encodeURIComponent(shareText('whatsapp'))}`, '_blank', 'noopener,noreferrer,width=720,height=640');
                     setStatus(card.status.whatsapp);
                 });
             });

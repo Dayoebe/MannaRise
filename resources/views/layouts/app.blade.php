@@ -460,14 +460,14 @@
             </div>
         </nav>
 
-        <div data-install-banner class="fixed inset-x-3 bottom-[calc(6.2rem+env(safe-area-inset-bottom))] z-40 mx-auto hidden max-w-lg rounded-2xl border border-emerald-200 bg-white p-3 shadow-2xl lg:hidden">
+        <div data-install-banner data-install-gate="after-value" class="fixed inset-x-3 bottom-[calc(6.2rem+env(safe-area-inset-bottom))] z-40 mx-auto hidden max-w-lg rounded-2xl border border-emerald-200 bg-white p-3 shadow-2xl lg:hidden">
             <div class="flex items-center gap-3">
                 <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-700 text-white">
                     <x-ui.icon name="download" class="h-5 w-5" />
                 </span>
                 <div class="min-w-0 flex-1">
-                    <p class="text-sm font-black tracking-normal text-slate-950">Install MannaRise</p>
-                    <p class="text-xs font-bold text-slate-500">Open faster and keep spiritual tools close.</p>
+                    <p class="text-sm font-black tracking-normal text-slate-950">Keep MannaRise close</p>
+                    <p class="text-xs font-bold text-slate-500">Install after using your daily card and prayer tools.</p>
                 </div>
                 <button type="button" data-install-now class="rounded-full bg-emerald-700 px-3 py-2 text-xs font-black text-white">Install</button>
                 <button type="button" data-install-dismiss class="rounded-full border border-slate-200 px-3 py-2 text-xs font-black text-slate-600">Later</button>

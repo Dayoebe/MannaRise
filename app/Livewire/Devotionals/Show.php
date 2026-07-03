@@ -6,6 +6,8 @@ use App\Models\Devotional;
 use App\Models\DevotionalCompletion;
 use App\Models\DevotionalFavorite;
 use App\Models\JournalEntry;
+use App\Support\GrowthAnalytics;
+use App\Support\LanguagePreference;
 use App\Support\Seo;
 use App\Support\Toast;
 use Livewire\Component;
@@ -24,6 +26,12 @@ class Show extends Component
             ->published()
             ->where('slug', $slug)
             ->firstOrFail();
+
+        if (GrowthAnalytics::isReferralRequest(request())) {
+            GrowthAnalytics::track('devotional_page_view', request(), [
+                'language' => is_string(request()->query('lang')) ? request()->query('lang') : LanguagePreference::current(),
+            ]);
+        }
 
         $this->journalTitle = 'Reflection on '.$this->devotional->title;
     }
@@ -133,6 +141,17 @@ class Show extends Component
     private function shareCard(): array
     {
         $summary = Seo::summarize($this->devotional->content, 36);
+        $language = LanguagePreference::current();
+        $shareId = GrowthAnalytics::makeShareId('devotional|'.$this->devotional->slug);
+        $shareUrl = GrowthAnalytics::trackedReferralUrl(route('devotionals.show', $this->devotional->slug), 'share_link', $language, null, $shareId, [
+            'share' => 'devotional-card',
+            'utm_campaign' => 'devotional-share',
+            'utm_content' => $this->devotional->slug,
+        ]);
+        $inviteUrl = GrowthAnalytics::trackedReferralUrl(route('prayer-invites.show', ['devotionalSlug' => $this->devotional->slug]), 'pray_with_me', $language, null, $shareId, [
+            'utm_campaign' => 'devotional-prayer-invite',
+            'utm_content' => $this->devotional->slug,
+        ]);
 
         return [
             'title' => $this->devotional->title,
@@ -140,9 +159,13 @@ class Show extends Component
             'summary' => $summary,
             'reference' => $this->devotional->bible_reference ?: 'MannaRise devotional',
             'date' => ($this->devotional->published_at ?: $this->devotional->created_at)->format('F j, Y'),
-            'url' => route('devotionals.show', $this->devotional->slug),
-            'invite_url' => route('prayer-invites.show', ['devotionalSlug' => $this->devotional->slug]),
+            'url' => $shareUrl,
+            'invite_url' => $inviteUrl,
             'app_url' => rtrim((string) config('app.url'), '/') ?: 'MannaRise',
+            'analytics_endpoint' => route('analytics.events'),
+            'csrf' => csrf_token(),
+            'language' => $language,
+            'share_id' => $shareId,
         ];
     }
 }

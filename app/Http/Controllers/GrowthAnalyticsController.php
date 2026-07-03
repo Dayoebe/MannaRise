@@ -14,6 +14,8 @@ class GrowthAnalyticsController extends Controller
         $validated = $request->validate([
             'event_type' => ['required', 'string', Rule::in([
                 'shared_card_click',
+                'pray_with_me_click',
+                'prayer_partner_prayed',
                 'install_prompt_click',
                 'pwa_install',
             ])],
@@ -21,6 +23,7 @@ class GrowthAnalyticsController extends Controller
             'daily_date' => ['nullable', 'date_format:Y-m-d'],
             'share_channel' => ['nullable', 'string', 'max:64'],
             'share_id' => ['nullable', 'string', 'max:80'],
+            'ref' => ['nullable', 'string', 'max:80'],
             'url' => ['nullable', 'url', 'max:2048'],
             'path' => ['nullable', 'string', 'max:255'],
             'source' => ['nullable', 'string', 'max:64'],
